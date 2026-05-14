@@ -51,6 +51,38 @@ export class GniHttpProvider {
     return response.json();
   }
 
+  async pollJob(providerJob) {
+    if (!providerJob?.statusUrl) {
+      throw new Error('GNI HTTP provider job polling requires providerJob.statusUrl');
+    }
+
+    const response = await this.fetchImpl(providerJob.statusUrl, {
+      method: 'GET',
+      headers: this.#headers(),
+      signal: createTimeoutSignal(this.timeoutMs)
+    });
+
+    if (!response.ok) {
+      const body = typeof response.text === 'function' ? await response.text() : '';
+      throw new Error(`GNI HTTP provider job poll failed with ${response.status}: ${body}`.trim());
+    }
+
+    if (response.status === 202 || response.status === 204) {
+      return {
+        schema: 'GniProviderJobStatusV1',
+        status: 'pending',
+        jobId: providerJob.id,
+        providerJob
+      };
+    }
+
+    if (typeof response.json !== 'function') {
+      throw new Error('GNI HTTP provider job response did not expose json()');
+    }
+
+    return response.json();
+  }
+
   #headers() {
     const headers = {
       accept: 'application/json',

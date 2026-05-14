@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 
 import { ArchitectState } from '../src/ai.js';
 import { GniDirectiveQueue } from '../src/gniQueue.js';
+import { createMockGniServer } from '../src/mockGniServer.js';
 import {
   createGniQueueProviderFromOptions,
   loadGniQueueProviderFromOptions,
@@ -129,6 +130,50 @@ test('saved GNI queue processor persists resolved directives back into save payl
     assert.equal(saved.lastGniQueueProcessResult.schema, 'GniDirectiveQueueProcessResultV1');
   } finally {
     await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('pending GNI queue processor polls provider job status URLs before resubmitting requests', async () => {
+  const mock = createMockGniServer({
+    mode: 'async',
+    directive: {
+      dreamWeightDeltas: { garden: 0.35 },
+      symbolEchoes: ['threshold']
+    }
+  });
+  const queue = new GniDirectiveQueue();
+
+  try {
+    await mock.start();
+    const acceptedResponse = await fetch(`${mock.url}/gni`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(REQUEST)
+    });
+    const accepted = await acceptedResponse.json();
+    queue.enqueue({
+      request: REQUEST,
+      reason: 'provider_empty',
+      providerJob: {
+        id: accepted.jobId,
+        statusUrl: accepted.statusUrl,
+        pollAfterMs: accepted.pollAfterMs
+      }
+    });
+
+    const result = await processPendingGniQueue({
+      queueSnapshot: queue.snapshot(),
+      architectState: new ArchitectState({ globalDreamWeights: { garden: 1 } })
+    });
+
+    assert.equal(result.processed[0].status, 'directive_ready');
+    assert.equal(result.queue.pending.length, 0);
+    assert.equal(result.queue.resolved.length, 1);
+    assert.equal(result.queue.resolved[0].providerJob.id, accepted.jobId);
+    assert.equal(result.architectState.globalDreamWeights.garden, 1.35);
+    assert.equal(result.architectState.symbolFrequency.threshold, 1);
+  } finally {
+    await mock.stop();
   }
 });
 

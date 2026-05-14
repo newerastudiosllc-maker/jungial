@@ -13,7 +13,9 @@ export async function processPendingGniQueue({
   architectState = new ArchitectState(),
   provider = null,
   limit = Infinity,
-  clock = null
+  clock = null,
+  jobFetchImpl = globalThis.fetch,
+  jobPollTimeoutMs = 10000
 } = {}) {
   const queue = new GniDirectiveQueue(queueSnapshot);
   const architect = toArchitectState(architectState);
@@ -21,17 +23,23 @@ export async function processPendingGniQueue({
   const pendingEntries = queue.snapshot().pending.slice(0, limit);
 
   for (const entry of pendingEntries) {
-    if (!provider) {
-      processed.push({
-        id: entry.id,
-        status: 'no_provider',
-        errors: []
-      });
-      continue;
-    }
-
     try {
-      const rawResponse = await callGniProvider(provider, entry.request, entry.request.payload);
+      const rawResponse = await resolvePendingEntry({
+        entry,
+        provider,
+        jobFetchImpl,
+        jobPollTimeoutMs
+      });
+
+      if (rawResponse === noProvider) {
+        processed.push({
+          id: entry.id,
+          status: 'no_provider',
+          errors: []
+        });
+        continue;
+      }
+
       if (isGniProviderPendingResponse(rawResponse)) {
         queue.enqueue({
           request: entry.request,
@@ -70,6 +78,7 @@ export async function processPendingGniQueue({
         status: 'directive_ready',
         directive: resolved.directive,
         directiveUpdate,
+        providerJob: entry.providerJob ?? null,
         errors: []
       });
     } catch (error) {
@@ -101,7 +110,9 @@ export async function processSavedGniQueue({
   outputPath = savePath,
   provider = null,
   limit = Infinity,
-  clock = null
+  clock = null,
+  jobFetchImpl = globalThis.fetch,
+  jobPollTimeoutMs = 10000
 } = {}) {
   if (!savePath) {
     throw new Error('processSavedGniQueue requires savePath');
@@ -113,7 +124,9 @@ export async function processSavedGniQueue({
     architectState: state.architectState,
     provider,
     limit,
-    clock
+    clock,
+    jobFetchImpl,
+    jobPollTimeoutMs
   });
 
   const nextState = {
@@ -193,6 +206,142 @@ function nowIso(clock) {
   return clock?.nowIso?.() ?? null;
 }
 
+const noProvider = Symbol('noProvider');
+
+async function resolvePendingEntry({
+  entry,
+  provider,
+  jobFetchImpl,
+  jobPollTimeoutMs
+}) {
+  if (entry.providerJob?.statusUrl) {
+    return pollProviderJobStatus(entry.providerJob, {
+      provider,
+      fetchImpl: jobFetchImpl,
+      timeoutMs: jobPollTimeoutMs
+    });
+  }
+
+  if (!provider) {
+    return noProvider;
+  }
+
+  return callGniProvider(provider, entry.request, entry.request.payload);
+}
+
+async function pollProviderJobStatus(providerJob, {
+  provider = null,
+  fetchImpl = globalThis.fetch,
+  timeoutMs = 10000
+} = {}) {
+  const status = typeof provider?.pollJob === 'function'
+    ? await provider.pollJob(providerJob)
+    : await fetchProviderJobStatus(providerJob, { fetchImpl, timeoutMs });
+
+  return normalizeProviderJobStatus(status, providerJob);
+}
+
+async function fetchProviderJobStatus(providerJob, {
+  fetchImpl = globalThis.fetch,
+  timeoutMs = 10000
+} = {}) {
+  if (typeof fetchImpl !== 'function') {
+    throw new Error('GNI provider job polling requires a fetch implementation');
+  }
+  if (!providerJob?.statusUrl) {
+    throw new Error('GNI provider job polling requires providerJob.statusUrl');
+  }
+
+  const response = await fetchImpl(providerJob.statusUrl, {
+    method: 'GET',
+    headers: {
+      accept: 'application/json'
+    },
+    signal: createTimeoutSignal(timeoutMs)
+  });
+
+  if (!response.ok) {
+    const body = typeof response.text === 'function' ? await response.text() : '';
+    throw new Error(`GNI provider job poll failed with ${response.status}: ${body}`.trim());
+  }
+
+  if (response.status === 202 || response.status === 204) {
+    return {
+      schema: 'GniProviderJobStatusV1',
+      status: 'pending',
+      jobId: providerJob.id,
+      providerJob
+    };
+  }
+
+  if (typeof response.json !== 'function') {
+    throw new Error('GNI provider job response did not expose json()');
+  }
+
+  return response.json();
+}
+
+function normalizeProviderJobStatus(status, fallbackProviderJob) {
+  if (isGniProviderPendingResponse(status)) {
+    return status;
+  }
+  if (!status) {
+    return {
+      schema: 'GniProviderPendingV1',
+      status: 'pending',
+      providerJob: fallbackProviderJob
+    };
+  }
+
+  const state = typeof status.status === 'string' ? status.status.toLowerCase() : '';
+  if (['pending', 'queued', 'processing', 'running', 'accepted'].includes(state)) {
+    return {
+      schema: 'GniProviderPendingV1',
+      status: 'pending',
+      providerJob: mergeProviderJob(fallbackProviderJob, status.providerJob ?? status)
+    };
+  }
+  if (['ready', 'complete', 'completed', 'succeeded', 'success'].includes(state)) {
+    const directive = status.directive ?? status.result ?? status.output ?? null;
+    if (!directive) {
+      throw new Error('GNI provider job reported ready without a directive');
+    }
+    return directive;
+  }
+  if (['error', 'failed', 'cancelled', 'canceled'].includes(state)) {
+    throw new Error(status.error ?? status.message ?? `GNI provider job ${state}`);
+  }
+
+  return status;
+}
+
+function mergeProviderJob(fallbackProviderJob, update = {}) {
+  const merged = {
+    ...(fallbackProviderJob ?? {})
+  };
+
+  const id = update.jobId ?? update.id;
+  if (typeof id === 'string' && id.trim().length > 0) {
+    merged.id = id.trim();
+  }
+  if (typeof update.statusUrl === 'string' && update.statusUrl.trim().length > 0) {
+    merged.statusUrl = update.statusUrl.trim();
+  }
+  if (Number.isFinite(update.pollAfterMs)) {
+    merged.pollAfterMs = Math.max(0, Math.round(update.pollAfterMs));
+  }
+
+  return merged;
+}
+
+function createTimeoutSignal(timeoutMs) {
+  if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+    return undefined;
+  }
+
+  return AbortSignal.timeout(timeoutMs);
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const options = parseGniQueueProcessorArgs(process.argv.slice(2));
   if (!options.savePath) {
@@ -207,7 +356,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     limit: options.limit ?? Infinity,
     clock: options.clockStartIso
       ? createDeterministicClock({ startIso: options.clockStartIso, stepMs: options.clockStepMs ?? 1000 })
-      : null
+      : null,
+    jobPollTimeoutMs: options.gniTimeoutMs ?? 10000
   });
 
   if (options.json) {

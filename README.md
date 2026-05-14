@@ -142,7 +142,7 @@ That metadata is normalized into `providerJob` and saved in `GniBridgeResultV1` 
 
 `GniDirectiveQueue` in `src/gniQueue.js` records pending GNI requests when the provider is empty, offline, or still processing. The simulation saves a `GniDirectiveQueueV1` snapshot beside the bridge result so later UE5, VR, or console builds can resume async AI work without blocking the chamber or dream return loop.
 
-`processPendingGniQueue()` and `processSavedGniQueue()` in `src/gniQueueProcessor.js` are the later-response path. They take pending queue entries, call the same GNI provider shapes used by the bridge, normalize any returned directive, apply it through `ArchitectState`, and persist the updated queue/Architect state when working from a save file.
+`processPendingGniQueue()` and `processSavedGniQueue()` in `src/gniQueueProcessor.js` are the later-response path. They first poll an existing `providerJob.statusUrl` when a queued entry already has async job metadata, then fall back to the same GNI provider shapes used by the bridge when no provider job exists. Any returned directive is normalized, applied through `ArchitectState`, and persisted with the updated queue/Architect state when working from a save file.
 
 `GniEmulator` in `src/gniEmulator.js` lets the prototype test AI-shaped behavior before real GNI is ready. Use `--emulate-gni` to have the simulation produce and apply a deterministic directive from the current `SessionBundleV1`.
 
