@@ -7,11 +7,13 @@ import { ThresholdChamber } from '../src/thresholdChamber.js';
 import { DreamflowGenerator } from '../src/dreamflow.js';
 import { JournalOfMirrors } from '../src/library.js';
 import { MaskRegistry } from '../src/masks.js';
+import { loadBundledContentCatalog } from '../src/contentCatalog.js';
 
 test('threshold chamber awakens from input and opens a dream transition', () => {
+  const catalog = loadBundledContentCatalog();
   const archetypes = new ArchetypeState();
   const feeling = new FeelingState();
-  const chamber = new ThresholdChamber();
+  const chamber = new ThresholdChamber({ toolSigils: catalog.toolSigils });
 
   const result = chamber.receiveInput({
     kind: 'speech',
@@ -32,10 +34,11 @@ test('threshold chamber awakens from input and opens a dream transition', () => 
 });
 
 test('dreamflow selects a weighted module and journal writes a return entry', () => {
+  const catalog = loadBundledContentCatalog();
   const archetypes = new ArchetypeState();
   const feeling = new FeelingState();
-  const chamber = new ThresholdChamber();
-  const dreamflow = new DreamflowGenerator({ seed: 42 });
+  const chamber = new ThresholdChamber({ toolSigils: catalog.toolSigils });
+  const dreamflow = new DreamflowGenerator({ seed: 42, modules: catalog.dreamModules });
 
   archetypes.recordAction('look_into_mirror', ['Shadow', 'Child'], ['mirror', 'self-observation']);
   feeling.nudge({ expansive_confined: -0.5, bright_dark: -0.4 });
@@ -66,7 +69,8 @@ test('mask registry chooses emergent presence from archetype and coherence', () 
   const archetypes = new ArchetypeState();
   archetypes.recordAction('listen_to_silence', ['Child', 'Shadow'], ['fog']);
 
-  const masks = new MaskRegistry({ seed: 12 });
+  const catalog = loadBundledContentCatalog();
+  const masks = new MaskRegistry({ seed: 12, masks: catalog.masks });
   const mask = masks.selectEligibleMask(archetypes);
 
   assert.ok(mask);

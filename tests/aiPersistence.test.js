@@ -10,11 +10,13 @@ import { ThresholdChamber } from '../src/thresholdChamber.js';
 import { WitnessState, ArchitectState, GniAdapter } from '../src/ai.js';
 import { JournalOfMirrors } from '../src/library.js';
 import { saveGameState, loadGameState } from '../src/persistence.js';
+import { loadBundledContentCatalog } from '../src/contentCatalog.js';
 
 test('witness bundles local context and architect updates global weights', async () => {
+  const catalog = loadBundledContentCatalog();
   const archetypes = new ArchetypeState();
   const feeling = new FeelingState();
-  const chamber = new ThresholdChamber();
+  const chamber = new ThresholdChamber({ toolSigils: catalog.toolSigils });
   const witness = new WitnessState({ archetypeState: archetypes, feelingState: feeling, room: chamber });
   const architect = new ArchitectState();
 
@@ -50,9 +52,10 @@ test('persistence saves and loads room, archetypes, journal, and architect state
   const savePath = join(dir, 'save.json');
 
   try {
+    const catalog = loadBundledContentCatalog();
     const archetypes = new ArchetypeState();
     archetypes.recordAction('open_portal', ['Seeker'], ['portal']);
-    const chamber = new ThresholdChamber();
+    const chamber = new ThresholdChamber({ toolSigils: catalog.toolSigils });
     chamber.receiveInput({ kind: 'speech', text: 'the word', archetypes, feeling: new FeelingState() });
     const journal = new JournalOfMirrors();
     journal.writeReturnEntry({

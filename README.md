@@ -40,6 +40,8 @@ Dream modules, masks, and tool-sigils are loaded through `src/contentCatalog.js`
 
 That matters for the UE5 path: these JSON files can become DataAssets later, while the same validation rules can keep GNI-authored or designer-authored content inside known archetype and feeling-axis keys.
 
+`src/runtime.js` is the composition boundary. It is the only gameplay bootstrap path that loads the bundled catalog by default, validates it, and injects content into Threshold Chamber, Dreamflow, and Masks. Those systems now require explicit content, matching how UE5 components should receive cooked DataAssets instead of loading files from inside constructors.
+
 ## GNI Integration Boundary
 
 GNI is represented by `GniAdapter` in `src/ai.js`.

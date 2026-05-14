@@ -2,13 +2,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { readFile } from 'node:fs/promises';
 
-import { ArchetypeState } from './archetype.js';
-import { FeelingState } from './feeling.js';
-import { ThresholdChamber } from './thresholdChamber.js';
-import { DreamflowGenerator } from './dreamflow.js';
-import { WitnessState, ArchitectState, GniAdapter } from './ai.js';
-import { JournalOfMirrors } from './library.js';
-import { MaskRegistry } from './masks.js';
+import { createJungialRuntime } from './runtime.js';
 import { saveGameState } from './persistence.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -17,17 +11,20 @@ const root = join(here, '..');
 export async function runSimulation({
   seed = 777,
   savePath = join(root, 'saves', 'latest-session.json'),
-  gniResponse = null
+  gniResponse = null,
+  catalog = undefined
 } = {}) {
-  const archetypes = new ArchetypeState();
-  const feeling = new FeelingState();
-  const chamber = new ThresholdChamber();
-  const witness = new WitnessState({ archetypeState: archetypes, feelingState: feeling, room: chamber });
-  const architect = new ArchitectState();
-  const dreamflow = new DreamflowGenerator({ seed });
-  const journal = new JournalOfMirrors();
-  const masks = new MaskRegistry({ seed });
-  const gni = new GniAdapter({ endpoint: 'gni://local-dev-placeholder' });
+  const {
+    archetypes,
+    feeling,
+    chamber,
+    witness,
+    architect,
+    dreamflow,
+    journal,
+    masks,
+    gni
+  } = createJungialRuntime({ seed, catalog });
 
   const transcript = [];
   transcript.push('Threshold Chamber: silent, dim, confined.');

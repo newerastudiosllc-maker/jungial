@@ -1,8 +1,11 @@
-import { loadBundledContentCatalog } from './contentCatalog.js';
 import { SeededRandom } from './random.js';
 
 export class MaskRegistry {
-  constructor({ seed = Date.now(), masks = loadBundledContentCatalog().masks } = {}) {
+  constructor({ seed = Date.now(), masks } = {}) {
+    if (!Array.isArray(masks)) {
+      throw new Error('MaskRegistry requires masks from a content catalog');
+    }
+
     this.random = new SeededRandom(seed);
     this.masks = masks.map((mask) => ({ ...mask }));
   }

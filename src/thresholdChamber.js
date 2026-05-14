@@ -1,8 +1,10 @@
-import { loadBundledContentCatalog } from './contentCatalog.js';
-
 export class ThresholdChamber {
-  constructor(snapshot = {}) {
-    this.toolSigils = (snapshot.toolSigils ?? loadBundledContentCatalog().toolSigils).map((tool) => ({ ...tool }));
+  constructor({ snapshot = {}, toolSigils } = {}) {
+    if (!Array.isArray(toolSigils)) {
+      throw new Error('ThresholdChamber requires toolSigils from a content catalog');
+    }
+
+    this.toolSigils = toolSigils.map((tool) => ({ ...tool }));
     this.note = snapshot.note ?? 'the word';
     this.awakened = snapshot.awakened ?? false;
     this.boundaryState = snapshot.boundaryState ?? 'confined';

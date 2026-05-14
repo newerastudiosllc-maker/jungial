@@ -1,8 +1,11 @@
-import { loadBundledContentCatalog } from './contentCatalog.js';
 import { SeededRandom } from './random.js';
 
 export class DreamflowGenerator {
-  constructor({ seed = Date.now(), modules = loadBundledContentCatalog().dreamModules } = {}) {
+  constructor({ seed = Date.now(), modules } = {}) {
+    if (!Array.isArray(modules)) {
+      throw new Error('DreamflowGenerator requires dream modules from a content catalog');
+    }
+
     this.random = new SeededRandom(seed);
     this.modules = modules.map((module) => ({ ...module }));
   }
