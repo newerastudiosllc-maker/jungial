@@ -13,6 +13,12 @@
       "hash": "5079a4c2f9160ed5fba1cf191a15cd980ee24a9883baac296887e37a09878af9",
       "selectedDreamId": "garden",
       "journeySummary": "entry:Garden -> pressure:Garden -> mirror:Mirror Hall -> return:Garden"
+    },
+    {
+      "id": "three-cycle-campaign",
+      "hash": "431c1de52e99f38fb3cee8fa4ec48eda1909630bf5636789a03b2a5c1de82b0a",
+      "selectedDreamId": "space_black_hole",
+      "journeySummary": "entry:Space / Black Hole -> pressure:Space / Black Hole -> mirror:Cabin -> return:Cabin"
     }
   ]
 }

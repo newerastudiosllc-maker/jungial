@@ -1,8 +1,8 @@
 const JOURNEY_ROLES = Object.freeze(['entry', 'pressure', 'mirror', 'return']);
 
-export function selectDreamJourney({ dreamflow, archetypeState, feelingState, roomConfig }) {
+export function selectDreamJourney({ dreamflow, archetypeState, feelingState, roomConfig, weightOverrides = {} }) {
   const beats = JOURNEY_ROLES.map((role) => {
-    const module = dreamflow.selectNext({ archetypeState, feelingState, roomConfig });
+    const module = dreamflow.selectNext({ archetypeState, feelingState, roomConfig, weightOverrides });
     return {
       role,
       moduleId: module.id,

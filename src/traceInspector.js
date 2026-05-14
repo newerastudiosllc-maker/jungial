@@ -7,7 +7,7 @@ export function inspectTrace(trace) {
     eventCounts[entry.type] = (eventCounts[entry.type] ?? 0) + 1;
   }
 
-  const journey = (trace.entries ?? []).find((entry) => entry.type === 'dream.journey.selected');
+  const journey = findLastEntry(trace.entries ?? [], 'dream.journey.selected');
 
   return {
     schema: 'JungialTraceSummaryV1',
@@ -18,6 +18,15 @@ export function inspectTrace(trace) {
     gniRequestCount: eventCounts['gni.request.created'] ?? 0,
     gniDirectiveCount: eventCounts['gni.directive.applied'] ?? 0
   };
+}
+
+function findLastEntry(entries, type) {
+  for (let index = entries.length - 1; index >= 0; index -= 1) {
+    if (entries[index].type === type) {
+      return entries[index];
+    }
+  }
+  return null;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

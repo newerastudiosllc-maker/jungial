@@ -14,6 +14,7 @@ UE5 was not available on PATH in this workspace, and no local C++ compiler was a
 npm test
 npm run simulate
 npm run validate
+npm run campaign
 npm run scenarios
 npm run scenario:check
 npm run fixtures
@@ -38,6 +39,14 @@ To run a deterministic replay script:
 ```powershell
 node src/replay.js data/replay_scripts/threshold_word.json saves/replay-threshold-word.json
 ```
+
+To run a multi-cycle campaign with Architect feedback:
+
+```powershell
+npm run campaign
+```
+
+The campaign keeps one Architect across cycles, applies optional GNI/emulated-GNI directives after each return, and feeds Architect dream weights back into later Dreamflow selection.
 
 To run the smoke scenario matrix:
 

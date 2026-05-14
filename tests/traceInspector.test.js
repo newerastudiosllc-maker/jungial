@@ -38,3 +38,38 @@ test('trace inspector summarizes journey, GNI, and event counts', () => {
     gniDirectiveCount: 1
   });
 });
+
+test('trace inspector summarizes the latest campaign journey', () => {
+  const summary = inspectTrace({
+    schema: 'JungialTraceV1',
+    runId: 'campaign-trace',
+    entries: [
+      { index: 1, at: 'x', type: 'campaign.started', payload: {} },
+      {
+        index: 2,
+        at: 'x',
+        type: 'dream.journey.selected',
+        payload: {
+          cycle: 1,
+          summary: 'entry:Garden -> return:Cabin',
+          symbolTrail: ['growth', 'memory']
+        }
+      },
+      {
+        index: 3,
+        at: 'x',
+        type: 'dream.journey.selected',
+        payload: {
+          cycle: 2,
+          summary: 'entry:Mirror Hall -> return:Boundless White Void',
+          symbolTrail: ['reflection', 'silence']
+        }
+      },
+      { index: 4, at: 'x', type: 'gni.directive.applied', payload: { cycle: 2 } }
+    ]
+  });
+
+  assert.equal(summary.journeySummary, 'entry:Mirror Hall -> return:Boundless White Void');
+  assert.deepEqual(summary.symbolTrail, ['reflection', 'silence']);
+  assert.equal(summary.gniDirectiveCount, 1);
+});

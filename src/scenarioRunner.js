@@ -3,6 +3,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { createDeterministicClock } from './clock.js';
+import { runCampaign } from './campaign.js';
 import { runReplay } from './replay.js';
 import { runSimulation } from './simulation.js';
 import { stableHash } from './stableHash.js';
@@ -18,16 +19,7 @@ export async function runScenarioMatrix({ matrix, outDir = 'saves/scenarios' }) 
       : undefined;
     const savePath = join(outDir, `${scenario.id}.save.json`);
     const tracePath = join(outDir, `${scenario.id}.trace.json`);
-    const run = scenario.kind === 'replay'
-      ? await runReplay({ script: scenario.script, savePath, clock })
-      : await runSimulation({
-        seed: scenario.seed,
-        savePath,
-        tracePath,
-        emulateGni: scenario.emulateGni ?? false,
-        gniResponse: scenario.gniResponse ?? null,
-        clock
-      });
+    const run = await runScenario({ scenario, savePath, tracePath, clock });
     const trace = run.trace;
     const traceSummary = inspectTrace(trace);
     const result = summarizeScenarioRun(scenario, run, traceSummary);
@@ -43,14 +35,42 @@ export async function runScenarioMatrix({ matrix, outDir = 'saves/scenarios' }) 
   return report;
 }
 
+async function runScenario({ scenario, savePath, tracePath, clock }) {
+  if (scenario.kind === 'replay') {
+    return runReplay({ script: scenario.script, savePath, clock });
+  }
+
+  if (scenario.kind === 'campaign') {
+    return runCampaign({
+      cycles: scenario.cycles ?? 3,
+      seed: scenario.seed,
+      emulateGni: scenario.emulateGni ?? false,
+      gniDirectives: scenario.gniDirectives ?? [],
+      savePath,
+      clock
+    });
+  }
+
+  return runSimulation({
+    seed: scenario.seed,
+    savePath,
+    tracePath,
+    emulateGni: scenario.emulateGni ?? false,
+    gniResponse: scenario.gniResponse ?? null,
+    clock
+  });
+}
+
 function summarizeScenarioRun(scenario, run, traceSummary) {
-  const selectedDream = run.selectedDream;
+  const selectedDream = run.selectedDream ?? run.cycles?.at(-1)?.selectedDream;
+  const dreamJourney = run.dreamJourney ?? run.cycles?.at(-1)?.dreamJourney;
+  const journalEntry = run.entry ?? run.journalEntry ?? run.cycles?.at(-1)?.journalEntry;
   const summary = {
     id: scenario.id,
     kind: scenario.kind,
     selectedDreamId: selectedDream?.id ?? null,
-    journeySummary: run.dreamJourney?.summary ?? null,
-    journalText: run.entry?.text ?? run.journalEntry?.text ?? '',
+    journeySummary: dreamJourney?.summary ?? null,
+    journalText: journalEntry?.text ?? '',
     traceEventCount: run.trace?.entries?.length ?? 0,
     traceSummary
   };

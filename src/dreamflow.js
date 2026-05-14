@@ -10,23 +10,29 @@ export class DreamflowGenerator {
     this.modules = modules.map((module) => ({ ...module }));
   }
 
-  selectNext({ archetypeState, feelingState, roomConfig }) {
-    const scored = this.modules.map((module) => ({
+  scoreModules({ archetypeState, feelingState, roomConfig, weightOverrides = {} }) {
+    return this.modules.map((module) => ({
+      id: module.id,
+      name: module.name,
       module,
-      score: this.#scoreModule(module, archetypeState, feelingState, roomConfig)
+      weightBreakdown: this.#scoreModule(module, archetypeState, feelingState, roomConfig, weightOverrides)
     }));
-    const selected = this.random.pickWeighted(scored, (entry) => entry.score.total);
+  }
+
+  selectNext({ archetypeState, feelingState, roomConfig, weightOverrides = {} }) {
+    const scored = this.scoreModules({ archetypeState, feelingState, roomConfig, weightOverrides });
+    const selected = this.random.pickWeighted(scored, (entry) => entry.weightBreakdown.total);
 
     return {
       ...selected.item.module,
       weightBreakdown: {
-        ...selected.item.score,
+        ...selected.item.weightBreakdown,
         roll: Number(selected.roll.toFixed(5))
       }
     };
   }
 
-  #scoreModule(module, archetypeState, feelingState, roomConfig) {
+  #scoreModule(module, archetypeState, feelingState, roomConfig, weightOverrides) {
     let archetype = 0;
     for (const [name, affinity] of Object.entries(module.archetypeAffinities ?? {})) {
       archetype += (archetypeState.archetypeVector[name] ?? 0) * affinity;
@@ -39,7 +45,9 @@ export class DreamflowGenerator {
 
     const room = roomConfig.boundaryState === 'boundless' ? 0.25 : 0;
     const portal = roomConfig.portalOpen ? 0.35 : 0;
-    const total = Math.max(0.05, module.baseWeight + archetype + vibe + room + portal);
+    const rawTotal = Math.max(0.05, module.baseWeight + archetype + vibe + room + portal);
+    const directorMultiplier = Math.max(0.05, weightOverrides[module.id] ?? 1);
+    const total = rawTotal * directorMultiplier;
 
     return {
       base: module.baseWeight,
@@ -47,6 +55,7 @@ export class DreamflowGenerator {
       vibe: Number(vibe.toFixed(3)),
       room: Number(room.toFixed(3)),
       portal: Number(portal.toFixed(3)),
+      directorMultiplier: Number(directorMultiplier.toFixed(3)),
       total: Number(total.toFixed(3))
     };
   }

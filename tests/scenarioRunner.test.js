@@ -31,6 +31,14 @@ test('scenario matrix runs mixed simulations and replays with stable hashes', as
               { kind: 'action', name: 'open_portal', archetypes: ['Seeker'], symbols: ['portal'] }
             ]
           }
+        },
+        {
+          id: 'two-cycle-campaign',
+          kind: 'campaign',
+          cycles: 2,
+          seed: 91,
+          emulateGni: true,
+          clockStartIso: '2055-01-03T00:00:00.000Z'
         }
       ]
     };
@@ -39,8 +47,8 @@ test('scenario matrix runs mixed simulations and replays with stable hashes', as
     const second = await runScenarioMatrix({ matrix, outDir: dir });
 
     assert.equal(first.schema, 'JungialScenarioReportV1');
-    assert.equal(first.results.length, 2);
-    assert.deepEqual(first.results.map((result) => result.id), ['sim-emulated', 'threshold-replay']);
+    assert.equal(first.results.length, 3);
+    assert.deepEqual(first.results.map((result) => result.id), ['sim-emulated', 'threshold-replay', 'two-cycle-campaign']);
     assert.deepEqual(first.results.map((result) => result.hash), second.results.map((result) => result.hash));
     assert.ok(first.results.every((result) => result.traceEventCount > 0));
 
