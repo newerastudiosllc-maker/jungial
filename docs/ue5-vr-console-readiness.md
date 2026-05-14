@@ -22,6 +22,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 
 - All procedural choices must accept a seed or UE `FRandomStream`.
 - Runtime timestamps and session IDs must come from an injected clock/session service during replays and QA captures.
+- Runtime services must hydrate from SaveGame snapshots so campaign memory can survive process restarts.
 - Replay scripts should produce stable dream journey, journal text shape, and ArchitectState.
 - QA and GNI debugging should use `JungialTraceV1` audit output rather than adding exposition to the world.
 - Scenario matrices should gate changes to procedural logic with stable hashes for selected dream, journey, trace summary, and journal shape.

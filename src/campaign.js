@@ -2,8 +2,8 @@ import { fileURLToPath } from 'node:url';
 import { readFile } from 'node:fs/promises';
 
 import { createDeterministicClock } from './clock.js';
-import { createJungialRuntime } from './runtime.js';
-import { saveGameState } from './persistence.js';
+import { createJungialRuntime, extractRuntimeSnapshots } from './runtime.js';
+import { loadGameState, saveGameState } from './persistence.js';
 import { selectDreamJourney } from './dreamJourney.js';
 import { createDreamWeightOverrides } from './directorPolicy.js';
 import { GniBridge } from './gniBridge.js';
@@ -17,10 +17,18 @@ export async function runCampaign({
   gniProvider = null,
   gniDirectives = [],
   savePath = null,
+  resumePath = null,
+  initialState = null,
   clock = undefined,
   catalog = undefined
 } = {}) {
-  const runtime = createJungialRuntime({ seed, clock, catalog });
+  const resumeState = initialState ?? (resumePath ? await loadGameState(resumePath) : null);
+  const runtime = createJungialRuntime({
+    seed,
+    clock,
+    catalog,
+    snapshots: extractRuntimeSnapshots(resumeState)
+  });
   const trace = new TraceRecorder({ clock: clock?.fork?.() ?? undefined });
   const gniBridge = new GniBridge({ adapter: runtime.gni, provider: gniProvider });
   const symbolGrammar = new SymbolGrammar();
@@ -165,7 +173,8 @@ export async function runCampaign({
       journal: runtime.journal.snapshot(),
       trace: traceSnapshot,
       room: runtime.chamber.snapshot(),
-      archetypeState: runtime.archetypes.snapshot()
+      archetypeState: runtime.archetypes.snapshot(),
+      feelingState: runtime.feeling.snapshot()
     }, { clock });
   }
 
