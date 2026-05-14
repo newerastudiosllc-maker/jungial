@@ -7,6 +7,7 @@ import { createDeterministicClock } from './clock.js';
 import { GniHttpProvider } from './gniHttpProvider.js';
 import { GniDirectiveQueue } from './gniQueue.js';
 import { loadGameState, saveGameState } from './persistence.js';
+import { appendTraceEntry } from './trace.js';
 
 export async function processPendingGniQueue({
   queueSnapshot,
@@ -133,7 +134,10 @@ export async function processSavedGniQueue({
     ...state,
     gniQueue: result.queue,
     architectState: result.architectState,
-    lastGniQueueProcessResult: result
+    lastGniQueueProcessResult: result,
+    trace: appendTraceEntry(state.trace, 'gni.queue.processed', summarizeQueueProcessForTrace(result), {
+      clock: clock ?? undefined
+    })
   };
 
   await saveGameState(outputPath, nextState, { clock });
@@ -204,6 +208,22 @@ function toArchitectState(input) {
 
 function nowIso(clock) {
   return clock?.nowIso?.() ?? null;
+}
+
+function summarizeQueueProcessForTrace(result) {
+  return {
+    processed: result.processed.map((entry) => ({
+      id: entry.id,
+      status: entry.status,
+      providerJob: entry.providerJob ?? null
+    })),
+    statusCounts: result.processed.reduce((acc, entry) => {
+      acc[entry.status] = (acc[entry.status] ?? 0) + 1;
+      return acc;
+    }, {}),
+    pendingCount: result.queue.pending.length,
+    resolvedCount: result.queue.resolved.length
+  };
 }
 
 const noProvider = Symbol('noProvider');

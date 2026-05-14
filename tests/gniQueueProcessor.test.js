@@ -133,6 +133,57 @@ test('saved GNI queue processor persists resolved directives back into save payl
   }
 });
 
+test('saved GNI queue processor appends a developer trace event', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-queue-trace-'));
+  const savePath = join(dir, 'save.json');
+  const queue = new GniDirectiveQueue();
+  queue.enqueue({ request: REQUEST, reason: 'pending' });
+
+  try {
+    await saveGameState(savePath, {
+      gniQueue: queue.snapshot(),
+      architectState: new ArchitectState({ globalDreamWeights: { garden: 1 } }).snapshot(),
+      trace: {
+        schema: 'JungialTraceV1',
+        runId: 'trace-one',
+        entries: [{
+          index: 1,
+          at: '2090-01-01T00:00:00.000Z',
+          type: 'gni.request.queued',
+          payload: { id: 'gni_pending_session-one' }
+        }]
+      }
+    });
+
+    await processSavedGniQueue({
+      savePath,
+      clock: {
+        nowIso() {
+          return '2090-01-01T00:00:01.000Z';
+        }
+      },
+      provider: async () => ({
+        dreamWeightDeltas: { garden: 0.25 },
+        symbolEchoes: ['threshold']
+      })
+    });
+    const saved = await loadGameState(savePath);
+    const traceEntry = saved.trace.entries.at(-1);
+
+    assert.equal(traceEntry.index, 2);
+    assert.equal(traceEntry.at, '2090-01-01T00:00:01.000Z');
+    assert.equal(traceEntry.type, 'gni.queue.processed');
+    assert.deepEqual(traceEntry.payload, {
+      processed: [{ id: 'gni_pending_session-one', status: 'directive_ready', providerJob: null }],
+      statusCounts: { directive_ready: 1 },
+      pendingCount: 0,
+      resolvedCount: 1
+    });
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
 test('pending GNI queue processor polls provider job status URLs before resubmitting requests', async () => {
   const mock = createMockGniServer({
     mode: 'async',

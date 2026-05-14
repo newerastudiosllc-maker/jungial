@@ -35,9 +35,36 @@ export class TraceRecorder {
   }
 }
 
+export function appendTraceEntry(traceSnapshot, type, payload = {}, { clock = createSystemClock() } = {}) {
+  const base = isTraceSnapshot(traceSnapshot)
+    ? traceSnapshot
+    : {
+        schema: 'JungialTraceV1',
+        runId: clock.nextId?.('trace') ?? 'trace_queue_process',
+        entries: []
+      };
+  const entries = base.entries.map((entry) => structuredClone(entry));
+  entries.push({
+    index: entries.length + 1,
+    at: clock.nowIso(),
+    type,
+    payload: sanitizePayload(payload)
+  });
+
+  return {
+    schema: 'JungialTraceV1',
+    runId: base.runId,
+    entries
+  };
+}
+
 export async function writeTrace(path, traceSnapshot) {
   await mkdir(dirname(path), { recursive: true });
   await writeFile(path, `${JSON.stringify(traceSnapshot, null, 2)}\n`, 'utf8');
+}
+
+function isTraceSnapshot(traceSnapshot) {
+  return traceSnapshot?.schema === 'JungialTraceV1' && Array.isArray(traceSnapshot.entries);
 }
 
 function sanitizePayload(payload) {

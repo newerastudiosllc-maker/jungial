@@ -211,9 +211,9 @@ Replay, simulation, and campaign runs all pass through this router.
 
 ## Trace/Audit Output
 
-`TraceRecorder` writes `JungialTraceV1` developer traces. These are not in-world exposition; they are black-box records for QA and GNI debugging. A trace captures threshold input, room awakening, portal opening, dream journey selection, mask selection, journal grounding, Witness bundle creation, GNI requests/directives, and save output.
+`TraceRecorder` writes `JungialTraceV1` developer traces. These are not in-world exposition; they are black-box records for QA and GNI debugging. A trace captures threshold input, room awakening, portal opening, dream journey selection, mask selection, journal grounding, Witness bundle creation, GNI requests/directives, queue processing summaries, and save output.
 
-Use `--trace=<path>` on simulation runs to write a standalone trace JSON file. Save files also include the trace snapshot.
+Use `--trace=<path>` on simulation runs to write a standalone trace JSON file. Save files also include the trace snapshot, and `processSavedGniQueue()` appends a `gni.queue.processed` event when background AI work is resolved later.
 
 Inspect a trace summary:
 
