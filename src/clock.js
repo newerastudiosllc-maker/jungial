@@ -7,6 +7,9 @@ export function createSystemClock() {
     nextId(prefix) {
       idCounter += 1;
       return `${prefix}_${Date.now()}_${String(idCounter).padStart(4, '0')}`;
+    },
+    fork() {
+      return createSystemClock();
     }
   };
 }
@@ -24,6 +27,9 @@ export function createDeterministicClock({ startIso = '2000-01-01T00:00:00.000Z'
     nextId(prefix) {
       idCounter += 1;
       return `${prefix}_${String(idCounter).padStart(4, '0')}`;
+    },
+    fork() {
+      return createDeterministicClock({ startIso, stepMs });
     }
   };
 }

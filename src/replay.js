@@ -4,12 +4,16 @@ import { readFile } from 'node:fs/promises';
 import { createJungialRuntime } from './runtime.js';
 import { saveGameState } from './persistence.js';
 import { selectDreamJourney } from './dreamJourney.js';
+import { TraceRecorder } from './trace.js';
 
-export async function runReplay({ script, savePath, clock = undefined }) {
+export async function runReplay({ script, savePath, clock = undefined, trace = undefined }) {
   const runtime = createJungialRuntime({ seed: script.seed ?? 1, clock });
+  const traceRecorder = trace ?? new TraceRecorder({ clock: clock?.fork?.() ?? undefined });
   const transcript = [];
+  traceRecorder.record('replay.started', { seed: script.seed ?? 1, inputCount: script.inputs?.length ?? 0 });
 
   for (const input of script.inputs ?? []) {
+    traceRecorder.record('replay.input', input);
     if (input.kind === 'speech') {
       runtime.chamber.receiveInput({
         kind: 'speech',
@@ -35,6 +39,11 @@ export async function runReplay({ script, savePath, clock = undefined }) {
     feelingState: runtime.feeling,
     roomConfig: runtime.chamber.snapshot()
   });
+  traceRecorder.record('dream.journey.selected', {
+    summary: journey.summary,
+    symbolTrail: journey.symbolTrail,
+    beats: journey.beats
+  });
   const selectedDream = {
     id: journey.beats[0].moduleId,
     name: journey.beats[0].moduleName,
@@ -47,12 +56,25 @@ export async function runReplay({ script, savePath, clock = undefined }) {
     vibeState: runtime.feeling.vibeState,
     journey
   });
+  traceRecorder.record('journal.entry.written', {
+    entryId: journalEntry.id,
+    symbols: journalEntry.symbols,
+    dominantArchetype: journalEntry.dominantArchetype
+  });
   const bundle = runtime.witness.toSessionBundle({ selectedDream });
+  traceRecorder.record('witness.bundle.created', {
+    sessionId: bundle.sessionId,
+    dominantArchetype: bundle.dominantArchetype,
+    coherence: bundle.coherence
+  });
   runtime.architect.update(bundle);
+  traceRecorder.record('architect.updated', { selectedDreamId: selectedDream.id });
 
   for (const directive of script.gniDirectives ?? []) {
     runtime.architect.applyDirective(directive);
   }
+  traceRecorder.record('replay.completed', { selectedDreamId: selectedDream.id });
+  const traceSnapshot = traceRecorder.snapshot();
 
   const result = {
     schema: 'JungialReplayResultV1',
@@ -62,6 +84,7 @@ export async function runReplay({ script, savePath, clock = undefined }) {
     dreamJourney: journey,
     journalEntry,
     sessionBundle: bundle,
+    trace: traceSnapshot,
     architectState: runtime.architect.snapshot()
   };
 
@@ -70,6 +93,7 @@ export async function runReplay({ script, savePath, clock = undefined }) {
       replayResult: result,
       architectState: runtime.architect.snapshot(),
       journal: runtime.journal.snapshot(),
+      trace: traceSnapshot,
       room: runtime.chamber.snapshot(),
       archetypeState: runtime.archetypes.snapshot()
     }, { clock });

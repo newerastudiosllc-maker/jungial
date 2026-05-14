@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/trace.schema.json",
+  "title": "JungialTraceV1",
+  "type": "object",
+  "required": ["schema", "runId", "entries"],
+  "properties": {
+    "schema": { "const": "JungialTraceV1" },
+    "runId": { "type": "string" },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["index", "at", "type", "payload"],
+        "properties": {
+          "index": { "type": "integer", "minimum": 1 },
+          "at": { "type": "string" },
+          "type": { "type": "string" },
+          "payload": {}
+        }
+      }
+    }
+  }
+}

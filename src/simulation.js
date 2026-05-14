@@ -8,6 +8,7 @@ import { GniEmulator } from './gniEmulator.js';
 import { selectDreamJourney } from './dreamJourney.js';
 import { SymbolGrammar } from './symbolGrammar.js';
 import { createDeterministicClock } from './clock.js';
+import { TraceRecorder, writeTrace } from './trace.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -18,8 +19,13 @@ export async function runSimulation({
   gniResponse = null,
   emulateGni = false,
   catalog = undefined,
-  clock = undefined
+  clock = undefined,
+  trace = undefined,
+  tracePath = undefined
 } = {}) {
+  const traceRecorder = trace ?? new TraceRecorder({ clock: clock?.fork?.() ?? undefined });
+  traceRecorder.record('simulation.started', { seed, emulateGni, hasGniResponse: Boolean(gniResponse) });
+
   const {
     archetypes,
     feeling,
@@ -36,6 +42,7 @@ export async function runSimulation({
   transcript.push('Threshold Chamber: silent, dim, confined.');
   transcript.push(`A small note waits: "${chamber.note}".`);
 
+  traceRecorder.record('threshold.input', { kind: 'speech', text: 'the word' });
   chamber.receiveInput({
     kind: 'speech',
     text: 'the word',
@@ -43,10 +50,16 @@ export async function runSimulation({
     feeling
   });
   transcript.push('The Heartlight opens. Tools become visible.');
+  traceRecorder.record('threshold.awakened', {
+    room: chamber.snapshot(),
+    vibeState: feeling.vibeState,
+    dominantArchetype: archetypes.dominantArchetype()
+  });
 
   witness.observeAction('open_portal', ['Seeker'], ['portal']);
   chamber.openPortal('key_of_portals');
   transcript.push('The Key of Portals turns without sound.');
+  traceRecorder.record('portal.opened', { room: chamber.snapshot() });
 
   const dreamJourney = selectDreamJourney({
     dreamflow,
@@ -63,11 +76,21 @@ export async function runSimulation({
   };
   transcript.push(`Dreamflow selects: ${selectedDream.name}.`);
   transcript.push(`Dream journey: ${dreamJourney.summary}.`);
+  traceRecorder.record('dream.journey.selected', {
+    summary: dreamJourney.summary,
+    symbolTrail: dreamJourney.symbolTrail,
+    beats: dreamJourney.beats
+  });
 
   const mask = masks.selectEligibleMask(archetypes);
   if (mask) {
     transcript.push(`A presence gathers: ${mask.name}.`);
   }
+  traceRecorder.record('mask.selected', {
+    maskId: mask?.id ?? null,
+    maskName: mask?.name ?? null,
+    spawnTrigger: mask?.spawnTrigger ?? null
+  });
 
   const symbolGrammar = new SymbolGrammar();
   symbolGrammar.ingest({ symbols: dreamJourney.symbolTrail, vibeState: feeling.vibeState });
@@ -80,25 +103,52 @@ export async function runSimulation({
     symbolGrammar
   });
   transcript.push(`Journal of Mirrors: ${entry.text}`);
+  traceRecorder.record('journal.entry.written', {
+    entryId: entry.id,
+    symbols: entry.symbols,
+    dominantArchetype: entry.dominantArchetype,
+    vibeState: entry.vibeState
+  });
 
   const bundle = witness.toSessionBundle({ selectedDream });
+  traceRecorder.record('witness.bundle.created', {
+    sessionId: bundle.sessionId,
+    dominantArchetype: bundle.dominantArchetype,
+    coherence: bundle.coherence,
+    recentSymbols: bundle.recentSymbols
+  });
   const architectUpdate = architect.update(bundle);
   const gniRequest = gni.createProcessingRequest(bundle);
   transcript.push(`Architect updates ${Object.keys(architectUpdate.adjustedWeights).length} dream weight(s).`);
   transcript.push(`GNI request prepared as ${gniRequest.contract.inputFormat} -> ${gniRequest.contract.outputFormat}.`);
+  traceRecorder.record('gni.request.created', {
+    provider: gniRequest.provider,
+    endpoint: gniRequest.endpoint,
+    contract: gniRequest.contract,
+    sessionId: gniRequest.payload.sessionId
+  });
 
   const emulatedGniResponse = !gniResponse && emulateGni
     ? new GniEmulator({ seed }).processSessionBundle(bundle)
     : null;
   if (emulatedGniResponse) {
     transcript.push('GNI emulator prepared a directive.');
+    traceRecorder.record('gni.emulator.directive.created', {
+      directive: emulatedGniResponse
+    });
   }
   const appliedGniDirective = gniResponse || emulatedGniResponse ? gni.parseDirective(gniResponse ?? emulatedGniResponse) : null;
   const directiveUpdate = appliedGniDirective ? architect.applyDirective(appliedGniDirective) : null;
   if (appliedGniDirective) {
     transcript.push(`GNI directive applied: ${Object.keys(appliedGniDirective.dreamWeightDeltas).length} dream delta(s).`);
+    traceRecorder.record('gni.directive.applied', {
+      directive: appliedGniDirective,
+      update: directiveUpdate
+    });
   }
 
+  traceRecorder.record('simulation.saved', { savePath, tracePath: tracePath ?? null });
+  const traceSnapshot = traceRecorder.snapshot();
   await saveGameState(savePath, {
     room: chamber.snapshot(),
     archetypeState: archetypes.snapshot(),
@@ -107,11 +157,16 @@ export async function runSimulation({
     architectState: architect.snapshot(),
     dreamJourney,
     symbolGrammar: symbolGrammar.snapshot(),
+    trace: traceSnapshot,
     lastSessionBundle: bundle,
     pendingGniRequest: gniRequest,
     appliedGniDirective
   }, { clock });
   transcript.push(`Saved session JSON to ${savePath}.`);
+
+  if (tracePath) {
+    await writeTrace(tracePath, traceSnapshot);
+  }
 
   return {
     transcript,
@@ -122,6 +177,7 @@ export async function runSimulation({
     directiveUpdate,
     gniRequest,
     appliedGniDirective,
+    trace: traceSnapshot,
     savePath
   };
 }
@@ -142,6 +198,8 @@ export function parseSimulationArgs(args) {
       options.clockStartIso = arg.slice('--clock-start='.length);
     } else if (arg.startsWith('--clock-step-ms=')) {
       options.clockStepMs = Number(arg.slice('--clock-step-ms='.length));
+    } else if (arg.startsWith('--trace=')) {
+      options.tracePath = arg.slice('--trace='.length);
     } else if (arg === '--json') {
       options.json = true;
     }
@@ -163,7 +221,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     savePath: options.savePath,
     gniResponse,
     emulateGni: options.emulateGni,
-    clock
+    clock,
+    tracePath: options.tracePath
   });
 
   if (options.json) {

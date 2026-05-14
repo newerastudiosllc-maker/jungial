@@ -50,6 +50,7 @@ test('simulation CLI args parse seed, save path, JSON mode, and mock GNI respons
     '--emulate-gni',
     '--clock-start=2040-01-02T03:04:05.000Z',
     '--clock-step-ms=250',
+    '--trace=saves/trace.json',
     '--json'
   ]);
 
@@ -60,6 +61,7 @@ test('simulation CLI args parse seed, save path, JSON mode, and mock GNI respons
     emulateGni: true,
     clockStartIso: '2040-01-02T03:04:05.000Z',
     clockStepMs: 250,
+    tracePath: 'saves/trace.json',
     json: true
   });
 });

@@ -21,6 +21,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - All procedural choices must accept a seed or UE `FRandomStream`.
 - Runtime timestamps and session IDs must come from an injected clock/session service during replays and QA captures.
 - Replay scripts should produce stable dream journey, journal text shape, and ArchitectState.
+- QA and GNI debugging should use `JungialTraceV1` audit output rather than adding exposition to the world.
 - GNI/GNI-emulator outputs must be normalized before touching gameplay state.
 - Content validation must run before packaged builds and before accepting AI-authored content.
 
@@ -29,6 +30,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - No filesystem content loading inside gameplay constructors.
 - No runtime code execution from AI directives.
 - Save migrations must be explicit and testable.
+- Trace output should be available in development builds and easy to disable or sample in shipping builds.
 - Atmosphere changes should be parameter curves, not one-off hard-coded scene edits.
 - Speech events should be captured as intent/symbol events so platforms without microphone permission still work.
 

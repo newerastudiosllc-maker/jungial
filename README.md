@@ -25,6 +25,7 @@ node src/simulation.js --seed=777 --gni-response=data/mock_gni_directive.json
 node src/simulation.js --seed=777 --gni-response=data/mock_gni_directive.json --json
 node src/simulation.js --seed=777 --emulate-gni
 node src/simulation.js --seed=777 --emulate-gni --clock-start=2040-01-02T03:04:05.000Z
+node src/simulation.js --seed=777 --emulate-gni --trace=saves/latest-trace.json
 ```
 
 The mock directive is normalized before the Architect receives it. Unsafe fields are ignored, numeric pressure is clamped, and dream weights cannot be driven below a small positive floor.
@@ -88,6 +89,12 @@ Save files are wrapped as `JungialSaveGame` with version metadata. Legacy unvers
 Dreamflow can now produce a four-beat `DreamJourneyV1`: entry, pressure, mirror, return. Replay scripts exercise deterministic inputs, GNI directives, dream outcomes, journal text shape, and ArchitectState.
 
 For QA-style reproducibility, pass `--clock-start=<ISO time>` and optional `--clock-step-ms=<milliseconds>` to simulation runs. Programmatic callers can inject `createDeterministicClock()`.
+
+## Trace/Audit Output
+
+`TraceRecorder` writes `JungialTraceV1` developer traces. These are not in-world exposition; they are black-box records for QA and GNI debugging. A trace captures threshold input, room awakening, portal opening, dream journey selection, mask selection, journal grounding, Witness bundle creation, GNI requests/directives, and save output.
+
+Use `--trace=<path>` on simulation runs to write a standalone trace JSON file. Save files also include the trace snapshot.
 
 ## Current Playable Loop
 
