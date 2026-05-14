@@ -66,6 +66,7 @@ npm run scenarios
 ```
 
 This writes `saves/scenarios/scenario-report.json` with stable hashes for each scenario.
+The matrix includes emulated-GNI, pending-GNI, replay, campaign, and controller-input paths.
 
 To compare the smoke matrix against the committed baseline:
 

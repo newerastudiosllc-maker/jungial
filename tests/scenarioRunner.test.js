@@ -21,6 +21,13 @@ test('scenario matrix runs mixed simulations and replays with stable hashes', as
           clockStartIso: '2055-01-01T00:00:00.000Z'
         },
         {
+          id: 'sim-pending-gni',
+          kind: 'simulation',
+          seed: 777,
+          gniProviderMode: 'empty',
+          clockStartIso: '2055-01-01T00:10:00.000Z'
+        },
+        {
           id: 'threshold-replay',
           kind: 'replay',
           clockStartIso: '2055-01-02T00:00:00.000Z',
@@ -47,8 +54,17 @@ test('scenario matrix runs mixed simulations and replays with stable hashes', as
     const second = await runScenarioMatrix({ matrix, outDir: dir });
 
     assert.equal(first.schema, 'JungialScenarioReportV1');
-    assert.equal(first.results.length, 3);
-    assert.deepEqual(first.results.map((result) => result.id), ['sim-emulated', 'threshold-replay', 'two-cycle-campaign']);
+    assert.equal(first.results.length, 4);
+    assert.deepEqual(first.results.map((result) => result.id), [
+      'sim-emulated',
+      'sim-pending-gni',
+      'threshold-replay',
+      'two-cycle-campaign'
+    ]);
+    const pendingGni = first.results.find((result) => result.id === 'sim-pending-gni');
+    assert.equal(pendingGni.traceSummary.gniQueuedRequestCount, 1);
+    assert.equal(pendingGni.gniBridgeStatus, 'provider_empty');
+    assert.equal(pendingGni.gniQueuePendingCount, 1);
     assert.deepEqual(first.results.map((result) => result.hash), second.results.map((result) => result.hash));
     assert.ok(first.results.every((result) => result.traceEventCount > 0));
 

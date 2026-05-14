@@ -10,6 +10,13 @@
       "clockStartIso": "2055-01-01T00:00:00.000Z"
     },
     {
+      "id": "sim-pending-gni",
+      "kind": "simulation",
+      "seed": 777,
+      "gniProviderMode": "empty",
+      "clockStartIso": "2055-01-01T00:10:00.000Z"
+    },
+    {
       "id": "threshold-word-replay",
       "kind": "replay",
       "clockStartIso": "2055-01-02T00:00:00.000Z",

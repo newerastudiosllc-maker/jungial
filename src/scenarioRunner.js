@@ -45,6 +45,7 @@ async function runScenario({ scenario, savePath, tracePath, clock }) {
       cycles: scenario.cycles ?? 3,
       seed: scenario.seed,
       emulateGni: scenario.emulateGni ?? false,
+      gniProvider: createScenarioGniProvider(scenario),
       gniDirectives: scenario.gniDirectives ?? [],
       savePath,
       clock
@@ -57,14 +58,37 @@ async function runScenario({ scenario, savePath, tracePath, clock }) {
     tracePath,
     emulateGni: scenario.emulateGni ?? false,
     gniResponse: scenario.gniResponse ?? null,
+    gniProvider: createScenarioGniProvider(scenario),
     clock
   });
+}
+
+function createScenarioGniProvider(scenario) {
+  if (scenario.gniProviderMode === 'empty') {
+    return {
+      async processRequest() {
+        return null;
+      }
+    };
+  }
+
+  if (scenario.gniProviderMode === 'error') {
+    return {
+      async processRequest() {
+        throw new Error('scenario GNI provider error');
+      }
+    };
+  }
+
+  return null;
 }
 
 function summarizeScenarioRun(scenario, run, traceSummary) {
   const selectedDream = run.selectedDream ?? run.cycles?.at(-1)?.selectedDream;
   const dreamJourney = run.dreamJourney ?? run.cycles?.at(-1)?.dreamJourney;
   const journalEntry = run.entry ?? run.journalEntry ?? run.cycles?.at(-1)?.journalEntry;
+  const gniBridgeResult = run.gniBridgeResult ?? run.cycles?.at(-1)?.gniBridgeResult;
+  const gniQueue = run.gniQueue ?? run.cycles?.at(-1)?.gniQueue;
   const summary = {
     id: scenario.id,
     kind: scenario.kind,
@@ -72,7 +96,9 @@ function summarizeScenarioRun(scenario, run, traceSummary) {
     journeySummary: dreamJourney?.summary ?? null,
     journalText: journalEntry?.text ?? '',
     traceEventCount: run.trace?.entries?.length ?? 0,
-    traceSummary
+    traceSummary,
+    gniBridgeStatus: gniBridgeResult?.status ?? null,
+    gniQueuePendingCount: gniQueue?.pending?.length ?? 0
   };
 
   return {
