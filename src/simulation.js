@@ -7,6 +7,7 @@ import { saveGameState } from './persistence.js';
 import { GniEmulator } from './gniEmulator.js';
 import { selectDreamJourney } from './dreamJourney.js';
 import { SymbolGrammar } from './symbolGrammar.js';
+import { createDeterministicClock } from './clock.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -16,7 +17,8 @@ export async function runSimulation({
   savePath = join(root, 'saves', 'latest-session.json'),
   gniResponse = null,
   emulateGni = false,
-  catalog = undefined
+  catalog = undefined,
+  clock = undefined
 } = {}) {
   const {
     archetypes,
@@ -28,7 +30,7 @@ export async function runSimulation({
     journal,
     masks,
     gni
-  } = createJungialRuntime({ seed, catalog });
+  } = createJungialRuntime({ seed, catalog, clock });
 
   const transcript = [];
   transcript.push('Threshold Chamber: silent, dim, confined.');
@@ -108,7 +110,7 @@ export async function runSimulation({
     lastSessionBundle: bundle,
     pendingGniRequest: gniRequest,
     appliedGniDirective
-  });
+  }, { clock });
   transcript.push(`Saved session JSON to ${savePath}.`);
 
   return {
@@ -136,6 +138,10 @@ export function parseSimulationArgs(args) {
       options.gniResponsePath = arg.slice('--gni-response='.length);
     } else if (arg === '--emulate-gni') {
       options.emulateGni = true;
+    } else if (arg.startsWith('--clock-start=')) {
+      options.clockStartIso = arg.slice('--clock-start='.length);
+    } else if (arg.startsWith('--clock-step-ms=')) {
+      options.clockStepMs = Number(arg.slice('--clock-step-ms='.length));
     } else if (arg === '--json') {
       options.json = true;
     }
@@ -149,11 +155,15 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const gniResponse = options.gniResponsePath
     ? JSON.parse(await readFile(options.gniResponsePath, 'utf8'))
     : null;
+  const clock = options.clockStartIso
+    ? createDeterministicClock({ startIso: options.clockStartIso, stepMs: options.clockStepMs ?? 1000 })
+    : undefined;
   const result = await runSimulation({
     seed: options.seed,
     savePath: options.savePath,
     gniResponse,
-    emulateGni: options.emulateGni
+    emulateGni: options.emulateGni,
+    clock
   });
 
   if (options.json) {

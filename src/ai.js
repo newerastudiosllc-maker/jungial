@@ -1,10 +1,12 @@
 import { clampNumber, normalizeDirective } from './contracts.js';
+import { createSystemClock } from './clock.js';
 
 export class WitnessState {
-  constructor({ archetypeState, feelingState, room }) {
+  constructor({ archetypeState, feelingState, room, clock = createSystemClock() }) {
     this.archetypeState = archetypeState;
     this.feelingState = feelingState;
     this.room = room;
+    this.clock = clock;
   }
 
   observeSpeech(text, symbols = []) {
@@ -19,7 +21,7 @@ export class WitnessState {
     return {
       schema: 'SessionBundleV1',
       schemaVersion: 1,
-      sessionId: `session_${Date.now()}`,
+      sessionId: this.clock.nextId('session'),
       dominantArchetype: this.archetypeState.dominantArchetype(),
       coherence: this.archetypeState.coherence,
       vibeState: this.feelingState.vibeState,

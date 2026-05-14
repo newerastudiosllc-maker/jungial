@@ -24,6 +24,7 @@ To test the GNI handoff before the real provider exists:
 node src/simulation.js --seed=777 --gni-response=data/mock_gni_directive.json
 node src/simulation.js --seed=777 --gni-response=data/mock_gni_directive.json --json
 node src/simulation.js --seed=777 --emulate-gni
+node src/simulation.js --seed=777 --emulate-gni --clock-start=2040-01-02T03:04:05.000Z
 ```
 
 The mock directive is normalized before the Architect receives it. Unsafe fields are ignored, numeric pressure is clamped, and dream weights cannot be driven below a small positive floor.
@@ -85,6 +86,8 @@ Game systems do not call GNI directly. They pass through the adapter so the AI c
 Save files are wrapped as `JungialSaveGame` with version metadata. Legacy unversioned saves migrate into the current envelope when loaded.
 
 Dreamflow can now produce a four-beat `DreamJourneyV1`: entry, pressure, mirror, return. Replay scripts exercise deterministic inputs, GNI directives, dream outcomes, journal text shape, and ArchitectState.
+
+For QA-style reproducibility, pass `--clock-start=<ISO time>` and optional `--clock-step-ms=<milliseconds>` to simulation runs. Programmatic callers can inject `createDeterministicClock()`.
 
 ## Current Playable Loop
 

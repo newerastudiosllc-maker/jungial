@@ -1,4 +1,5 @@
 import { ARCHETYPES } from './constants.js';
+import { createSystemClock } from './clock.js';
 
 const SYMBOL_ARCHETYPE_HINTS = Object.freeze({
   light: { Creator: 0.35, Seeker: 0.15 },
@@ -11,7 +12,8 @@ const SYMBOL_ARCHETYPE_HINTS = Object.freeze({
 });
 
 export class ArchetypeState {
-  constructor(snapshot = {}) {
+  constructor(snapshot = {}, { clock = createSystemClock() } = {}) {
+    this.clock = clock;
     this.archetypeVector = Object.fromEntries(
       ARCHETYPES.map((name) => [name, snapshot.archetype_vector?.[name] ?? 0])
     );
@@ -27,7 +29,7 @@ export class ArchetypeState {
     const event = {
       text,
       symbols,
-      timestamp: new Date().toISOString()
+      timestamp: this.clock.nowIso()
     };
     this.speechEvents.push(event);
     this.#recordSymbols(symbols);
@@ -40,7 +42,7 @@ export class ArchetypeState {
       name,
       archetypes,
       symbols,
-      timestamp: new Date().toISOString()
+      timestamp: this.clock.nowIso()
     };
     this.actionEvents.push(event);
 

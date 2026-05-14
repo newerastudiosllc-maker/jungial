@@ -19,6 +19,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 ## Determinism Requirements
 
 - All procedural choices must accept a seed or UE `FRandomStream`.
+- Runtime timestamps and session IDs must come from an injected clock/session service during replays and QA captures.
 - Replay scripts should produce stable dream journey, journal text shape, and ArchitectState.
 - GNI/GNI-emulator outputs must be normalized before touching gameplay state.
 - Content validation must run before packaged builds and before accepting AI-authored content.

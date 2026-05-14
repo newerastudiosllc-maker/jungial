@@ -1,5 +1,8 @@
+import { createSystemClock } from './clock.js';
+
 export class JournalOfMirrors {
-  constructor(snapshot = {}) {
+  constructor(snapshot = {}, { clock = createSystemClock() } = {}) {
+    this.clock = clock;
     this.entries = [...(snapshot.entries ?? [])];
     this.lexiconOfSymbols = { ...(snapshot.lexiconOfSymbols ?? {}) };
     this.playerNotes = [...(snapshot.playerNotes ?? [])];
@@ -28,7 +31,7 @@ export class JournalOfMirrors {
       dominantArchetype,
       vibeState,
       text,
-      createdAt: new Date().toISOString()
+      createdAt: this.clock.nowIso()
     };
 
     this.entries.push(entry);
@@ -48,7 +51,7 @@ export class JournalOfMirrors {
     const note = {
       id: `note_${String(this.playerNotes.length + 1).padStart(3, '0')}`,
       text,
-      createdAt: new Date().toISOString()
+      createdAt: this.clock.nowIso()
     };
     this.playerNotes.push(note);
     return note;

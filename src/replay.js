@@ -5,8 +5,8 @@ import { createJungialRuntime } from './runtime.js';
 import { saveGameState } from './persistence.js';
 import { selectDreamJourney } from './dreamJourney.js';
 
-export async function runReplay({ script, savePath }) {
-  const runtime = createJungialRuntime({ seed: script.seed ?? 1 });
+export async function runReplay({ script, savePath, clock = undefined }) {
+  const runtime = createJungialRuntime({ seed: script.seed ?? 1, clock });
   const transcript = [];
 
   for (const input of script.inputs ?? []) {
@@ -61,6 +61,7 @@ export async function runReplay({ script, savePath }) {
     selectedDream,
     dreamJourney: journey,
     journalEntry,
+    sessionBundle: bundle,
     architectState: runtime.architect.snapshot()
   };
 
@@ -71,7 +72,7 @@ export async function runReplay({ script, savePath }) {
       journal: runtime.journal.snapshot(),
       room: runtime.chamber.snapshot(),
       archetypeState: runtime.archetypes.snapshot()
-    });
+    }, { clock });
   }
 
   return result;
