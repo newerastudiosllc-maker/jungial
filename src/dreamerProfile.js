@@ -1,11 +1,42 @@
 import { createSystemClock } from './clock.js';
 import { SeededRandom } from './random.js';
 import { stableHash } from './stableHash.js';
+import { DREAD_BUDGET_AXES, WEATHER_TAGS } from './dreamWeather.js';
 
 const DEFAULT_CONSENT = Object.freeze({
   profileMemory: true,
   crossSaveEchoes: false
 });
+const WEATHER_SYMBOLIC_TAGS = Object.freeze([
+  'annihilation',
+  'rebirth',
+  'cosmic_mystery',
+  'reflection',
+  'shadow',
+  'self_observation',
+  'safety',
+  'memory',
+  'hearth',
+  'containment',
+  'growth',
+  'innocence',
+  'fertility',
+  'beauty',
+  'dissolution',
+  'void',
+  'star',
+  'unknown',
+  'invitation',
+  'door',
+  'breath',
+  'lamp'
+]);
+const ALLOWED_WEATHER_TAGS = Object.freeze(new Set([
+  ...WEATHER_TAGS,
+  ...DREAD_BUDGET_AXES,
+  ...WEATHER_SYMBOLIC_TAGS
+]));
+const ALLOWED_DREAD_AXES = Object.freeze(new Set(DREAD_BUDGET_AXES));
 
 export class DreamerProfile {
   constructor(snapshot = {}, { clock = createSystemClock() } = {}) {
@@ -73,9 +104,15 @@ export class DreamerProfile {
       incrementMemory(this.memory.gestures, gesture, { at });
     }
     for (const tag of dreamWeather?.weatherTags ?? []) {
+      if (!ALLOWED_WEATHER_TAGS.has(tag)) {
+        continue;
+      }
       incrementMemory(this.memory.weatherTags, tag, { at });
     }
     for (const [axis, value] of Object.entries(dreamWeather?.dreadBudget ?? {})) {
+      if (!ALLOWED_DREAD_AXES.has(axis)) {
+        continue;
+      }
       if (value > 0.05) {
         addWeight(this.memory.dreadAxes, axis, value, { at });
       }

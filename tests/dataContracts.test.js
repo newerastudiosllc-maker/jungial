@@ -522,6 +522,46 @@ test('Dreamer profile validation rejects malformed present weather aggregate mem
   ]);
 });
 
+test('Dreamer profile validation rejects unknown weather aggregate keys', () => {
+  const result = validateDreamerProfile({
+    schema: 'DreamerProfileV1',
+    schemaVersion: 1,
+    profileId: 'dreamer-one',
+    rootSeed: 'root-seed-one',
+    createdAt: '2060-01-01T00:00:00.000Z',
+    updatedAt: '2060-01-01T00:00:00.000Z',
+    consent: { profileMemory: true, crossSaveEchoes: false },
+    memory: {
+      sessionCount: 1,
+      symbols: {},
+      archetypes: {},
+      actions: {},
+      dreamModules: {},
+      masks: {},
+      vibeStates: {},
+      passages: {},
+      motifs: {},
+      gestures: {},
+      echoThreads: {},
+      weatherTags: {
+        mist: { count: 1, weight: 1, lastSeenAt: null },
+        raw_childhood_address: { count: 1, weight: 1, lastSeenAt: null }
+      },
+      dreadAxes: {
+        watching: { count: 1, weight: 0.4, lastSeenAt: null },
+        privateAxis: { count: 1, weight: 0.8, lastSeenAt: null }
+      },
+      lastSessionDigest: null
+    }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'memory.weatherTags.raw_childhood_address is not allowed',
+    'memory.dreadAxes.privateAxis is not allowed'
+  ]);
+});
+
 test('Dreamer profile validation accepts old V1 profiles missing weather aggregate memory maps', () => {
   const result = validateDreamerProfile({
     schema: 'DreamerProfileV1',
@@ -626,6 +666,34 @@ test('Dreamer memory context validation accepts old V1 contexts missing weather 
   });
 
   assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('Dreamer memory context validation rejects unknown extra fields', () => {
+  const result = validateDreamerMemoryContext({
+    schema: 'DreamerMemoryContextV1',
+    schemaVersion: 1,
+    profileId: null,
+    slotId: 'slot-a',
+    saveMode: 'continue',
+    sessionCount: 0,
+    strongSymbols: [],
+    recurringArchetypes: [],
+    familiarMasks: [],
+    familiarDreamModules: [],
+    familiarActions: [],
+    familiarPassages: [],
+    familiarMotifs: [],
+    familiarGestures: [],
+    echoThreadIds: [],
+    vibeEchoes: [],
+    familiarWeatherTags: [],
+    familiarDreadAxes: [],
+    lastSessionDigest: null,
+    rawWeatherData: { note: 'do not send' }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, ['dreamerMemoryContext.rawWeatherData is not allowed']);
 });
 
 test('save game validation checks optional Dreamer profile payload', () => {

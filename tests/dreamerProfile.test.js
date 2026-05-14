@@ -125,6 +125,42 @@ test('DreamerProfile records familiar dream weather without storing raw player i
   assert.equal(snapshotText.includes('privateNote'), false);
 });
 
+test('DreamerProfile ignores malformed dream weather keys before long-term memory', () => {
+  const profile = new DreamerProfile({
+    profileId: 'dreamer-one',
+    rootSeed: 'root-one'
+  }, {
+    clock: createDeterministicClock({ startIso: '2060-01-01T00:00:00.000Z' })
+  });
+  const dreamWeather = {
+    ...createDreamWeather({
+      seed: 14,
+      weatherTags: ['mist'],
+      dreadBudget: { watching: 0.4 }
+    }),
+    weatherTags: ['mist', 'raw_childhood_address', 'private_session_note'],
+    dreadBudget: {
+      watching: 0.4,
+      privateAxis: 0.9,
+      rawFearName: 0.8
+    }
+  };
+
+  profile.recordSession({ sessionBundle: SESSION_BUNDLE, dreamWeather });
+  const snapshot = profile.snapshot();
+  const snapshotText = JSON.stringify(snapshot);
+
+  assert.equal(snapshot.memory.weatherTags.mist.count, 1);
+  assert.equal(snapshot.memory.weatherTags.raw_childhood_address, undefined);
+  assert.equal(snapshot.memory.weatherTags.private_session_note, undefined);
+  assert.equal(snapshot.memory.dreadAxes.watching.count, 1);
+  assert.equal(snapshot.memory.dreadAxes.privateAxis, undefined);
+  assert.equal(snapshot.memory.dreadAxes.rawFearName, undefined);
+  assert.equal(snapshotText.includes('raw_childhood_address'), false);
+  assert.equal(snapshotText.includes('private_session_note'), false);
+  assert.equal(snapshotText.includes('privateAxis'), false);
+});
+
 test('DreamerProfile hydrates old snapshots with empty weather memory maps', () => {
   const profile = new DreamerProfile({
     profileId: 'legacy-dreamer',
