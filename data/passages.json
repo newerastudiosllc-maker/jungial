@@ -1,0 +1,60 @@
+{
+  "schema": "PassageCatalogV1",
+  "passages": [
+    {
+      "id": "door_breathing_low",
+      "motifs": ["door", "breath", "threshold"],
+      "pressure_tags": ["unknown", "invitation"],
+      "form_tags": ["locked_door", "warm_air", "soft_knocking"],
+      "intensity_band": "strange",
+      "allowed_response_kinds": ["approach", "speak", "wait", "withdraw", "alter_object"],
+      "return_anchor_tags": ["lamp", "note", "threshold"],
+      "variation_family": "threshold_doors",
+      "base_weight": 1
+    },
+    {
+      "id": "candle_refuses_dark",
+      "motifs": ["light", "threshold", "memory"],
+      "pressure_tags": ["hope", "refusal"],
+      "form_tags": ["candle", "dim_room", "held_flame"],
+      "intensity_band": "gentle",
+      "allowed_response_kinds": ["protect", "speak", "wait", "alter_object"],
+      "return_anchor_tags": ["lamp", "note", "hearth"],
+      "variation_family": "unspent_lights",
+      "base_weight": 1
+    },
+    {
+      "id": "mirror_yesterday_room",
+      "motifs": ["mirror", "memory", "self-observation"],
+      "pressure_tags": ["reflection", "recurrence"],
+      "form_tags": ["mist_mirror", "old_room", "delayed_motion"],
+      "intensity_band": "dark",
+      "allowed_response_kinds": ["approach", "speak", "wait", "withdraw", "alter_object"],
+      "return_anchor_tags": ["mirror", "note", "threshold"],
+      "variation_family": "returning_reflections",
+      "base_weight": 0.9
+    },
+    {
+      "id": "garden_keyholes",
+      "motifs": ["garden", "growth", "key"],
+      "pressure_tags": ["beauty", "invitation"],
+      "form_tags": ["flowers", "keyholes", "soft_path"],
+      "intensity_band": "strange",
+      "allowed_response_kinds": ["approach", "speak", "wait", "alter_object"],
+      "return_anchor_tags": ["garden", "key", "threshold"],
+      "variation_family": "inviting_growth",
+      "base_weight": 0.95
+    },
+    {
+      "id": "black_star_silence",
+      "motifs": ["star", "silence", "void"],
+      "pressure_tags": ["cosmic_mystery", "annihilation"],
+      "form_tags": ["black_star", "soundless_pull", "distant_ring"],
+      "intensity_band": "horrific",
+      "allowed_response_kinds": ["approach", "withdraw", "speak", "return_anchor"],
+      "return_anchor_tags": ["lamp", "threshold", "light"],
+      "variation_family": "cosmic_thresholds",
+      "base_weight": 0.55
+    }
+  ]
+}

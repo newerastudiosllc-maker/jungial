@@ -4,17 +4,23 @@
     { "id": "awakening", "domain": "threshold", "note": "The first stirring of the chamber." },
     { "id": "beauty", "domain": "garden", "note": "A shape that asks to be witnessed without being owned." },
     { "id": "boundlessness", "domain": "void", "note": "Space without walls or edges." },
+    { "id": "breath", "domain": "body", "note": "A sign of life, pressure, and invitation." },
     { "id": "containment", "domain": "hearth", "note": "A vessel, wall, cabin, or held breath." },
     { "id": "cosmic mystery", "domain": "cosmic", "note": "Scale too large for direct speech." },
     { "id": "dissolution", "domain": "void", "note": "The loosening of identity into silence." },
+    { "id": "door", "domain": "threshold", "note": "A closed or open edge between states." },
     { "id": "fertility", "domain": "garden", "note": "A hidden readiness to become." },
     { "id": "fog", "domain": "threshold", "note": "Presence before a mask gathers." },
+    { "id": "garden", "domain": "garden", "note": "A living place where growth becomes visible." },
     { "id": "growth", "domain": "garden", "note": "A living movement toward form." },
     { "id": "hearth", "domain": "hearth", "note": "Warmth remembered by a room." },
     { "id": "innocence", "domain": "garden", "note": "A beginning that has not learned its name." },
+    { "id": "key", "domain": "threshold", "note": "Permission, access, and chosen entry." },
+    { "id": "lamp", "domain": "threshold", "note": "A carried return point when the dark gathers." },
     { "id": "light", "domain": "threshold", "note": "Recognition made visible." },
     { "id": "memory", "domain": "hearth", "note": "The room keeping what passed through it." },
     { "id": "mirror", "domain": "reflection", "note": "A surface that returns altered sight." },
+    { "id": "note", "domain": "threshold", "note": "A small written presence that waits to be read." },
     { "id": "portal", "domain": "threshold", "note": "A way through that opens after recognition." },
     { "id": "rebirth", "domain": "cosmic", "note": "Return after the form has been emptied." },
     { "id": "reflection", "domain": "reflection", "note": "The self becoming visible at an angle." },
@@ -22,6 +28,8 @@
     { "id": "self-observation", "domain": "reflection", "note": "The watcher noticing itself watching." },
     { "id": "shadow", "domain": "reflection", "note": "The disowned figure in the field of sight." },
     { "id": "silence", "domain": "threshold", "note": "Meaning held before words arrive." },
-    { "id": "threshold", "domain": "threshold", "note": "The place before change becomes visible." }
+    { "id": "star", "domain": "cosmic", "note": "A distant light or wound in the dream sky." },
+    { "id": "threshold", "domain": "threshold", "note": "The place before change becomes visible." },
+    { "id": "void", "domain": "void", "note": "A depth where form loosens and scale disappears." }
   ]
 }

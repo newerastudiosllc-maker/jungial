@@ -10,7 +10,8 @@ export function loadBundledContentCatalog() {
     toolSigils: require('../data/tool_sigils.json').tool_sigils,
     dreamModules: require('../data/dream_modules.json').modules,
     masks: require('../data/masks.json').masks,
-    symbolLexicon: require('../data/symbols.json').symbols
+    symbolLexicon: require('../data/symbols.json').symbols,
+    passages: require('../data/passages.json').passages
   });
 }
 
@@ -42,6 +43,17 @@ export function normalizeContentCatalog(raw) {
       material: mask.material ?? mask.visual_material_placeholder,
       dialogueTone: mask.dialogueTone ?? mask.dialogue_tone_placeholder,
       minCoherence: mask.minCoherence ?? mask.min_coherence ?? 0
+    })),
+    passages: (raw.passages ?? []).map((passage) => ({
+      id: passage.id,
+      motifs: [...(passage.motifs ?? [])],
+      pressureTags: [...(passage.pressureTags ?? passage.pressure_tags ?? [])],
+      formTags: [...(passage.formTags ?? passage.form_tags ?? [])],
+      intensityBand: passage.intensityBand ?? passage.intensity_band ?? 'strange',
+      allowedResponseKinds: [...(passage.allowedResponseKinds ?? passage.allowed_response_kinds ?? [])],
+      returnAnchorTags: [...(passage.returnAnchorTags ?? passage.return_anchor_tags ?? [])],
+      variationFamily: passage.variationFamily ?? passage.variation_family ?? '',
+      baseWeight: passage.baseWeight ?? passage.base_weight ?? 1
     }))
   };
 }
@@ -51,6 +63,7 @@ export function validateContentCatalog(catalog) {
   const knownArchetypes = new Set(normalized.archetypes.length > 0 ? normalized.archetypes : ARCHETYPES);
   const knownAxes = new Set(FEELING_AXES);
   const knownSymbols = new Set(normalized.symbolLexicon.map((symbol) => symbol.id));
+  const supportedIntensityBands = new Set(['gentle', 'strange', 'dark', 'horrific', 'abyssal']);
   const errors = [];
 
   for (const module of normalized.dreamModules) {
@@ -80,6 +93,27 @@ export function validateContentCatalog(catalog) {
       if (!knownArchetypes.has(archetype)) {
         errors.push(`masks.${mask.id} has unknown archetype tag ${archetype}`);
       }
+    }
+  }
+
+  for (const passage of normalized.passages) {
+    if (knownSymbols.size > 0) {
+      for (const motif of passage.motifs) {
+        if (!knownSymbols.has(motif)) {
+          errors.push(`passages.${passage.id} has unknown motif ${motif}`);
+        }
+      }
+      for (const anchor of passage.returnAnchorTags) {
+        if (!knownSymbols.has(anchor)) {
+          errors.push(`passages.${passage.id} has unknown return anchor ${anchor}`);
+        }
+      }
+    }
+    if (!supportedIntensityBands.has(passage.intensityBand)) {
+      errors.push(`passages.${passage.id} has unsupported intensity band ${passage.intensityBand}`);
+    }
+    if (!passage.variationFamily) {
+      errors.push(`passages.${passage.id} variationFamily is required`);
     }
   }
 

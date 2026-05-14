@@ -101,3 +101,43 @@ test('chamber, dreamflow, and masks can run entirely from bundled content catalo
   assert.ok(catalog.dreamModules.some((module) => module.id === selectedDream.id));
   assert.ok(catalog.masks.some((candidate) => candidate.id === mask.id));
 });
+
+test('bundled Passage catalog loads into runtime-ready catalog objects', () => {
+  const catalog = loadBundledContentCatalog();
+
+  assert.ok(catalog.passages.length >= 5);
+  const door = catalog.passages.find((passage) => passage.id === 'door_breathing_low');
+  assert.deepEqual(door.motifs, ['door', 'breath', 'threshold']);
+  assert.equal(door.intensityBand, 'strange');
+  assert.equal(door.variationFamily, 'threshold_doors');
+});
+
+test('content catalog validation rejects malformed Passage content', () => {
+  const result = validateContentCatalog({
+    archetypes: ['Seeker'],
+    symbolLexicon: [{ id: 'known_symbol', domain: 'test', note: 'Known.' }],
+    toolSigils: [],
+    dreamModules: [],
+    masks: [],
+    passages: [
+      {
+        id: 'bad_passage',
+        motifs: ['unknown_symbol'],
+        pressureTags: ['unknown'],
+        formTags: [],
+        intensityBand: 'too_much',
+        allowedResponseKinds: [],
+        returnAnchorTags: ['missing_anchor'],
+        variationFamily: ''
+      }
+    ]
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'passages.bad_passage has unknown motif unknown_symbol',
+    'passages.bad_passage has unknown return anchor missing_anchor',
+    'passages.bad_passage has unsupported intensity band too_much',
+    'passages.bad_passage variationFamily is required'
+  ]);
+});
