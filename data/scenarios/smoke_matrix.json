@@ -36,6 +36,26 @@
       "seed": 91,
       "emulateGni": true,
       "clockStartIso": "2070-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "controller-threshold-replay",
+      "kind": "replay",
+      "clockStartIso": "2055-01-03T00:00:00.000Z",
+      "script": {
+        "seed": 44,
+        "inputs": [
+          {
+            "source": "controller",
+            "kind": "action",
+            "name": "speak_word"
+          },
+          {
+            "source": "controller",
+            "kind": "tool",
+            "toolId": "key_of_portals"
+          }
+        ]
+      }
     }
   ]
 }

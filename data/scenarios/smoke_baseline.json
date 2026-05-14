@@ -19,6 +19,12 @@
       "hash": "8ca04db8b51c93e287d39b27f38b19cf287ce06c382b17aed7bf5a119b279db0",
       "selectedDreamId": "space_black_hole",
       "journeySummary": "entry:Space / Black Hole -> pressure:Space / Black Hole -> mirror:Cabin -> return:Cabin"
+    },
+    {
+      "id": "controller-threshold-replay",
+      "hash": "177d757e82d58804126986c1b1cd682590dc24474cc3765b0453b658fa82574b",
+      "selectedDreamId": "garden",
+      "journeySummary": "entry:Garden -> pressure:Garden -> mirror:Mirror Hall -> return:Garden"
     }
   ]
 }

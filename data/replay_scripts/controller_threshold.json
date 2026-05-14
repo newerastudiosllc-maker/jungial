@@ -1,0 +1,15 @@
+{
+  "seed": 44,
+  "inputs": [
+    {
+      "source": "controller",
+      "kind": "action",
+      "name": "speak_word"
+    },
+    {
+      "source": "controller",
+      "kind": "tool",
+      "toolId": "key_of_portals"
+    }
+  ]
+}
