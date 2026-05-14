@@ -15,6 +15,7 @@ npm test
 npm run simulate
 npm run validate
 npm run scenarios
+npm run scenario:check
 npm run fixtures
 ```
 
@@ -45,6 +46,18 @@ npm run scenarios
 ```
 
 This writes `saves/scenarios/scenario-report.json` with stable hashes for each scenario.
+
+To compare the smoke matrix against the committed baseline:
+
+```powershell
+npm run scenario:check
+```
+
+When intentional procedural changes happen, refresh the baseline with:
+
+```powershell
+npm run scenario:baseline
+```
 
 ## Folder Structure
 

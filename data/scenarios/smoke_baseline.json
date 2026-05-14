@@ -1,0 +1,18 @@
+{
+  "schema": "JungialScenarioBaselineV1",
+  "generatedFrom": "JungialScenarioReportV1",
+  "scenarios": [
+    {
+      "id": "sim-emulated-gni",
+      "hash": "5c0e545c509488f7e85ce7528207f97654831e25b6bda6c31ec5e84cdaa061f1",
+      "selectedDreamId": "white_void",
+      "journeySummary": "entry:Boundless White Void -> pressure:Space / Black Hole -> mirror:Space / Black Hole -> return:Boundless White Void"
+    },
+    {
+      "id": "threshold-word-replay",
+      "hash": "5079a4c2f9160ed5fba1cf191a15cd980ee24a9883baac296887e37a09878af9",
+      "selectedDreamId": "garden",
+      "journeySummary": "entry:Garden -> pressure:Garden -> mirror:Mirror Hall -> return:Garden"
+    }
+  ]
+}
