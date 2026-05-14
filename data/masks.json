@@ -1,0 +1,45 @@
+{
+  "schema": "MaskCatalogV1",
+  "masks": [
+    {
+      "id": "mirror_child",
+      "name": "Mirror Child",
+      "archetype_tags": ["Child", "Shadow"],
+      "visual_material_placeholder": "misted_glass_skin_placeholder",
+      "dialogue_tone_placeholder": "small, exact, almost remembered",
+      "min_coherence": 0.1
+    },
+    {
+      "id": "ash_faced_one",
+      "name": "Ash-Faced One",
+      "archetype_tags": ["Shadow", "Destroyer"],
+      "visual_material_placeholder": "matte_ash_with_inner_ember_placeholder",
+      "dialogue_tone_placeholder": "low, spare, unfinished",
+      "min_coherence": 0.15
+    },
+    {
+      "id": "weaver",
+      "name": "Weaver",
+      "archetype_tags": ["Creator", "Mother", "Sage"],
+      "visual_material_placeholder": "threaded_light_fog_placeholder",
+      "dialogue_tone_placeholder": "patient, patterned, indirect",
+      "min_coherence": 0.2
+    },
+    {
+      "id": "jester_of_glass",
+      "name": "Jester of Glass",
+      "archetype_tags": ["Trickster", "Shadow"],
+      "visual_material_placeholder": "fractured_prism_placeholder",
+      "dialogue_tone_placeholder": "playful, brittle, revealing",
+      "min_coherence": 0.1
+    },
+    {
+      "id": "double",
+      "name": "Double",
+      "archetype_tags": ["Shadow", "Seeker", "Hero"],
+      "visual_material_placeholder": "backlit_silhouette_placeholder",
+      "dialogue_tone_placeholder": "familiar, delayed, almost yours",
+      "min_coherence": 0.25
+    }
+  ]
+}

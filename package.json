@@ -1,0 +1,11 @@
+{
+  "name": "jungial-prototype-foundation",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Engine-agnostic Jungian dreamscape prototype foundation with a GNI-ready AI boundary.",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "simulate": "node src/simulation.js"
+  }
+}

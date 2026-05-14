@@ -1,0 +1,90 @@
+{
+  "schema": "DreamModuleCatalogV1",
+  "modules": [
+    {
+      "id": "cabin",
+      "name": "Cabin",
+      "symbolic_tags": ["safety", "memory", "hearth", "containment"],
+      "archetype_affinities": {
+        "Mother": 1.1,
+        "Father": 0.7,
+        "Child": 0.7,
+        "Sage": 0.4
+      },
+      "vibe_affinities": {
+        "expansive_confined": -0.5,
+        "warm_cold": -0.35,
+        "bright_dark": 0.15
+      },
+      "base_weight": 1
+    },
+    {
+      "id": "garden",
+      "name": "Garden",
+      "symbolic_tags": ["growth", "innocence", "fertility", "beauty"],
+      "archetype_affinities": {
+        "Child": 1,
+        "Lover": 0.8,
+        "Creator": 0.8,
+        "Mother": 0.5
+      },
+      "vibe_affinities": {
+        "hopeful_melancholic": 0.6,
+        "bright_dark": 0.4,
+        "warm_cold": -0.2
+      },
+      "base_weight": 1
+    },
+    {
+      "id": "white_void",
+      "name": "Boundless White Void",
+      "symbolic_tags": ["boundlessness", "dissolution", "silence"],
+      "archetype_affinities": {
+        "Seeker": 0.9,
+        "Sage": 0.7,
+        "Anima": 0.4,
+        "Animus": 0.4
+      },
+      "vibe_affinities": {
+        "expansive_confined": 0.8,
+        "bright_dark": 0.7,
+        "calm_tense": -0.3
+      },
+      "base_weight": 1
+    },
+    {
+      "id": "space_black_hole",
+      "name": "Space / Black Hole",
+      "symbolic_tags": ["annihilation", "rebirth", "cosmic mystery"],
+      "archetype_affinities": {
+        "Destroyer": 1.1,
+        "Seeker": 0.8,
+        "Sage": 0.5,
+        "Shadow": 0.4
+      },
+      "vibe_affinities": {
+        "bright_dark": -0.8,
+        "expansive_confined": 0.7,
+        "hopeful_melancholic": -0.35
+      },
+      "base_weight": 1
+    },
+    {
+      "id": "mirror_hall",
+      "name": "Mirror Hall",
+      "symbolic_tags": ["reflection", "shadow", "self-observation"],
+      "archetype_affinities": {
+        "Shadow": 1,
+        "Trickster": 0.7,
+        "Child": 0.5,
+        "Sage": 0.4
+      },
+      "vibe_affinities": {
+        "calm_tense": 0.25,
+        "bright_dark": -0.35,
+        "expansive_confined": -0.2
+      },
+      "base_weight": 1
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/gni_directive.schema.json",
+  "title": "JungialDirectiveV1",
+  "type": "object",
+  "required": ["schema"],
+  "properties": {
+    "schema": { "const": "JungialDirectiveV1" },
+    "dreamWeightDeltas": {
+      "type": "object",
+      "additionalProperties": { "type": "number" }
+    },
+    "symbolEchoes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "maskPressure": {
+      "type": "object",
+      "additionalProperties": { "type": "number" }
+    },
+    "pacingDelta": {
+      "type": "object",
+      "additionalProperties": { "type": "number" }
+    }
+  },
+  "additionalProperties": false
+}

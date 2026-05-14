@@ -1,0 +1,18 @@
+{
+  "schema": "ArchetypeCatalogV1",
+  "archetypes": [
+    "Hero",
+    "Shadow",
+    "Anima",
+    "Animus",
+    "Sage",
+    "Trickster",
+    "Creator",
+    "Destroyer",
+    "Child",
+    "Mother",
+    "Father",
+    "Lover",
+    "Seeker"
+  ]
+}

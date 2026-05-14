@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/content_catalog.schema.json",
+  "title": "JungialContentCatalogV1",
+  "type": "object",
+  "properties": {
+    "archetypes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "tool_sigils": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "effect"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "effect": { "type": "string" }
+        }
+      }
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "symbolic_tags", "archetype_affinities", "vibe_affinities", "base_weight"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "symbolic_tags": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "archetype_affinities": {
+            "type": "object",
+            "additionalProperties": { "type": "number" }
+          },
+          "vibe_affinities": {
+            "type": "object",
+            "additionalProperties": { "type": "number" }
+          },
+          "base_weight": { "type": "number" }
+        }
+      }
+    },
+    "masks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "archetype_tags",
+          "visual_material_placeholder",
+          "dialogue_tone_placeholder",
+          "min_coherence"
+        ],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "archetype_tags": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "visual_material_placeholder": { "type": "string" },
+          "dialogue_tone_placeholder": { "type": "string" },
+          "min_coherence": { "type": "number", "minimum": 0, "maximum": 1 }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/session_bundle.schema.json",
+  "title": "SessionBundleV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "sessionId",
+    "dominantArchetype",
+    "coherence",
+    "vibeState",
+    "recentSymbols",
+    "recentActions",
+    "roomConfigSnapshot",
+    "archetypeVector"
+  ],
+  "properties": {
+    "schema": { "const": "SessionBundleV1" },
+    "sessionId": { "type": "string" },
+    "dominantArchetype": { "type": "string" },
+    "coherence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "vibeState": { "type": "string" },
+    "recentSymbols": { "type": "array", "items": { "type": "string" } },
+    "recentActions": { "type": "array", "items": { "type": "string" } },
+    "roomConfigSnapshot": { "type": "object" },
+    "selectedDream": { "type": ["object", "null"] },
+    "archetypeVector": {
+      "type": "object",
+      "additionalProperties": { "type": "number" }
+    }
+  }
+}

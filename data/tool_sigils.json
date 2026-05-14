@@ -1,0 +1,25 @@
+{
+  "schema": "ToolSigilCatalogV1",
+  "tool_sigils": [
+    {
+      "id": "key_of_portals",
+      "name": "Key of Portals",
+      "effect": "opens_dream_transition"
+    },
+    {
+      "id": "glyph_quill",
+      "name": "Glyph Quill",
+      "effect": "writes_journal_placeholder"
+    },
+    {
+      "id": "mirror_lens",
+      "name": "Mirror Lens",
+      "effect": "changes_visual_mood"
+    },
+    {
+      "id": "lamp_of_forms",
+      "name": "Lamp of Forms",
+      "effect": "spawns_forms_lights_mirrors"
+    }
+  ]
+}

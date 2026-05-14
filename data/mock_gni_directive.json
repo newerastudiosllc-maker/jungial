@@ -1,0 +1,16 @@
+{
+  "schema": "JungialDirectiveV1",
+  "dreamWeightDeltas": {
+    "mirror_hall": 0.35,
+    "garden": 0.15
+  },
+  "symbolEchoes": ["mirror", "portal"],
+  "maskPressure": {
+    "double": 0.2,
+    "mirror_child": 0.1
+  },
+  "pacingDelta": {
+    "intensity": 0.1,
+    "silence": -0.05
+  }
+}

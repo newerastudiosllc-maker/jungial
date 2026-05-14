@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/save_game.schema.json",
+  "title": "JungialSaveGameV1",
+  "type": "object",
+  "required": ["room", "archetypeState", "journal", "architectState"],
+  "properties": {
+    "room": { "type": "object" },
+    "archetypeState": {
+      "type": "object",
+      "required": ["archetype_vector", "coherence", "vibe_state", "symbol_hits"],
+      "properties": {
+        "archetype_vector": {
+          "type": "object",
+          "additionalProperties": { "type": "number" }
+        },
+        "coherence": { "type": "number" },
+        "vibe_state": { "type": "string" },
+        "symbol_hits": { "type": "object" },
+        "speech_events": { "type": "array" },
+        "action_events": { "type": "array" },
+        "room_config_snapshot": { "type": ["object", "null"] }
+      }
+    },
+    "feelingState": { "type": "object" },
+    "journal": { "type": "object" },
+    "architectState": { "type": "object" },
+    "lastSessionBundle": { "type": "object" },
+    "pendingGniRequest": { "type": "object" },
+    "appliedGniDirective": { "type": ["object", "null"] }
+  }
+}
