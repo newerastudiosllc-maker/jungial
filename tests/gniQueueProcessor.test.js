@@ -144,6 +144,8 @@ test('GNI queue processor CLI args and provider factory support HTTP handoff opt
       '--gni-token-env=TEST_GNI_TOKEN',
       '--gni-timeout-ms=2500',
       '--limit=2',
+      '--clock-start=2090-01-01T00:00:00.000Z',
+      '--clock-step-ms=500',
       '--json'
     ]);
     const provider = createGniQueueProviderFromOptions(options);
@@ -155,6 +157,8 @@ test('GNI queue processor CLI args and provider factory support HTTP handoff opt
       gniTokenEnv: 'TEST_GNI_TOKEN',
       gniTimeoutMs: 2500,
       limit: 2,
+      clockStartIso: '2090-01-01T00:00:00.000Z',
+      clockStepMs: 500,
       json: true
     });
     assert.equal(provider.endpoint, 'https://gni.local/process');
@@ -166,6 +170,35 @@ test('GNI queue processor CLI args and provider factory support HTTP handoff opt
     } else {
       process.env.TEST_GNI_TOKEN = previous;
     }
+  }
+});
+
+test('saved GNI queue processor can stamp deterministic process timestamps', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-queue-clock-'));
+  const savePath = join(dir, 'save.json');
+  const queue = new GniDirectiveQueue();
+  queue.enqueue({ request: REQUEST, reason: 'pending' });
+
+  try {
+    await saveGameState(savePath, {
+      gniQueue: queue.snapshot(),
+      architectState: new ArchitectState().snapshot()
+    });
+
+    await processSavedGniQueue({
+      savePath,
+      clock: {
+        nowIso() {
+          return '2090-01-01T00:00:00.000Z';
+        }
+      },
+      provider: async () => ({ dreamWeightDeltas: { garden: 0.1 } })
+    });
+    const saved = await loadGameState(savePath);
+
+    assert.equal(saved.gniQueue.resolved[0].resolvedAt, '2090-01-01T00:00:00.000Z');
+  } finally {
+    await rm(dir, { recursive: true, force: true });
   }
 });
 

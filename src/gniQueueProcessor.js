@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 
 import { ArchitectState } from './ai.js';
 import { callGniProvider } from './gniBridge.js';
+import { createDeterministicClock } from './clock.js';
 import { GniHttpProvider } from './gniHttpProvider.js';
 import { GniDirectiveQueue } from './gniQueue.js';
 import { loadGameState, saveGameState } from './persistence.js';
@@ -121,6 +122,10 @@ export function parseGniQueueProcessorArgs(args) {
       options.gniTimeoutMs = Number(arg.slice('--gni-timeout-ms='.length));
     } else if (arg.startsWith('--limit=')) {
       options.limit = Number(arg.slice('--limit='.length));
+    } else if (arg.startsWith('--clock-start=')) {
+      options.clockStartIso = arg.slice('--clock-start='.length);
+    } else if (arg.startsWith('--clock-step-ms=')) {
+      options.clockStepMs = Number(arg.slice('--clock-step-ms='.length));
     } else if (arg === '--json') {
       options.json = true;
     }
@@ -165,7 +170,7 @@ function nowIso(clock) {
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const options = parseGniQueueProcessorArgs(process.argv.slice(2));
   if (!options.savePath) {
-    console.error('Usage: node src/gniQueueProcessor.js --save=<save.json> [--out=<save.json>] [--gni-response=<directive.json>] [--gni-endpoint=<url>] [--gni-token-env=GNI_API_KEY] [--limit=1] [--json]');
+    console.error('Usage: node src/gniQueueProcessor.js --save=<save.json> [--out=<save.json>] [--gni-response=<directive.json>] [--gni-endpoint=<url>] [--gni-token-env=GNI_API_KEY] [--limit=1] [--clock-start=<iso>] [--clock-step-ms=1000] [--json]');
     process.exit(1);
   }
 
@@ -173,7 +178,10 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     savePath: options.savePath,
     outputPath: options.outputPath ?? options.savePath,
     provider: await loadGniQueueProviderFromOptions(options),
-    limit: options.limit ?? Infinity
+    limit: options.limit ?? Infinity,
+    clock: options.clockStartIso
+      ? createDeterministicClock({ startIso: options.clockStartIso, stepMs: options.clockStepMs ?? 1000 })
+      : null
   });
 
   if (options.json) {
