@@ -6,12 +6,15 @@
   "mood": "stillness",
   "pressure": "low",
   "sourceTags": [
+    "dissolution",
+    "silence",
     "threshold",
     "memory"
   ],
   "resultingTags": [
     "silence",
     "threshold",
+    "dissolution",
     "memory"
   ],
   "suppressedTags": [],

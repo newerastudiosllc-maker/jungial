@@ -9,7 +9,6 @@ import { inspectTrace } from './traceInspector.js';
 import { processPendingGniQueue } from './gniQueueProcessor.js';
 import { checkGniContract } from './gniContractCheck.js';
 import { DreamerProfile } from './dreamerProfile.js';
-import { createDreamWeather, createWeatherTrace } from './dreamWeather.js';
 
 const FIXTURE_FILES = Object.freeze([
   'session_bundle_v1.json',
@@ -71,16 +70,8 @@ export async function exportContractFixtures({
     slotId: 'fixture-slot',
     mode: 'continue'
   });
-  const dreamWeather = createDreamWeather({
-    seed,
-    covenant: sessionCovenant,
-    weatherTags: echoTrace.motifsTouched
-  });
-  const weatherTrace = createWeatherTrace({
-    weather: dreamWeather,
-    sourceTags: echoTrace.motifsTouched,
-    seed
-  });
+  const dreamWeather = run.dreamWeather;
+  const weatherTrace = run.weatherTrace;
   const gniRequest = run.gniRequest;
   const gniDirective = run.appliedGniDirective;
   const gniBridgeResult = run.gniBridgeResult;

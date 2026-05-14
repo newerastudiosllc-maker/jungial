@@ -7,6 +7,7 @@ import {
   validateDreamerProfile,
   validateDreamWeather,
   validateEchoTrace,
+  validateFixtureManifest,
   validateGniBridgeResult,
   validateGniContractCheckReport,
   validateGniDirectiveQueue,
@@ -17,6 +18,7 @@ import {
   validateSessionCovenant,
   validateSessionBundle,
   validateTrace,
+  validateTraceSummary,
   validateWeatherTrace
 } from './contracts.js';
 
@@ -52,6 +54,10 @@ export function validateContractDocument(document) {
       return validateGniQueueProcessResult(document);
     case 'JungialTraceV1':
       return validateTrace(document);
+    case 'JungialTraceSummaryV1':
+      return validateTraceSummary(document);
+    case 'JungialContractFixtureManifestV1':
+      return validateFixtureManifest(document);
     case 'JungialSaveGame':
       return validateSaveGame(document);
     default:

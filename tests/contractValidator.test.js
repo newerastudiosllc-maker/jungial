@@ -27,6 +27,23 @@ test('contract validator routes known Jungial contract schemas', () => {
       payload: { statusCounts: { directive_ready: 1 } }
     }]
   });
+  const traceSummaryResult = validateContractDocument({
+    schema: 'JungialTraceSummaryV1',
+    runId: 'trace-one',
+    eventCounts: { 'gni.request.created': 1 },
+    journeySummary: null,
+    symbolTrail: ['portal'],
+    gniRequestCount: 1,
+    gniQueuedRequestCount: 0,
+    gniDirectiveCount: 0
+  });
+  const manifestResult = validateContractDocument({
+    schema: 'JungialContractFixtureManifestV1',
+    seed: 777,
+    clockStartIso: '2060-01-01T00:00:00.000Z',
+    files: ['session_bundle_v1.json'],
+    hash: 'a'.repeat(64)
+  });
   const gniContractCheckResult = validateContractDocument({
     schema: 'GniContractCheckReportV1',
     ok: true,
@@ -128,6 +145,8 @@ test('contract validator routes known Jungial contract schemas', () => {
 
   assert.deepEqual(directiveResult, { valid: true, errors: [] });
   assert.deepEqual(traceResult, { valid: true, errors: [] });
+  assert.deepEqual(traceSummaryResult, { valid: true, errors: [] });
+  assert.deepEqual(manifestResult, { valid: true, errors: [] });
   assert.deepEqual(gniContractCheckResult, { valid: true, errors: [] });
   assert.deepEqual(dreamerProfileResult, { valid: true, errors: [] });
   assert.deepEqual(sessionCovenantResult, { valid: true, errors: [] });
@@ -172,7 +191,7 @@ test('contract validator routes WeatherTraceV1 documents', () => {
   assert.deepEqual(result, { valid: true, errors: [] });
 });
 
-test('contract validator validates generated Dream Weather fixture files', async () => {
+test('contract validator validates generated Dream Weather and summary fixture files', async () => {
   const dir = await mkdtemp(join(tmpdir(), 'jungial-weather-contracts-'));
 
   try {
@@ -184,18 +203,60 @@ test('contract validator validates generated Dream Weather fixture files', async
 
     const report = await validateContractFiles([
       join(dir, 'dream_weather_v1.json'),
-      join(dir, 'weather_trace_v1.json')
+      join(dir, 'weather_trace_v1.json'),
+      join(dir, 'trace_summary_v1.json'),
+      join(dir, 'manifest.json')
     ]);
 
     assert.equal(report.ok, true);
     assert.deepEqual(report.files.map((file) => file.schema), [
       'DreamWeatherV1',
-      'WeatherTraceV1'
+      'WeatherTraceV1',
+      'JungialTraceSummaryV1',
+      'JungialContractFixtureManifestV1'
     ]);
-    assert.deepEqual(report.files.map((file) => file.valid), [true, true]);
+    assert.deepEqual(report.files.map((file) => file.valid), [true, true, true, true]);
   } finally {
     await rm(dir, { recursive: true, force: true });
   }
+});
+
+test('contract validator rejects malformed trace summaries and fixture manifests', () => {
+  const traceSummaryResult = validateContractDocument({
+    schema: 'JungialTraceSummaryV1',
+    runId: '',
+    eventCounts: { ok: 1, bad: -1, fractional: 0.5 },
+    journeySummary: 7,
+    symbolTrail: ['portal', ''],
+    gniRequestCount: -1,
+    gniQueuedRequestCount: 0.5,
+    gniDirectiveCount: 0
+  });
+  const manifestResult = validateContractDocument({
+    schema: 'JungialContractFixtureManifestV1',
+    seed: '777',
+    clockStartIso: '',
+    files: ['session_bundle_v1.json', ''],
+    hash: 'not-a-hash'
+  });
+
+  assert.equal(traceSummaryResult.valid, false);
+  assert.deepEqual(traceSummaryResult.errors, [
+    'runId is required',
+    'eventCounts.bad must be a non-negative integer',
+    'eventCounts.fractional must be a non-negative integer',
+    'journeySummary must be a string or null',
+    'symbolTrail[1] must be a non-empty string',
+    'gniRequestCount must be a non-negative integer',
+    'gniQueuedRequestCount must be a non-negative integer'
+  ]);
+  assert.equal(manifestResult.valid, false);
+  assert.deepEqual(manifestResult.errors, [
+    'seed must be a number',
+    'clockStartIso is required',
+    'files[1] must be a non-empty string',
+    'hash must be a 64-character lowercase hex string'
+  ]);
 });
 
 test('contract validator requires save game migration metadata', () => {

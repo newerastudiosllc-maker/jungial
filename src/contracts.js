@@ -854,6 +854,63 @@ export function validateTrace(trace) {
   };
 }
 
+export function validateTraceSummary(summary) {
+  const errors = [];
+
+  if (summary?.schema !== 'JungialTraceSummaryV1') {
+    errors.push('schema must be JungialTraceSummaryV1');
+  }
+  if (!isNonEmptyString(summary?.runId)) {
+    errors.push('runId is required');
+  }
+  if (!isObject(summary?.eventCounts)) {
+    errors.push('eventCounts must be an object');
+  } else {
+    for (const [key, value] of Object.entries(summary.eventCounts)) {
+      if (!isNonNegativeInteger(value)) {
+        errors.push(`eventCounts.${key} must be a non-negative integer`);
+      }
+    }
+  }
+  if (!isNullableString(summary?.journeySummary)) {
+    errors.push('journeySummary must be a string or null');
+  }
+  errors.push(...validateStringList(summary?.symbolTrail, 'symbolTrail'));
+  for (const key of ['gniRequestCount', 'gniQueuedRequestCount', 'gniDirectiveCount']) {
+    if (!isNonNegativeInteger(summary?.[key])) {
+      errors.push(`${key} must be a non-negative integer`);
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function validateFixtureManifest(manifest) {
+  const errors = [];
+
+  if (manifest?.schema !== 'JungialContractFixtureManifestV1') {
+    errors.push('schema must be JungialContractFixtureManifestV1');
+  }
+  if (!Number.isFinite(manifest?.seed)) {
+    errors.push('seed must be a number');
+  }
+  if (!isNonEmptyString(manifest?.clockStartIso)) {
+    errors.push('clockStartIso is required');
+  }
+  errors.push(...validateStringList(manifest?.files, 'files'));
+  if (!/^[a-f0-9]{64}$/.test(manifest?.hash ?? '')) {
+    errors.push('hash must be a 64-character lowercase hex string');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
 function validateContractCheckRequest(request, errors) {
   if (!isObject(request)) {
     errors.push('request must be an object');
@@ -1315,6 +1372,10 @@ function isObject(value) {
 
 function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0;
+}
+
+function isNonNegativeInteger(value) {
+  return Number.isInteger(value) && value >= 0;
 }
 
 function isNullableString(value) {

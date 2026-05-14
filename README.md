@@ -262,7 +262,9 @@ Export GNI contract fixtures:
 npm run fixtures
 ```
 
-This writes `fixtures/session_bundle_v1.json`, `fixtures/session_covenant_v1.json`, `fixtures/passage_v1.json`, `fixtures/echo_trace_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/dream_weather_v1.json`, `fixtures/weather_trace_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
+This writes `fixtures/session_bundle_v1.json`, `fixtures/session_covenant_v1.json`, `fixtures/passage_v1.json`, `fixtures/echo_trace_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/dream_weather_v1.json`, `fixtures/weather_trace_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_contract_check_report_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
+
+The provider-safe fixture surface is `gni_request_v1.json` and its nested `SessionBundleV1`. Full SaveGame fixtures are internal examples for resume, migration, and QA flows; they may include local or session state that should not be treated as provider input.
 
 Validate generated fixtures, SaveGame envelopes, and mock GNI directives against the strict contract gate:
 
