@@ -125,7 +125,7 @@ test('validates DreamWeatherV1 contracts', () => {
   const result = validateDreamWeather({
     ...weather,
     pressure: 'crushing',
-    dreadBudget: { ...weather.dreadBudget, watching: 2 },
+    dreadBudget: { ...weather.dreadBudget, watching: 2, teeth: 0.1 },
     atmosphere: { ...weather.atmosphere, fogDensity: -0.1 },
     rawPrompt: 'do not store'
   });
@@ -134,8 +134,24 @@ test('validates DreamWeatherV1 contracts', () => {
   assert.deepEqual(result.errors, [
     'dreamWeather.rawPrompt is not allowed',
     'pressure must be one of low, medium, heavy, storm',
+    'dreadBudget.teeth is not allowed',
     'dreadBudget.watching must be between 0 and 1',
     'atmosphere.fogDensity must be between 0 and 1'
+  ]);
+});
+
+test('DreamWeatherV1 validation rejects private-looking weather tags', () => {
+  const weather = createDreamWeather({ seed: 12 });
+  const result = validateDreamWeather({
+    ...weather,
+    weatherTags: ['threshold', 'raw_childhood_address'],
+    suppressedTags: ['private_session_note']
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'weatherTags[1] must be an allowed weather tag',
+    'suppressedTags[0] must be an allowed weather tag'
   ]);
 });
 
@@ -164,6 +180,24 @@ test('validates WeatherTraceV1 contracts', () => {
     'weatherId must be a string or null',
     'sourceTags[1] must be a non-empty string',
     'strongestDreadAxis must be one of pursuit, bodyUnease, cosmicDread, disorientation, loss, watching, claustrophobia'
+  ]);
+});
+
+test('WeatherTraceV1 validation rejects tags outside the weather symbolic surface', () => {
+  const weather = createDreamWeather({ seed: 13 });
+  const trace = createWeatherTrace({ weather, seed: 13 });
+  const result = validateWeatherTrace({
+    ...trace,
+    sourceTags: ['door', 'private_name'],
+    resultingTags: ['threshold', 'raw_prompt_fragment'],
+    suppressedTags: ['memory', 'home_address']
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'sourceTags[1] must be an allowed weather tag',
+    'resultingTags[1] must be an allowed weather tag',
+    'suppressedTags[1] must be an allowed weather tag'
   ]);
 });
 
@@ -202,6 +236,8 @@ test('session bundle validation rejects malformed dreamWeatherContext pressure o
     ...validSessionBundle(),
     dreamWeatherContext: {
       ...toGniWeatherContext({ dreamWeather }),
+      dreadBudget: { ...dreamWeather.dreadBudget, teeth: 0.1 },
+      weatherTags: ['threshold', 'private_symbol'],
       pressure: 'thunder',
       rawPrompt: 'not allowed'
     }
@@ -210,7 +246,9 @@ test('session bundle validation rejects malformed dreamWeatherContext pressure o
   assert.equal(result.valid, false);
   assert.deepEqual(result.errors, [
     'dreamWeatherContext.rawPrompt is not allowed',
-    'dreamWeatherContext.pressure must be one of low, medium, heavy, storm'
+    'dreamWeatherContext.weatherTags[1] must be an allowed weather tag',
+    'dreamWeatherContext.pressure must be one of low, medium, heavy, storm',
+    'dreamWeatherContext.dreadBudget.teeth is not allowed'
   ]);
 });
 
@@ -240,6 +278,23 @@ test('save game validation checks optional dreamWeather/weatherTrace payloads', 
   assert.deepEqual(result.errors, [
     'payload.dreamWeather.weatherId is required',
     'payload.weatherTrace.resultingTags[1] must be a non-empty string'
+  ]);
+});
+
+test('save game validation rejects null dreamWeather and weatherTrace payloads', () => {
+  const result = validateSaveGame({
+    ...validSaveGame(),
+    payload: {
+      ...validSaveGame().payload,
+      dreamWeather: null,
+      weatherTrace: null
+    }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'payload.dreamWeather must be an object',
+    'payload.weatherTrace must be an object'
   ]);
 });
 

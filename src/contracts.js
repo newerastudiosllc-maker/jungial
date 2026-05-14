@@ -1,5 +1,59 @@
-import { DREAD_BUDGET_AXES } from './dreamWeather.js';
-
+const DREAD_BUDGET_AXES = Object.freeze([
+  'pursuit',
+  'bodyUnease',
+  'cosmicDread',
+  'disorientation',
+  'loss',
+  'watching',
+  'claustrophobia'
+]);
+const WEATHER_TAGS = Object.freeze([
+  'silence',
+  'threshold',
+  'soft_lamp',
+  'mirror',
+  'ash',
+  'mist',
+  'static',
+  'gravity',
+  'garden',
+  'warmth',
+  'cold',
+  'distant_voice',
+  'watching',
+  'boundless',
+  'contained',
+  'pursuit'
+]);
+const WEATHER_SYMBOLIC_TAGS = Object.freeze([
+  'annihilation',
+  'rebirth',
+  'cosmic_mystery',
+  'reflection',
+  'shadow',
+  'self_observation',
+  'safety',
+  'memory',
+  'hearth',
+  'containment',
+  'growth',
+  'innocence',
+  'fertility',
+  'beauty',
+  'dissolution',
+  'void',
+  'star',
+  'unknown',
+  'invitation',
+  'door',
+  'breath',
+  'lamp'
+]);
+const ALLOWED_WEATHER_TAGS = Object.freeze(new Set([
+  ...WEATHER_TAGS,
+  ...DREAD_BUDGET_AXES,
+  ...WEATHER_SYMBOLIC_TAGS
+]));
 const DREAM_WEATHER_MOODS = Object.freeze(['stillness', 'hush', 'gravity', 'flicker', 'bloom', 'eclipse']);
 const DREAM_WEATHER_PRESSURES = Object.freeze(['low', 'medium', 'heavy', 'storm']);
 
@@ -123,10 +177,10 @@ export function validateDreamWeather(weather) {
 
   const dreadValidation = validateDreadBudget(weather?.dreadBudget);
   if (!dreadValidation.valid) {
-    errors.push(...dreadValidation.errors.map((error) => `dreadBudget.${error}`));
+    errors.push(...prefixNestedErrors(dreadValidation.errors, 'dreadBudget', 'dreadBudget'));
   }
-  errors.push(...validateStringList(weather?.weatherTags, 'weatherTags'));
-  errors.push(...validateStringList(weather?.suppressedTags, 'suppressedTags'));
+  errors.push(...validateWeatherTagList(weather?.weatherTags, 'weatherTags'));
+  errors.push(...validateWeatherTagList(weather?.suppressedTags, 'suppressedTags'));
   if (!isObject(weather?.atmosphere)) {
     errors.push('atmosphere must be an object');
   } else {
@@ -176,9 +230,9 @@ export function validateWeatherTrace(trace) {
   if (!DREAM_WEATHER_PRESSURES.includes(trace?.pressure)) {
     errors.push(`pressure must be one of ${DREAM_WEATHER_PRESSURES.join(', ')}`);
   }
-  errors.push(...validateStringList(trace?.sourceTags, 'sourceTags'));
-  errors.push(...validateStringList(trace?.resultingTags, 'resultingTags'));
-  errors.push(...validateStringList(trace?.suppressedTags, 'suppressedTags'));
+  errors.push(...validateWeatherTagList(trace?.sourceTags, 'sourceTags'));
+  errors.push(...validateWeatherTagList(trace?.resultingTags, 'resultingTags'));
+  errors.push(...validateWeatherTagList(trace?.suppressedTags, 'suppressedTags'));
   if (!DREAD_BUDGET_AXES.includes(trace?.strongestDreadAxis)) {
     errors.push(`strongestDreadAxis must be one of ${DREAD_BUDGET_AXES.join(', ')}`);
   }
@@ -207,15 +261,15 @@ export function validateDreamWeatherContext(context) {
     errors.push('schemaVersion must be 1');
   }
   errors.push(...validateKnownKeys(context, allowedKeys, 'dreamWeatherContext'));
-  errors.push(...validateStringList(context?.weatherTags, 'weatherTags'));
+  errors.push(...validateWeatherTagList(context?.weatherTags, 'weatherTags'));
   if (!DREAM_WEATHER_PRESSURES.includes(context?.pressure)) {
     errors.push(`pressure must be one of ${DREAM_WEATHER_PRESSURES.join(', ')}`);
   }
   const dreadValidation = validateDreadBudget(context?.dreadBudget);
   if (!dreadValidation.valid) {
-    errors.push(...dreadValidation.errors.map((error) => `dreadBudget.${error}`));
+    errors.push(...prefixNestedErrors(dreadValidation.errors, 'dreadBudget', 'dreadBudget'));
   }
-  errors.push(...validateStringList(context?.suppressedTags, 'suppressedTags'));
+  errors.push(...validateWeatherTagList(context?.suppressedTags, 'suppressedTags'));
 
   return {
     valid: errors.length === 0,
@@ -924,16 +978,24 @@ export function validateSaveGame(saveGame) {
     'payload.echoTrace',
     validateEchoTrace
   ));
-  if (saveGame.payload.dreamWeather !== undefined && saveGame.payload.dreamWeather !== null) {
-    const weatherValidation = validateDreamWeather(saveGame.payload.dreamWeather);
-    if (!weatherValidation.valid) {
-      errors.push(...prefixNestedErrors(weatherValidation.errors, 'payload.dreamWeather', 'dreamWeather'));
+  if (saveGame.payload.dreamWeather !== undefined) {
+    if (!isObject(saveGame.payload.dreamWeather)) {
+      errors.push('payload.dreamWeather must be an object');
+    } else {
+      const weatherValidation = validateDreamWeather(saveGame.payload.dreamWeather);
+      if (!weatherValidation.valid) {
+        errors.push(...prefixNestedErrors(weatherValidation.errors, 'payload.dreamWeather', 'dreamWeather'));
+      }
     }
   }
-  if (saveGame.payload.weatherTrace !== undefined && saveGame.payload.weatherTrace !== null) {
-    const traceValidation = validateWeatherTrace(saveGame.payload.weatherTrace);
-    if (!traceValidation.valid) {
-      errors.push(...prefixNestedErrors(traceValidation.errors, 'payload.weatherTrace', 'weatherTrace'));
+  if (saveGame.payload.weatherTrace !== undefined) {
+    if (!isObject(saveGame.payload.weatherTrace)) {
+      errors.push('payload.weatherTrace must be an object');
+    } else {
+      const traceValidation = validateWeatherTrace(saveGame.payload.weatherTrace);
+      if (!traceValidation.valid) {
+        errors.push(...prefixNestedErrors(traceValidation.errors, 'payload.weatherTrace', 'weatherTrace'));
+      }
     }
   }
   errors.push(...validateOptionalNestedContract(
@@ -1021,6 +1083,19 @@ function validateStringList(value, label) {
   value.forEach((item, index) => {
     if (!isNonEmptyString(item)) {
       errors.push(`${label}[${index}] must be a non-empty string`);
+    }
+  });
+  return errors;
+}
+
+function validateWeatherTagList(value, label) {
+  const errors = validateStringList(value, label);
+  if (!Array.isArray(value)) {
+    return errors;
+  }
+  value.forEach((item, index) => {
+    if (isNonEmptyString(item) && !ALLOWED_WEATHER_TAGS.has(item)) {
+      errors.push(`${label}[${index}] must be an allowed weather tag`);
     }
   });
   return errors;

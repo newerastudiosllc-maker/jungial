@@ -22,9 +22,9 @@
     "weatherId": { "type": ["string", "null"] },
     "mood": { "enum": ["stillness", "hush", "gravity", "flicker", "bloom", "eclipse"] },
     "pressure": { "enum": ["low", "medium", "heavy", "storm"] },
-    "sourceTags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
-    "resultingTags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
-    "suppressedTags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "sourceTags": { "type": "array", "items": { "$ref": "#/$defs/weatherTag" } },
+    "resultingTags": { "type": "array", "items": { "$ref": "#/$defs/weatherTag" } },
+    "suppressedTags": { "type": "array", "items": { "$ref": "#/$defs/weatherTag" } },
     "strongestDreadAxis": {
       "enum": [
         "pursuit",
@@ -37,5 +37,54 @@
       ]
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$defs": {
+    "weatherTag": {
+      "enum": [
+        "silence",
+        "threshold",
+        "soft_lamp",
+        "mirror",
+        "ash",
+        "mist",
+        "static",
+        "gravity",
+        "garden",
+        "warmth",
+        "cold",
+        "distant_voice",
+        "watching",
+        "boundless",
+        "contained",
+        "pursuit",
+        "bodyUnease",
+        "cosmicDread",
+        "disorientation",
+        "loss",
+        "claustrophobia",
+        "annihilation",
+        "rebirth",
+        "cosmic_mystery",
+        "reflection",
+        "shadow",
+        "self_observation",
+        "safety",
+        "memory",
+        "hearth",
+        "containment",
+        "growth",
+        "innocence",
+        "fertility",
+        "beauty",
+        "dissolution",
+        "void",
+        "star",
+        "unknown",
+        "invitation",
+        "door",
+        "breath",
+        "lamp"
+      ]
+    }
+  }
 }

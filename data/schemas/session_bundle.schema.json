@@ -44,10 +44,10 @@
       "properties": {
         "schema": { "const": "DreamWeatherContextV1" },
         "schemaVersion": { "const": 1 },
-        "weatherTags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "weatherTags": { "type": "array", "items": { "$ref": "#/$defs/weatherTag" } },
         "pressure": { "enum": ["low", "medium", "heavy", "storm"] },
         "dreadBudget": { "$ref": "dread_budget.schema.json" },
-        "suppressedTags": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+        "suppressedTags": { "type": "array", "items": { "$ref": "#/$defs/weatherTag" } }
       },
       "additionalProperties": false
     },
@@ -63,6 +63,55 @@
         "echoThreadIds": { "type": "array", "items": { "type": "string" } }
       },
       "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "weatherTag": {
+      "enum": [
+        "silence",
+        "threshold",
+        "soft_lamp",
+        "mirror",
+        "ash",
+        "mist",
+        "static",
+        "gravity",
+        "garden",
+        "warmth",
+        "cold",
+        "distant_voice",
+        "watching",
+        "boundless",
+        "contained",
+        "pursuit",
+        "bodyUnease",
+        "cosmicDread",
+        "disorientation",
+        "loss",
+        "claustrophobia",
+        "annihilation",
+        "rebirth",
+        "cosmic_mystery",
+        "reflection",
+        "shadow",
+        "self_observation",
+        "safety",
+        "memory",
+        "hearth",
+        "containment",
+        "growth",
+        "innocence",
+        "fertility",
+        "beauty",
+        "dissolution",
+        "void",
+        "star",
+        "unknown",
+        "invitation",
+        "door",
+        "breath",
+        "lamp"
+      ]
     }
   }
 }
