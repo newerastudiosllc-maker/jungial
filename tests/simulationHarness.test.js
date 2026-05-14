@@ -239,6 +239,12 @@ test('simulation attaches hidden Dreamer memory context to GNI and persists upda
           motifs: {},
           gestures: {},
           echoThreads: {},
+          weatherTags: {
+            mist: { count: 2, weight: 2, lastSeenAt: '2050-01-01T00:00:00.000Z' }
+          },
+          dreadAxes: {
+            watching: { count: 1, weight: 0.5, lastSeenAt: '2050-01-01T00:00:00.000Z' }
+          },
           lastSessionDigest: 'previous-digest'
         }
       },
@@ -255,9 +261,13 @@ test('simulation attaches hidden Dreamer memory context to GNI and persists upda
     assert.equal(requests[0].payload.dreamerMemoryContext.schema, 'DreamerMemoryContextV1');
     assert.equal(requests[0].payload.dreamerMemoryContext.profileId, null);
     assert.equal(requests[0].payload.dreamerMemoryContext.strongSymbols[0], 'mirror');
+    assert.deepEqual(requests[0].payload.dreamerMemoryContext.familiarWeatherTags, ['mist']);
+    assert.deepEqual(requests[0].payload.dreamerMemoryContext.familiarDreadAxes, ['watching']);
     assert.equal(result.dreamerProfile.memory.sessionCount, 2);
     assert.equal(saved.dreamerProfile.memory.sessionCount, 2);
     assert.equal(saved.dreamerProfile.memory.dreamModules.white_void.count, 1);
+    assert.ok(Object.keys(result.dreamerProfile.memory.weatherTags).length > 0);
+    assert.ok(Object.keys(saved.dreamerProfile.memory.dreadAxes).length > 0);
   } finally {
     await rm(dir, { recursive: true, force: true });
   }

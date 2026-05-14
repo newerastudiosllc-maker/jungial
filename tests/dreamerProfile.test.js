@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import { createDeterministicClock } from '../src/clock.js';
 import { DreamerProfile } from '../src/dreamerProfile.js';
+import { createDreamWeather } from '../src/dreamWeather.js';
 
 const SESSION_BUNDLE = Object.freeze({
   schema: 'SessionBundleV1',
@@ -87,6 +88,41 @@ test('Dreamer profile records Passage motifs and gestures as aggregates only', (
   assert.equal(snapshot.memory.gestures.speak.count, 1);
   assert.equal(JSON.stringify(snapshot).includes('rawSpeech'), false);
   assert.deepEqual(profile.toGniMemoryContext({ slotId: 'slot-a' }).familiarMotifs, ['door', 'threshold']);
+});
+
+test('DreamerProfile records familiar dream weather without storing raw player input', () => {
+  const profile = new DreamerProfile({
+    profileId: 'dreamer-one',
+    rootSeed: 'root-one'
+  }, {
+    clock: createDeterministicClock({ startIso: '2060-01-01T00:00:00.000Z' })
+  });
+  const dreamWeather = {
+    ...createDreamWeather({
+      seed: 12,
+      weatherTags: ['mist', 'watching'],
+      dreadBudget: { watching: 0.4, loss: 0.03 }
+    }),
+    rawPrompt: 'my childhood address is 10 Lantern Lane',
+    privateNote: 'do not remember this sentence'
+  };
+
+  profile.recordSession({ sessionBundle: SESSION_BUNDLE, dreamWeather });
+  const snapshot = profile.snapshot();
+  const context = profile.toGniMemoryContext({ slotId: 'slot-a' });
+  const snapshotText = JSON.stringify(snapshot);
+
+  assert.equal(snapshot.memory.weatherTags.mist.count, 1);
+  assert.equal(snapshot.memory.weatherTags.watching.count, 1);
+  assert.equal(snapshot.memory.dreadAxes.watching.count, 1);
+  assert.equal(snapshot.memory.dreadAxes.watching.weight, dreamWeather.dreadBudget.watching);
+  assert.equal(snapshot.memory.dreadAxes.loss, undefined);
+  assert.ok(context.familiarWeatherTags.includes('mist'));
+  assert.deepEqual(context.familiarDreadAxes, ['watching']);
+  assert.equal(snapshotText.includes('10 Lantern Lane'), false);
+  assert.equal(snapshotText.includes('do not remember this sentence'), false);
+  assert.equal(snapshotText.includes('rawPrompt'), false);
+  assert.equal(snapshotText.includes('privateNote'), false);
 });
 
 test('DreamerProfile derives divergent seeds for fresh saves and incarnations', () => {

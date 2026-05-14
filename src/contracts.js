@@ -289,7 +289,9 @@ export function validateDreamerMemoryContext(context) {
     'familiarMotifs',
     'familiarGestures',
     'echoThreadIds',
-    'vibeEchoes'
+    'vibeEchoes',
+    'familiarWeatherTags',
+    'familiarDreadAxes'
   ];
 
   if (context?.schema !== 'DreamerMemoryContextV1') {
@@ -371,6 +373,8 @@ export function validateDreamerProfile(profile) {
       'motifs',
       'gestures',
       'echoThreads',
+      'weatherTags',
+      'dreadAxes',
       'lastSessionDigest'
     ];
     errors.push(...validateKnownKeys(profile.memory, allowedMemoryKeys, 'memory'));
@@ -387,6 +391,12 @@ export function validateDreamerProfile(profile) {
     errors.push(...validateMemoryMap(profile.memory.motifs, 'memory.motifs'));
     errors.push(...validateMemoryMap(profile.memory.gestures, 'memory.gestures'));
     errors.push(...validateMemoryMap(profile.memory.echoThreads, 'memory.echoThreads'));
+    if (!(profile.memory.sessionCount === 0 && profile.memory.weatherTags === undefined)) {
+      errors.push(...validateMemoryMap(profile.memory.weatherTags, 'memory.weatherTags'));
+    }
+    if (!(profile.memory.sessionCount === 0 && profile.memory.dreadAxes === undefined)) {
+      errors.push(...validateMemoryMap(profile.memory.dreadAxes, 'memory.dreadAxes'));
+    }
     if (!isNullableString(profile.memory.lastSessionDigest)) {
       errors.push('memory.lastSessionDigest must be a string or null');
     }

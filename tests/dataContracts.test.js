@@ -467,6 +467,8 @@ test('Dreamer profile validation rejects raw private memory shapes', () => {
       motifs: {},
       gestures: {},
       echoThreads: {},
+      weatherTags: {},
+      dreadAxes: {},
       lastSessionDigest: null,
       rawSpeech: ['I am afraid']
     }
@@ -476,6 +478,39 @@ test('Dreamer profile validation rejects raw private memory shapes', () => {
   assert.deepEqual(result.errors, [
     'memory.rawSpeech is not allowed',
     'memory.symbols.portal.count must be a positive integer'
+  ]);
+});
+
+test('Dreamer profile validation requires weather aggregate memory maps', () => {
+  const result = validateDreamerProfile({
+    schema: 'DreamerProfileV1',
+    schemaVersion: 1,
+    profileId: 'dreamer-one',
+    rootSeed: 'root-seed-one',
+    createdAt: '2060-01-01T00:00:00.000Z',
+    updatedAt: '2060-01-01T00:00:00.000Z',
+    consent: { profileMemory: true, crossSaveEchoes: false },
+    memory: {
+      sessionCount: 1,
+      symbols: {},
+      archetypes: {},
+      actions: {},
+      dreamModules: {},
+      masks: {},
+      vibeStates: {},
+      passages: {},
+      motifs: {},
+      gestures: {},
+      echoThreads: {},
+      dreadAxes: { watching: { count: 1, weight: Number.NaN, lastSeenAt: null } },
+      lastSessionDigest: null
+    }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'memory.weatherTags must be an object',
+    'memory.dreadAxes.watching.weight must be a finite number'
   ]);
 });
 
@@ -519,6 +554,8 @@ test('GNI request validation checks optional Dreamer memory context', () => {
         familiarGestures: [],
         echoThreadIds: [],
         vibeEchoes: [],
+        familiarWeatherTags: [],
+        familiarDreadAxes: [''],
         lastSessionDigest: null
       }
     }
@@ -526,7 +563,8 @@ test('GNI request validation checks optional Dreamer memory context', () => {
 
   assert.equal(result.valid, false);
   assert.deepEqual(result.errors, [
-    'payload.dreamerMemoryContext.slotId is required'
+    'payload.dreamerMemoryContext.slotId is required',
+    'payload.dreamerMemoryContext.familiarDreadAxes[0] must be a non-empty string'
   ]);
 });
 
@@ -562,6 +600,8 @@ test('save game validation checks optional Dreamer profile payload', () => {
           motifs: {},
           gestures: {},
           echoThreads: {},
+          weatherTags: {},
+          dreadAxes: {},
           lastSessionDigest: null
         }
       }

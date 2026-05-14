@@ -30,11 +30,13 @@ export class DreamerProfile {
       motifs: cloneMap(snapshot.memory?.motifs),
       gestures: cloneMap(snapshot.memory?.gestures),
       echoThreads: cloneMap(snapshot.memory?.echoThreads),
+      weatherTags: cloneMap(snapshot.memory?.weatherTags),
+      dreadAxes: cloneMap(snapshot.memory?.dreadAxes),
       lastSessionDigest: snapshot.memory?.lastSessionDigest ?? null
     };
   }
 
-  recordSession({ sessionBundle, dreamJourney = null, mask = null, echoTrace = null } = {}) {
+  recordSession({ sessionBundle, dreamJourney = null, mask = null, echoTrace = null, dreamWeather = null } = {}) {
     if (!this.consent.profileMemory || !sessionBundle) {
       return this.snapshot();
     }
@@ -69,6 +71,14 @@ export class DreamerProfile {
     }
     for (const gesture of echoTrace?.gestureTags ?? []) {
       incrementMemory(this.memory.gestures, gesture, { at });
+    }
+    for (const tag of dreamWeather?.weatherTags ?? []) {
+      incrementMemory(this.memory.weatherTags, tag, { at });
+    }
+    for (const [axis, value] of Object.entries(dreamWeather?.dreadBudget ?? {})) {
+      if (value > 0.05) {
+        addWeight(this.memory.dreadAxes, axis, value, { at });
+      }
     }
 
     this.memory.lastSessionDigest = stableHash({
@@ -120,6 +130,8 @@ export class DreamerProfile {
       familiarGestures: topKeys(this.memory.gestures, limit),
       echoThreadIds: topKeys(this.memory.echoThreads, limit),
       vibeEchoes: topKeys(this.memory.vibeStates, limit),
+      familiarWeatherTags: topKeys(this.memory.weatherTags, limit),
+      familiarDreadAxes: topKeys(this.memory.dreadAxes, 5, 'weight'),
       lastSessionDigest: this.memory.lastSessionDigest
     };
   }
@@ -145,6 +157,8 @@ export class DreamerProfile {
         motifs: cloneMap(this.memory.motifs),
         gestures: cloneMap(this.memory.gestures),
         echoThreads: cloneMap(this.memory.echoThreads),
+        weatherTags: cloneMap(this.memory.weatherTags),
+        dreadAxes: cloneMap(this.memory.dreadAxes),
         lastSessionDigest: this.memory.lastSessionDigest
       }
     };

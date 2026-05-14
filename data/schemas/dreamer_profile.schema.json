@@ -43,6 +43,8 @@
         "motifs",
         "gestures",
         "echoThreads",
+        "weatherTags",
+        "dreadAxes",
         "lastSessionDigest"
       ],
       "properties": {
@@ -57,6 +59,8 @@
         "motifs": { "$ref": "#/$defs/memoryMap" },
         "gestures": { "$ref": "#/$defs/memoryMap" },
         "echoThreads": { "$ref": "#/$defs/memoryMap" },
+        "weatherTags": { "$ref": "#/$defs/memoryMap" },
+        "dreadAxes": { "$ref": "#/$defs/memoryMap" },
         "lastSessionDigest": { "type": ["string", "null"] }
       },
       "additionalProperties": false

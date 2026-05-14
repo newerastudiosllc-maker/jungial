@@ -20,6 +20,8 @@
     "familiarGestures",
     "echoThreadIds",
     "vibeEchoes",
+    "familiarWeatherTags",
+    "familiarDreadAxes",
     "lastSessionDigest"
   ],
   "properties": {
@@ -39,6 +41,8 @@
     "familiarGestures": { "$ref": "#/$defs/stringList" },
     "echoThreadIds": { "$ref": "#/$defs/stringList" },
     "vibeEchoes": { "$ref": "#/$defs/stringList" },
+    "familiarWeatherTags": { "$ref": "#/$defs/stringList" },
+    "familiarDreadAxes": { "$ref": "#/$defs/stringList" },
     "lastSessionDigest": { "type": ["string", "null"] }
   },
   "additionalProperties": false,

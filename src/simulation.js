@@ -269,7 +269,7 @@ export async function runSimulation({
     });
   }
   const dreamerProfileSnapshot = dreamer
-    ? dreamer.recordSession({ sessionBundle: bundle, dreamJourney, mask, echoTrace })
+    ? dreamer.recordSession({ sessionBundle: bundle, dreamJourney, mask, echoTrace, dreamWeather })
     : null;
 
   const thresholdPresentation = buildThresholdPresentation({ chamber, feeling });
