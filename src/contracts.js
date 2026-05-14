@@ -276,6 +276,13 @@ function validateQueueProcessEntry(entry, label) {
     });
   }
 
+  if (entry?.status === 'directive_ready' && entry?.directive === undefined) {
+    errors.push(`${label}.directive is required when status is directive_ready`);
+  }
+  if (entry?.status === 'provider_error' && Array.isArray(entry?.errors) && entry.errors.length === 0) {
+    errors.push(`${label}.errors must include provider error details`);
+  }
+
   if (entry?.directive !== undefined) {
     const directiveValidation = validateDirective(entry.directive);
     if (!directiveValidation.valid) {

@@ -23,7 +23,27 @@
             "items": { "type": "string" }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": { "status": { "const": "directive_ready" } }
+            },
+            "then": {
+              "required": ["directive"]
+            }
+          },
+          {
+            "if": {
+              "properties": { "status": { "const": "provider_error" } }
+            },
+            "then": {
+              "properties": {
+                "errors": { "minItems": 1 }
+              }
+            }
+          }
+        ]
       }
     },
     "queue": { "type": "object" },

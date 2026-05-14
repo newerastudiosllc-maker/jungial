@@ -236,6 +236,28 @@ test('GNI queue process result validation accepts processor output envelopes', (
   assert.deepEqual(validateGniQueueProcessResult(result), { valid: true, errors: [] });
 });
 
+test('GNI queue process result validation rejects ready entries without directives', () => {
+  const result = validateGniQueueProcessResult({
+    schema: 'GniDirectiveQueueProcessResultV1',
+    processed: [{
+      id: 'gni_pending_session-one',
+      status: 'directive_ready',
+      errors: []
+    }],
+    queue: {
+      schema: 'GniDirectiveQueueV1',
+      pending: [],
+      resolved: []
+    },
+    architectState: {}
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'processed[0].directive is required when status is directive_ready'
+  ]);
+});
+
 async function readJson(path) {
   return JSON.parse(await readFile(join(root, path), 'utf8'));
 }
