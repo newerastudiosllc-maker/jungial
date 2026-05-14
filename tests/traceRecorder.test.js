@@ -64,6 +64,7 @@ test('simulation trace explains dream journey and GNI handoff without in-world e
       'passage.gathered',
       'echo.trace.created',
       'dream.journey.selected',
+      'dream.weather.created',
       'mask.selected',
       'journal.entry.written',
       'witness.bundle.created',

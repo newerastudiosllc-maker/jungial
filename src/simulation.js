@@ -15,6 +15,7 @@ import { buildThresholdPresentation } from './presentation.js';
 import { DreamerProfile } from './dreamerProfile.js';
 import { createSessionCovenant } from './sessionCovenant.js';
 import { createEchoTrace, selectPassage, toGniPassageContext } from './passageLattice.js';
+import { createDreamWeather, createWeatherTrace, toGniWeatherContext } from './dreamWeather.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -56,6 +57,7 @@ export async function runSimulation({
     ? new DreamerProfile(dreamerProfile, { clock: clock?.fork?.() ?? undefined })
     : null;
   const activeSessionCovenant = createSessionCovenant(sessionCovenant ?? {});
+  const dreamerMemoryContext = dreamer?.toGniMemoryContext({ slotId: saveSlotId, mode: saveMode }) ?? null;
 
   const transcript = [];
   transcript.push('Threshold Chamber: silent, dim, confined.');
@@ -84,13 +86,22 @@ export async function runSimulation({
   transcript.push('The Key of Portals turns without sound.');
   traceRecorder.record('portal.opened', { room: chamber.snapshot() });
 
+  const weatherPreview = createDreamWeather({
+    covenant: activeSessionCovenant,
+    archetypeVector: { ...archetypes.archetypeVector },
+    vibeState: feeling.vibeState,
+    dreamerMemoryContext,
+    recentEchoTraces,
+    seed
+  });
   const passageSelection = selectPassage({
     passages: contentCatalog.passages,
     covenant: activeSessionCovenant,
     seed,
     recentEchoTraces,
-    dreamerMemoryContext: dreamer?.toGniMemoryContext({ slotId: saveSlotId, mode: saveMode }) ?? null,
-    architectState: architect.snapshot()
+    dreamerMemoryContext,
+    architectState: architect.snapshot(),
+    dreamWeather: weatherPreview
   });
   const activePassage = passageSelection.passage;
   const echoTrace = createEchoTrace({
@@ -125,6 +136,34 @@ export async function runSimulation({
     symbolTrail: dreamJourney.symbolTrail,
     beats: dreamJourney.beats
   });
+  const currentEchoTraces = [...recentEchoTraces, echoTrace];
+  const weatherSourceTags = [
+    ...(selectedDream.symbolicTags ?? []),
+    ...(activePassage.motifs ?? []),
+    ...(activePassage.pressureTags ?? [])
+  ];
+  const dreamWeather = createDreamWeather({
+    covenant: activeSessionCovenant,
+    archetypeVector: { ...archetypes.archetypeVector },
+    vibeState: feeling.vibeState,
+    dreamerMemoryContext,
+    selectedDream,
+    activePassage,
+    recentEchoTraces: currentEchoTraces,
+    weatherTags: weatherSourceTags,
+    seed
+  });
+  const weatherTrace = createWeatherTrace({
+    weather: dreamWeather,
+    sourceTags: weatherSourceTags,
+    seed
+  });
+  traceRecorder.record('dream.weather.created', {
+    weatherId: dreamWeather.weatherId,
+    mood: dreamWeather.mood,
+    pressure: dreamWeather.pressure,
+    weatherTags: dreamWeather.weatherTags
+  });
 
   const mask = masks.selectEligibleMask(archetypes);
   if (mask) {
@@ -156,16 +195,14 @@ export async function runSimulation({
 
   const bundle = witness.toSessionBundle({ selectedDream });
   if (dreamer) {
-    bundle.dreamerMemoryContext = dreamer.toGniMemoryContext({
-      slotId: saveSlotId,
-      mode: saveMode
-    });
+    bundle.dreamerMemoryContext = dreamerMemoryContext;
   }
   bundle.sessionCovenant = activeSessionCovenant;
   bundle.passageContext = toGniPassageContext({
     activePassage,
-    recentEchoTraces: [...recentEchoTraces, echoTrace]
+    recentEchoTraces: currentEchoTraces
   });
+  bundle.dreamWeatherContext = toGniWeatherContext({ dreamWeather, weatherTrace });
   traceRecorder.record('witness.bundle.created', {
     sessionId: bundle.sessionId,
     dominantArchetype: bundle.dominantArchetype,
@@ -254,6 +291,8 @@ export async function runSimulation({
     sessionCovenant: activeSessionCovenant,
     echoTrace,
     activePassage,
+    dreamWeather,
+    weatherTrace,
     ...(dreamerProfileSnapshot ? { dreamerProfile: dreamerProfileSnapshot } : {})
   }, { clock });
   transcript.push(`Saved session JSON to ${savePath}.`);
@@ -278,6 +317,8 @@ export async function runSimulation({
     sessionCovenant: activeSessionCovenant,
     activePassage,
     echoTrace,
+    dreamWeather,
+    weatherTrace,
     dreamerProfile: dreamerProfileSnapshot,
     savePath
   };

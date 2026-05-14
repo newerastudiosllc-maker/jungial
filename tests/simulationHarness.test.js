@@ -294,11 +294,17 @@ test('simulation saves covenant EchoTrace and sends redacted Passage context to 
 
     assert.equal(result.sessionCovenant.schema, 'SessionCovenantV1');
     assert.equal(result.echoTrace.schema, 'EchoTraceV1');
+    assert.equal(result.dreamWeather.schema, 'DreamWeatherV1');
+    assert.equal(result.weatherTrace.schema, 'WeatherTraceV1');
     assert.equal(saved.sessionCovenant.schema, 'SessionCovenantV1');
     assert.equal(saved.echoTrace.schema, 'EchoTraceV1');
+    assert.equal(saved.dreamWeather.weatherId, result.dreamWeather.weatherId);
+    assert.equal(saved.weatherTrace.weatherId, result.dreamWeather.weatherId);
     assert.equal(requests[0].payload.sessionCovenant.schema, 'SessionCovenantV1');
     assert.equal(requests[0].payload.passageContext.schema, 'PassageContextV1');
+    assert.equal(requests[0].payload.dreamWeatherContext.schema, 'DreamWeatherContextV1');
     assert.equal(JSON.stringify(requests[0]).includes('this should not be sent'), false);
+    assert.equal(JSON.stringify(requests[0].payload.dreamWeatherContext).includes('this should not be sent'), false);
   } finally {
     await rm(dir, { recursive: true, force: true });
   }

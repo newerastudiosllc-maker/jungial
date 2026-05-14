@@ -51,6 +51,40 @@ test('GNI adapter packages session bundle without coupling game systems to provi
   assert.deepEqual(request.payload.archetypeVector, {});
 });
 
+test('GNI adapter includes Dream Weather context when present', () => {
+  const adapter = new GniAdapter({ endpoint: 'local-gni-placeholder' });
+  const dreamWeatherContext = {
+    schema: 'DreamWeatherContextV1',
+    schemaVersion: 1,
+    weatherTags: ['silence', 'threshold'],
+    pressure: 'low',
+    dreadBudget: {
+      pursuit: 0.1,
+      bodyUnease: 0.1,
+      cosmicDread: 0.1,
+      disorientation: 0.1,
+      loss: 0.1,
+      watching: 0.1,
+      claustrophobia: 0.1
+    },
+    suppressedTags: []
+  };
+
+  const request = adapter.createProcessingRequest({
+    schemaVersion: 1,
+    sessionId: 'session-weather',
+    dominantArchetype: 'Seeker',
+    vibeState: 'calm_hopeful_boundless_bright_warm',
+    coherence: 0.5,
+    recentSymbols: [],
+    recentActions: [],
+    dreamWeatherContext
+  });
+
+  assert.deepEqual(request.payload.dreamWeatherContext, dreamWeatherContext);
+  assert.notEqual(request.payload.dreamWeatherContext, dreamWeatherContext);
+});
+
 test('persistence saves and loads room, archetypes, journal, and architect state as JSON', async () => {
   const dir = await mkdtemp(join(tmpdir(), 'jungial-'));
   const savePath = join(dir, 'save.json');
