@@ -12,6 +12,7 @@ const FIXTURE_FILES = Object.freeze([
   'session_bundle_v1.json',
   'gni_request_v1.json',
   'gni_directive_v1.json',
+  'gni_bridge_result_v1.json',
   'gni_directive_queue_v1.json',
   'gni_queue_process_result_v1.json',
   'trace_summary_v1.json'
@@ -38,6 +39,7 @@ export async function exportContractFixtures({
   const sessionBundle = run.gniRequest.payload;
   const gniRequest = run.gniRequest;
   const gniDirective = run.appliedGniDirective;
+  const gniBridgeResult = run.gniBridgeResult;
   const gniDirectiveQueue = pendingRun.gniQueue;
   const gniQueueProcessResult = await processPendingGniQueue({
     queueSnapshot: gniDirectiveQueue,
@@ -59,6 +61,7 @@ export async function exportContractFixtures({
     'session_bundle_v1.json': sessionBundle,
     'gni_request_v1.json': gniRequest,
     'gni_directive_v1.json': gniDirective,
+    'gni_bridge_result_v1.json': gniBridgeResult,
     'gni_directive_queue_v1.json': gniDirectiveQueue,
     'gni_queue_process_result_v1.json': gniQueueProcessResult,
     'trace_summary_v1.json': traceSummary

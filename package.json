@@ -14,7 +14,7 @@
     "scenario:check": "npm run scenarios && node src/scenarioBaseline.js check data/scenarios/smoke_baseline.json saves/scenarios/scenario-report.json",
     "scenario:baseline": "npm run scenarios && node src/scenarioBaseline.js write saves/scenarios/scenario-report.json data/scenarios/smoke_baseline.json",
     "fixtures": "node src/fixtureExporter.js fixtures",
-    "contracts": "npm run fixtures && node src/contractValidator.js fixtures/session_bundle_v1.json fixtures/gni_request_v1.json fixtures/gni_directive_v1.json fixtures/gni_directive_queue_v1.json fixtures/gni_queue_process_result_v1.json data/mock_gni_directive.json",
+    "contracts": "npm run fixtures && node src/contractValidator.js fixtures/session_bundle_v1.json fixtures/gni_request_v1.json fixtures/gni_directive_v1.json fixtures/gni_bridge_result_v1.json fixtures/gni_directive_queue_v1.json fixtures/gni_queue_process_result_v1.json data/mock_gni_directive.json",
     "gni:process": "node src/gniQueueProcessor.js",
     "trace": "node src/traceInspector.js"
   }
