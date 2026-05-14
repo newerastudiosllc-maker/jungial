@@ -3,9 +3,10 @@
   "$id": "https://jungial.local/schemas/gni_directive.schema.json",
   "title": "JungialDirectiveV1",
   "type": "object",
-  "required": ["schema"],
+  "required": ["schema", "schemaVersion"],
   "properties": {
     "schema": { "const": "JungialDirectiveV1" },
+    "schemaVersion": { "const": 1 },
     "dreamWeightDeltas": {
       "type": "object",
       "additionalProperties": { "type": "number" }

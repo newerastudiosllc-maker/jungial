@@ -17,6 +17,7 @@ test('simulation can apply a mocked GNI directive and persist the result', async
       savePath,
       gniResponse: {
         schema: 'JungialDirectiveV1',
+        schemaVersion: 1,
         dreamWeightDeltas: {
           mirror_hall: 0.5
         },
@@ -46,6 +47,7 @@ test('simulation CLI args parse seed, save path, JSON mode, and mock GNI respons
     '--seed=123',
     '--save=saves/test.json',
     '--gni-response=data/mock.json',
+    '--emulate-gni',
     '--json'
   ]);
 
@@ -53,6 +55,22 @@ test('simulation CLI args parse seed, save path, JSON mode, and mock GNI respons
     seed: 123,
     savePath: 'saves/test.json',
     gniResponsePath: 'data/mock.json',
+    emulateGni: true,
     json: true
   });
+});
+
+test('simulation can use deterministic GNI emulator when no real directive is provided', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-emulated-gni-'));
+  const savePath = join(dir, 'latest.json');
+
+  try {
+    const result = await runSimulation({ seed: 55, savePath, emulateGni: true });
+
+    assert.equal(result.appliedGniDirective.schema, 'JungialDirectiveV1');
+    assert.equal(result.appliedGniDirective.schemaVersion, 1);
+    assert.match(result.transcript.join('\n'), /GNI emulator prepared a directive/);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
 });

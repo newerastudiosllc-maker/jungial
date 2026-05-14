@@ -4,6 +4,9 @@ import { readFile } from 'node:fs/promises';
 
 import { createJungialRuntime } from './runtime.js';
 import { saveGameState } from './persistence.js';
+import { GniEmulator } from './gniEmulator.js';
+import { selectDreamJourney } from './dreamJourney.js';
+import { SymbolGrammar } from './symbolGrammar.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -12,6 +15,7 @@ export async function runSimulation({
   seed = 777,
   savePath = join(root, 'saves', 'latest-session.json'),
   gniResponse = null,
+  emulateGni = false,
   catalog = undefined
 } = {}) {
   const {
@@ -42,23 +46,36 @@ export async function runSimulation({
   chamber.openPortal('key_of_portals');
   transcript.push('The Key of Portals turns without sound.');
 
-  const selectedDream = dreamflow.selectNext({
+  const dreamJourney = selectDreamJourney({
+    dreamflow,
     archetypeState: archetypes,
     feelingState: feeling,
     roomConfig: chamber.snapshot()
   });
+  const firstBeat = dreamJourney.beats[0];
+  const selectedDream = {
+    id: firstBeat.moduleId,
+    name: firstBeat.moduleName,
+    symbolicTags: firstBeat.symbolicTags,
+    weightBreakdown: firstBeat.weightBreakdown
+  };
   transcript.push(`Dreamflow selects: ${selectedDream.name}.`);
+  transcript.push(`Dream journey: ${dreamJourney.summary}.`);
 
   const mask = masks.selectEligibleMask(archetypes);
   if (mask) {
     transcript.push(`A presence gathers: ${mask.name}.`);
   }
 
+  const symbolGrammar = new SymbolGrammar();
+  symbolGrammar.ingest({ symbols: dreamJourney.symbolTrail, vibeState: feeling.vibeState });
   const entry = journal.writeReturnEntry({
-    symbols: selectedDream.symbolicTags,
+    symbols: dreamJourney.symbolTrail,
     actions: archetypes.recentActions(),
     dominantArchetype: archetypes.dominantArchetype(),
-    vibeState: feeling.vibeState
+    vibeState: feeling.vibeState,
+    journey: dreamJourney,
+    symbolGrammar
   });
   transcript.push(`Journal of Mirrors: ${entry.text}`);
 
@@ -68,7 +85,13 @@ export async function runSimulation({
   transcript.push(`Architect updates ${Object.keys(architectUpdate.adjustedWeights).length} dream weight(s).`);
   transcript.push(`GNI request prepared as ${gniRequest.contract.inputFormat} -> ${gniRequest.contract.outputFormat}.`);
 
-  const appliedGniDirective = gniResponse ? gni.parseDirective(gniResponse) : null;
+  const emulatedGniResponse = !gniResponse && emulateGni
+    ? new GniEmulator({ seed }).processSessionBundle(bundle)
+    : null;
+  if (emulatedGniResponse) {
+    transcript.push('GNI emulator prepared a directive.');
+  }
+  const appliedGniDirective = gniResponse || emulatedGniResponse ? gni.parseDirective(gniResponse ?? emulatedGniResponse) : null;
   const directiveUpdate = appliedGniDirective ? architect.applyDirective(appliedGniDirective) : null;
   if (appliedGniDirective) {
     transcript.push(`GNI directive applied: ${Object.keys(appliedGniDirective.dreamWeightDeltas).length} dream delta(s).`);
@@ -80,6 +103,8 @@ export async function runSimulation({
     feelingState: feeling.snapshot(),
     journal: journal.snapshot(),
     architectState: architect.snapshot(),
+    dreamJourney,
+    symbolGrammar: symbolGrammar.snapshot(),
     lastSessionBundle: bundle,
     pendingGniRequest: gniRequest,
     appliedGniDirective
@@ -89,6 +114,7 @@ export async function runSimulation({
   return {
     transcript,
     selectedDream,
+    dreamJourney,
     entry,
     architectUpdate,
     directiveUpdate,
@@ -108,6 +134,8 @@ export function parseSimulationArgs(args) {
       options.savePath = arg.slice('--save='.length);
     } else if (arg.startsWith('--gni-response=')) {
       options.gniResponsePath = arg.slice('--gni-response='.length);
+    } else if (arg === '--emulate-gni') {
+      options.emulateGni = true;
     } else if (arg === '--json') {
       options.json = true;
     }
@@ -124,7 +152,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const result = await runSimulation({
     seed: options.seed,
     savePath: options.savePath,
-    gniResponse
+    gniResponse,
+    emulateGni: options.emulateGni
   });
 
   if (options.json) {

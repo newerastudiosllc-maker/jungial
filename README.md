@@ -13,6 +13,7 @@ UE5 was not available on PATH in this workspace, and no local C++ compiler was a
 ```powershell
 npm test
 npm run simulate
+npm run validate
 ```
 
 `npm run simulate` writes `saves/latest-session.json`. That folder is ignored by git.
@@ -22,9 +23,16 @@ To test the GNI handoff before the real provider exists:
 ```powershell
 node src/simulation.js --seed=777 --gni-response=data/mock_gni_directive.json
 node src/simulation.js --seed=777 --gni-response=data/mock_gni_directive.json --json
+node src/simulation.js --seed=777 --emulate-gni
 ```
 
 The mock directive is normalized before the Architect receives it. Unsafe fields are ignored, numeric pressure is clamped, and dream weights cannot be driven below a small positive floor.
+
+To run a deterministic replay script:
+
+```powershell
+node src/replay.js data/replay_scripts/threshold_word.json saves/replay-threshold-word.json
+```
 
 ## Folder Structure
 
@@ -42,9 +50,13 @@ That matters for the UE5 path: these JSON files can become DataAssets later, whi
 
 `src/runtime.js` is the composition boundary. It is the only gameplay bootstrap path that loads the bundled catalog by default, validates it, and injects content into Threshold Chamber, Dreamflow, and Masks. Those systems now require explicit content, matching how UE5 components should receive cooked DataAssets instead of loading files from inside constructors.
 
+`npm run validate` checks duplicate IDs, missing symbolic tags, positive dream weights, known archetypes, and known feeling-axis keys.
+
 ## GNI Integration Boundary
 
 GNI is represented by `GniAdapter` in `src/ai.js`.
+
+`GniEmulator` in `src/gniEmulator.js` lets the prototype test AI-shaped behavior before real GNI is ready. Use `--emulate-gni` to have the simulation produce and apply a deterministic directive from the current `SessionBundleV1`.
 
 The game sends `SessionBundleV1`:
 
@@ -67,6 +79,12 @@ GNI should return `JungialDirectiveV1`:
 Game systems do not call GNI directly. They pass through the adapter so the AI can process structured state without owning mutable runtime state.
 
 `src/contracts.js` is the guardrail layer. It validates `SessionBundleV1` shape and normalizes `JungialDirectiveV1` before the Architect applies anything.
+
+## Versioning And Replay
+
+Save files are wrapped as `JungialSaveGame` with version metadata. Legacy unversioned saves migrate into the current envelope when loaded.
+
+Dreamflow can now produce a four-beat `DreamJourneyV1`: entry, pressure, mirror, return. Replay scripts exercise deterministic inputs, GNI directives, dream outcomes, journal text shape, and ArchitectState.
 
 ## Current Playable Loop
 

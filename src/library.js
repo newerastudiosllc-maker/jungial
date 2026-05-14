@@ -6,13 +6,18 @@ export class JournalOfMirrors {
     this.unlockedBooks = [...(snapshot.unlockedBooks ?? [])];
   }
 
-  writeReturnEntry({ symbols, actions, dominantArchetype, vibeState }) {
+  writeReturnEntry({ symbols, actions, dominantArchetype, vibeState, journey = null, symbolGrammar = null }) {
     const symbolLine = symbols.slice(0, 4).join(', ') || 'no named thing';
     const actionLine = actions.slice(-3).join(', ') || 'standing still';
+    const grammar = symbolGrammar?.snapshot?.();
+    const echoLine = grammar?.echoes?.length ? ` ${grammar.echoes.join(', ')} returned before I did.` : '';
+    const journeyLine = journey?.beats?.length
+      ? ` ${journey.beats.map((beat) => beat.role).join(', ')} folded into one path.`
+      : '';
     const text = [
       `I returned with ${symbolLine}.`,
       `The ${dominantArchetype} current moved beneath ${actionLine}.`,
-      `The room remembered me as ${vibeState}.`
+      `The room remembered me as ${vibeState}.${journeyLine}${echoLine}`
     ].join(' ');
 
     const entry = {

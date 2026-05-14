@@ -1,5 +1,6 @@
 {
   "schema": "JungialDirectiveV1",
+  "schemaVersion": 1,
   "dreamWeightDeltas": {
     "mirror_hall": 0.35,
     "garden": 0.15

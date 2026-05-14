@@ -1,0 +1,31 @@
+{
+  "seed": 44,
+  "inputs": [
+    {
+      "kind": "speech",
+      "text": "the word"
+    },
+    {
+      "kind": "action",
+      "name": "open_portal",
+      "archetypes": ["Seeker"],
+      "symbols": ["portal"]
+    }
+  ],
+  "gniDirectives": [
+    {
+      "schema": "JungialDirectiveV1",
+      "schemaVersion": 1,
+      "dreamWeightDeltas": {
+        "mirror_hall": 0.25
+      },
+      "symbolEchoes": ["mirror"],
+      "maskPressure": {
+        "double": 0.2
+      },
+      "pacingDelta": {
+        "intensity": 0.1
+      }
+    }
+  ]
+}

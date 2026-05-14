@@ -4,6 +4,9 @@ export function validateSessionBundle(bundle) {
   if (bundle?.schema !== 'SessionBundleV1') {
     errors.push('schema must be SessionBundleV1');
   }
+  if (bundle?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
   if (!isNonEmptyString(bundle?.sessionId)) {
     errors.push('sessionId is required');
   }
@@ -38,6 +41,7 @@ export function validateSessionBundle(bundle) {
 export function normalizeDirective(response) {
   return {
     schema: 'JungialDirectiveV1',
+    schemaVersion: 1,
     dreamWeightDeltas: normalizeNumberMap(response?.dreamWeightDeltas, {
       min: -0.95,
       max: 2

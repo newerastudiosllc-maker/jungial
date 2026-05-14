@@ -35,6 +35,7 @@ test('session bundle validation reports missing GNI handoff fields', () => {
 
   assert.equal(result.valid, false);
   assert.deepEqual(result.errors, [
+    'schemaVersion must be 1',
     'coherence is required',
     'vibeState is required',
     'recentSymbols must be an array',
@@ -47,6 +48,7 @@ test('session bundle validation reports missing GNI handoff fields', () => {
 test('session bundle validation accepts compact Witness handoff data', () => {
   const result = validateSessionBundle({
     schema: 'SessionBundleV1',
+    schemaVersion: 1,
     sessionId: 'session-one',
     dominantArchetype: 'Seeker',
     coherence: 0.5,

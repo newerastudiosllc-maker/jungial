@@ -18,6 +18,7 @@ export class WitnessState {
   toSessionBundle({ selectedDream = null } = {}) {
     return {
       schema: 'SessionBundleV1',
+      schemaVersion: 1,
       sessionId: `session_${Date.now()}`,
       dominantArchetype: this.archetypeState.dominantArchetype(),
       coherence: this.archetypeState.coherence,
@@ -138,6 +139,7 @@ export class GniAdapter {
         ]
       },
       payload: {
+        schemaVersion: sessionBundle.schemaVersion ?? 1,
         sessionId: sessionBundle.sessionId,
         dominantArchetype: sessionBundle.dominantArchetype,
         vibeState: sessionBundle.vibeState,

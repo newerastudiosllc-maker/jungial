@@ -34,6 +34,7 @@ test('witness bundles local context and architect updates global weights', async
 test('GNI adapter packages session bundle without coupling game systems to provider internals', () => {
   const adapter = new GniAdapter({ endpoint: 'local-gni-placeholder' });
   const request = adapter.createProcessingRequest({
+    schemaVersion: 1,
     sessionId: 'session-one',
     dominantArchetype: 'Seeker',
     vibeState: 'calm_hopeful_boundless_bright_warm',
@@ -76,7 +77,8 @@ test('persistence saves and loads room, archetypes, journal, and architect state
     const raw = JSON.parse(await readFile(savePath, 'utf8'));
     const loaded = await loadGameState(savePath);
 
-    assert.equal(raw.room.awakened, true);
+    assert.equal(raw.schema, 'JungialSaveGame');
+    assert.equal(raw.payload.room.awakened, true);
     assert.equal(loaded.journal.entries.length, 1);
     assert.ok(loaded.archetypeState.archetype_vector.Seeker > 0);
   } finally {
