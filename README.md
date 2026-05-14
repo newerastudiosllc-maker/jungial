@@ -20,6 +20,7 @@ npm run scenarios
 npm run scenario:check
 npm run fixtures
 npm run contracts
+npm run gni:smoke:async
 ```
 
 `npm run simulate` writes `saves/latest-session.json`. That folder is ignored by git.
@@ -53,6 +54,15 @@ node src/simulation.js --gni-endpoint=http://127.0.0.1:8787/gni
 ```
 
 Use `--mode=async` to make the mock server return HTTP `202` with a `jobId`, `statusUrl`, and `pollAfterMs` instead of an immediate directive.
+
+To exercise the whole async GNI save/resume path in one command:
+
+```powershell
+npm run gni:smoke:async
+npm run gni:smoke:async -- --save=saves/async-gni-smoke-session.json --json
+```
+
+This starts the local mock server in async mode, runs the Threshold-to-dream simulation against it, saves the pending queue, polls the mock job status URL, applies the returned directive, and writes the resolved queue back into the same save.
 
 To run a deterministic replay script:
 
