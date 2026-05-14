@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/gni_queue_process_result.schema.json",
+  "title": "GniDirectiveQueueProcessResultV1",
+  "type": "object",
+  "required": ["schema", "processed", "queue", "architectState"],
+  "properties": {
+    "schema": { "const": "GniDirectiveQueueProcessResultV1" },
+    "processed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "status", "errors"],
+        "properties": {
+          "id": { "type": "string" },
+          "status": {
+            "enum": ["no_provider", "provider_empty", "provider_error", "directive_ready"]
+          },
+          "directive": { "type": "object" },
+          "directiveUpdate": { "type": ["object", "null"] },
+          "errors": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "queue": { "type": "object" },
+    "architectState": { "type": "object" }
+  },
+  "additionalProperties": false
+}

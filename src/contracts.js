@@ -203,6 +203,34 @@ export function validateGniDirectiveQueue(queue) {
   };
 }
 
+export function validateGniQueueProcessResult(result) {
+  const errors = [];
+
+  if (result?.schema !== 'GniDirectiveQueueProcessResultV1') {
+    errors.push('schema must be GniDirectiveQueueProcessResultV1');
+  }
+  if (!Array.isArray(result?.processed)) {
+    errors.push('processed must be an array');
+  } else {
+    result.processed.forEach((entry, index) => {
+      errors.push(...validateQueueProcessEntry(entry, `processed[${index}]`));
+    });
+  }
+
+  const queueValidation = validateGniDirectiveQueue(result?.queue);
+  if (!queueValidation.valid) {
+    errors.push(...queueValidation.errors.map((error) => `queue.${error}`));
+  }
+  if (!isObject(result?.architectState)) {
+    errors.push('architectState must be an object');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
 export function normalizeDirective(response) {
   return {
     schema: 'JungialDirectiveV1',
@@ -226,6 +254,39 @@ export function normalizeDirective(response) {
 
 export function clampNumber(value, min, max) {
   return Math.max(min, Math.min(max, value));
+}
+
+function validateQueueProcessEntry(entry, label) {
+  const errors = [];
+  const statuses = ['no_provider', 'provider_empty', 'provider_error', 'directive_ready'];
+
+  if (!isNonEmptyString(entry?.id)) {
+    errors.push(`${label}.id is required`);
+  }
+  if (!statuses.includes(entry?.status)) {
+    errors.push(`${label}.status must be one of ${statuses.join(', ')}`);
+  }
+  if (!Array.isArray(entry?.errors)) {
+    errors.push(`${label}.errors must be an array`);
+  } else {
+    entry.errors.forEach((error, index) => {
+      if (typeof error !== 'string') {
+        errors.push(`${label}.errors[${index}] must be a string`);
+      }
+    });
+  }
+
+  if (entry?.directive !== undefined) {
+    const directiveValidation = validateDirective(entry.directive);
+    if (!directiveValidation.valid) {
+      errors.push(...directiveValidation.errors.map((error) => `${label}.directive.${error}`));
+    }
+  }
+  if (entry?.directiveUpdate !== undefined && entry.directiveUpdate !== null && !isObject(entry.directiveUpdate)) {
+    errors.push(`${label}.directiveUpdate must be an object or null`);
+  }
+
+  return errors;
 }
 
 function validateQueueEntry(entry, label, expectedStatus) {

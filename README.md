@@ -158,6 +158,7 @@ The current contract schemas live in `data/schemas/`:
 - `gni_directive.schema.json`
 - `gni_bridge_result.schema.json`
 - `gni_directive_queue.schema.json`
+- `gni_queue_process_result.schema.json`
 
 ## Versioning And Replay
 
@@ -195,7 +196,7 @@ Export GNI contract fixtures:
 npm run fixtures
 ```
 
-This writes `fixtures/session_bundle_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
+This writes `fixtures/session_bundle_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
 
 Validate generated fixtures and mock GNI directives against the strict contract gate:
 

@@ -9,6 +9,7 @@ import {
   validateDirective,
   validateGniBridgeResult,
   validateGniDirectiveQueue,
+  validateGniQueueProcessResult,
   validateGniProcessingRequest,
   validateSessionBundle
 } from '../src/contracts.js';
@@ -193,6 +194,46 @@ test('GNI directive queue validation accepts pending and resolved envelopes', ()
   };
 
   assert.deepEqual(validateGniDirectiveQueue(queue), { valid: true, errors: [] });
+});
+
+test('GNI queue process result validation accepts processor output envelopes', () => {
+  const queue = {
+    schema: 'GniDirectiveQueueV1',
+    pending: [],
+    resolved: []
+  };
+  const result = {
+    schema: 'GniDirectiveQueueProcessResultV1',
+    processed: [{
+      id: 'gni_pending_session-one',
+      status: 'directive_ready',
+      directive: {
+        schema: 'JungialDirectiveV1',
+        schemaVersion: 1,
+        dreamWeightDeltas: { garden: 0.2 },
+        symbolEchoes: ['threshold'],
+        maskPressure: {},
+        pacingDelta: {}
+      },
+      directiveUpdate: {
+        adjustedWeights: { garden: 1.2 },
+        symbolFrequency: { threshold: 1 },
+        maskPressure: {},
+        pacingProfile: { intensity: 0.2, repetition: 0.1, silence: 0.6 }
+      },
+      errors: []
+    }],
+    queue,
+    architectState: {
+      globalDreamWeights: { garden: 1.2 },
+      symbolFrequency: { threshold: 1 },
+      pacingProfile: { intensity: 0.2, repetition: 0.1, silence: 0.6 },
+      futureDreamModuleWeights: {},
+      maskPressure: {}
+    }
+  };
+
+  assert.deepEqual(validateGniQueueProcessResult(result), { valid: true, errors: [] });
 });
 
 async function readJson(path) {

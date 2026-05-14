@@ -5,6 +5,7 @@ import {
   validateDirective,
   validateGniBridgeResult,
   validateGniDirectiveQueue,
+  validateGniQueueProcessResult,
   validateGniProcessingRequest,
   validateSessionBundle
 } from './contracts.js';
@@ -21,6 +22,8 @@ export function validateContractDocument(document) {
       return validateGniBridgeResult(document);
     case 'GniDirectiveQueueV1':
       return validateGniDirectiveQueue(document);
+    case 'GniDirectiveQueueProcessResultV1':
+      return validateGniQueueProcessResult(document);
     default:
       return {
         valid: false,

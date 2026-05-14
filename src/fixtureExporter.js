@@ -6,12 +6,14 @@ import { createDeterministicClock } from './clock.js';
 import { runSimulation } from './simulation.js';
 import { stableHash } from './stableHash.js';
 import { inspectTrace } from './traceInspector.js';
+import { processPendingGniQueue } from './gniQueueProcessor.js';
 
 const FIXTURE_FILES = Object.freeze([
   'session_bundle_v1.json',
   'gni_request_v1.json',
   'gni_directive_v1.json',
   'gni_directive_queue_v1.json',
+  'gni_queue_process_result_v1.json',
   'trace_summary_v1.json'
 ]);
 
@@ -37,12 +39,28 @@ export async function exportContractFixtures({
   const gniRequest = run.gniRequest;
   const gniDirective = run.appliedGniDirective;
   const gniDirectiveQueue = pendingRun.gniQueue;
+  const gniQueueProcessResult = await processPendingGniQueue({
+    queueSnapshot: gniDirectiveQueue,
+    architectState: {
+      globalDreamWeights: pendingRun.architectUpdate.adjustedWeights,
+      symbolFrequency: pendingRun.architectUpdate.symbolFrequency,
+      pacingProfile: pendingRun.architectUpdate.pacingProfile,
+      futureDreamModuleWeights: {},
+      maskPressure: pendingRun.architectUpdate.maskPressure
+    },
+    provider: async () => ({
+      dreamWeightDeltas: { white_void: 0.2 },
+      symbolEchoes: ['threshold'],
+      pacingDelta: { silence: 0.1 }
+    })
+  });
   const traceSummary = inspectTrace(run.trace);
   const payloads = {
     'session_bundle_v1.json': sessionBundle,
     'gni_request_v1.json': gniRequest,
     'gni_directive_v1.json': gniDirective,
     'gni_directive_queue_v1.json': gniDirectiveQueue,
+    'gni_queue_process_result_v1.json': gniQueueProcessResult,
     'trace_summary_v1.json': traceSummary
   };
 

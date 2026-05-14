@@ -21,6 +21,7 @@ test('fixture exporter writes stable GNI handoff fixtures', async () => {
       'gni_request_v1.json',
       'gni_directive_v1.json',
       'gni_directive_queue_v1.json',
+      'gni_queue_process_result_v1.json',
       'trace_summary_v1.json'
     ]);
     assert.match(manifest.hash, /^[a-f0-9]{64}$/);
@@ -29,6 +30,7 @@ test('fixture exporter writes stable GNI handoff fixtures', async () => {
     const request = JSON.parse(await readFile(join(dir, 'gni_request_v1.json'), 'utf8'));
     const directive = JSON.parse(await readFile(join(dir, 'gni_directive_v1.json'), 'utf8'));
     const queue = JSON.parse(await readFile(join(dir, 'gni_directive_queue_v1.json'), 'utf8'));
+    const processResult = JSON.parse(await readFile(join(dir, 'gni_queue_process_result_v1.json'), 'utf8'));
 
     assert.equal(bundle.schema, 'SessionBundleV1');
     assert.equal(bundle.schemaVersion, 1);
@@ -39,6 +41,8 @@ test('fixture exporter writes stable GNI handoff fixtures', async () => {
     assert.equal(directive.schemaVersion, 1);
     assert.equal(queue.schema, 'GniDirectiveQueueV1');
     assert.equal(queue.pending.length, 1);
+    assert.equal(processResult.schema, 'GniDirectiveQueueProcessResultV1');
+    assert.equal(processResult.processed[0].status, 'directive_ready');
   } finally {
     await rm(dir, { recursive: true, force: true });
   }
