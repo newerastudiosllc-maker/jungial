@@ -7,12 +7,14 @@ import { runSimulation } from './simulation.js';
 import { stableHash } from './stableHash.js';
 import { inspectTrace } from './traceInspector.js';
 import { processPendingGniQueue } from './gniQueueProcessor.js';
+import { checkGniContract } from './gniContractCheck.js';
 
 const FIXTURE_FILES = Object.freeze([
   'session_bundle_v1.json',
   'gni_request_v1.json',
   'gni_directive_v1.json',
   'gni_bridge_result_v1.json',
+  'gni_contract_check_report_v1.json',
   'gni_directive_queue_v1.json',
   'gni_queue_process_result_v1.json',
   'fixture-run.save.json',
@@ -60,12 +62,23 @@ export async function exportContractFixtures({
       pacingDelta: { silence: 0.1 }
     })
   });
+  const gniContractCheckReport = await checkGniContract({
+    endpoint: 'gni://fixture-provider',
+    request: gniRequest,
+    provider: {
+      endpoint: 'gni://fixture-provider',
+      async processRequest() {
+        return gniDirective;
+      }
+    }
+  });
   const traceSummary = inspectTrace(run.trace);
   const payloads = {
     'session_bundle_v1.json': sessionBundle,
     'gni_request_v1.json': gniRequest,
     'gni_directive_v1.json': gniDirective,
     'gni_bridge_result_v1.json': gniBridgeResult,
+    'gni_contract_check_report_v1.json': gniContractCheckReport,
     'gni_directive_queue_v1.json': gniDirectiveQueue,
     'gni_queue_process_result_v1.json': gniQueueProcessResult,
     'fixture-run.save.json': fixtureRunSave,

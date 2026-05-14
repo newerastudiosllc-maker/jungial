@@ -8,6 +8,7 @@ import { ARCHETYPES } from '../src/constants.js';
 import {
   validateDirective,
   validateGniBridgeResult,
+  validateGniContractCheckReport,
   validateGniDirectiveQueue,
   validateGniQueueProcessResult,
   validateGniProcessingRequest,
@@ -134,6 +135,94 @@ test('GNI request and bridge result validation accept provider-ready contracts',
 
   assert.deepEqual(validateGniProcessingRequest(request), { valid: true, errors: [] });
   assert.deepEqual(validateGniBridgeResult(bridgeResult), { valid: true, errors: [] });
+});
+
+test('GNI contract check report validation accepts endpoint check summaries', () => {
+  const result = validateGniContractCheckReport({
+    schema: 'GniContractCheckReportV1',
+    ok: true,
+    endpoint: 'https://gni.local/process',
+    request: {
+      valid: true,
+      errors: [],
+      value: {
+        schema: 'GniProcessingRequestV1',
+        schemaVersion: 1,
+        provider: 'GNI',
+        endpoint: 'gni://local-dev-placeholder',
+        model: 'gni-dream-director-dev',
+        contract: {
+          inputFormat: 'SessionBundleV1',
+          outputFormat: 'JungialDirectiveV1',
+          allowedDirectives: ['adjust_dream_weights']
+        },
+        payload: {
+          schema: 'SessionBundleV1',
+          schemaVersion: 1,
+          sessionId: 'session-one',
+          dominantArchetype: 'Seeker',
+          coherence: 0.6,
+          vibeState: 'calm_hopeful_boundless_bright_warm',
+          recentSymbols: ['portal'],
+          recentActions: ['open_portal'],
+          roomConfigSnapshot: { portalOpen: true },
+          selectedDream: { id: 'garden' },
+          archetypeVector: { Seeker: 1 }
+        }
+      }
+    },
+    response: {
+      status: 'directive_ready',
+      directive: {
+        valid: true,
+        errors: [],
+        value: {
+          schema: 'JungialDirectiveV1',
+          schemaVersion: 1,
+          dreamWeightDeltas: { garden: 0.2 },
+          symbolEchoes: ['threshold'],
+          maskPressure: {},
+          pacingDelta: {}
+        }
+      },
+      errors: []
+    },
+    job: null
+  });
+
+  assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('GNI contract check report validation rejects impossible ok reports', () => {
+  const result = validateGniContractCheckReport({
+    schema: 'GniContractCheckReportV1',
+    ok: true,
+    endpoint: '',
+    request: {
+      valid: false,
+      errors: [],
+      value: {}
+    },
+    response: {
+      status: 'provider_error',
+      errors: []
+    },
+    job: {
+      status: 'invalid_job_status',
+      polls: 0,
+      errors: []
+    }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'endpoint is required',
+    'request.errors must include details when request.valid is false',
+    'response.errors must include details when status is provider_error',
+    'job.polls must be a positive integer when job is present',
+    'job.errors must include details when status is invalid_job_status',
+    'ok cannot be true when request, response, or job failed'
+  ]);
 });
 
 test('GNI bridge result validation rejects impossible status envelopes', () => {

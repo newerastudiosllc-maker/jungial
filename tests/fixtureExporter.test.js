@@ -21,6 +21,7 @@ test('fixture exporter writes stable GNI handoff fixtures', async () => {
       'gni_request_v1.json',
       'gni_directive_v1.json',
       'gni_bridge_result_v1.json',
+      'gni_contract_check_report_v1.json',
       'gni_directive_queue_v1.json',
       'gni_queue_process_result_v1.json',
       'fixture-run.save.json',
@@ -33,6 +34,7 @@ test('fixture exporter writes stable GNI handoff fixtures', async () => {
     const request = JSON.parse(await readFile(join(dir, 'gni_request_v1.json'), 'utf8'));
     const directive = JSON.parse(await readFile(join(dir, 'gni_directive_v1.json'), 'utf8'));
     const bridgeResult = JSON.parse(await readFile(join(dir, 'gni_bridge_result_v1.json'), 'utf8'));
+    const contractCheck = JSON.parse(await readFile(join(dir, 'gni_contract_check_report_v1.json'), 'utf8'));
     const queue = JSON.parse(await readFile(join(dir, 'gni_directive_queue_v1.json'), 'utf8'));
     const processResult = JSON.parse(await readFile(join(dir, 'gni_queue_process_result_v1.json'), 'utf8'));
 
@@ -47,6 +49,9 @@ test('fixture exporter writes stable GNI handoff fixtures', async () => {
     assert.equal(bridgeResult.status, 'directive_ready');
     assert.equal(bridgeResult.request.schema, 'GniProcessingRequestV1');
     assert.equal(bridgeResult.directive.schema, 'JungialDirectiveV1');
+    assert.equal(contractCheck.schema, 'GniContractCheckReportV1');
+    assert.equal(contractCheck.ok, true);
+    assert.equal(contractCheck.response.status, 'directive_ready');
     assert.equal(queue.schema, 'GniDirectiveQueueV1');
     assert.equal(queue.pending.length, 1);
     assert.equal(processResult.schema, 'GniDirectiveQueueProcessResultV1');

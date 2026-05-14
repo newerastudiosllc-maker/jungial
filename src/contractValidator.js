@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import {
   validateDirective,
   validateGniBridgeResult,
+  validateGniContractCheckReport,
   validateGniDirectiveQueue,
   validateGniQueueProcessResult,
   validateGniProcessingRequest,
@@ -22,6 +23,8 @@ export function validateContractDocument(document) {
       return validateDirective(document);
     case 'GniBridgeResultV1':
       return validateGniBridgeResult(document);
+    case 'GniContractCheckReportV1':
+      return validateGniContractCheckReport(document);
     case 'GniDirectiveQueueV1':
       return validateGniDirectiveQueue(document);
     case 'GniDirectiveQueueProcessResultV1':

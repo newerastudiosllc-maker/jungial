@@ -25,9 +25,45 @@ test('contract validator routes known Jungial contract schemas', () => {
       payload: { statusCounts: { directive_ready: 1 } }
     }]
   });
+  const gniContractCheckResult = validateContractDocument({
+    schema: 'GniContractCheckReportV1',
+    ok: true,
+    endpoint: 'https://gni.local/process',
+    request: {
+      valid: true,
+      errors: [],
+      value: {
+        schema: 'GniProcessingRequestV1',
+        schemaVersion: 1,
+        provider: 'GNI',
+        endpoint: 'gni://local-dev-placeholder',
+        model: 'gni-dream-director-dev',
+        contract: {
+          inputFormat: 'SessionBundleV1',
+          outputFormat: 'JungialDirectiveV1',
+          allowedDirectives: ['adjust_dream_weights']
+        },
+        payload: {
+          schema: 'SessionBundleV1',
+          schemaVersion: 1,
+          sessionId: 'session-one',
+          dominantArchetype: 'Seeker',
+          coherence: 0.6,
+          vibeState: 'calm_hopeful_boundless_bright_warm',
+          recentSymbols: ['portal'],
+          recentActions: ['open_portal'],
+          roomConfigSnapshot: { portalOpen: true },
+          archetypeVector: { Seeker: 1 }
+        }
+      }
+    },
+    response: { status: 'provider_empty', errors: [] },
+    job: null
+  });
 
   assert.deepEqual(directiveResult, { valid: true, errors: [] });
   assert.deepEqual(traceResult, { valid: true, errors: [] });
+  assert.deepEqual(gniContractCheckResult, { valid: true, errors: [] });
 });
 
 test('contract validator validates save game payload and nested GNI state', () => {

@@ -245,6 +245,35 @@ export function validateGniQueueProcessResult(result) {
   };
 }
 
+export function validateGniContractCheckReport(report) {
+  const errors = [];
+
+  if (report?.schema !== 'GniContractCheckReportV1') {
+    errors.push('schema must be GniContractCheckReportV1');
+  }
+  if (typeof report?.ok !== 'boolean') {
+    errors.push('ok must be a boolean');
+  }
+  if (!isNonEmptyString(report?.endpoint)) {
+    errors.push('endpoint is required');
+  }
+
+  const requestOk = validateContractCheckRequest(report?.request, errors);
+  const responseOk = validateContractCheckEndpointResult(report?.response, 'response', errors, { requirePolls: false });
+  const jobOk = report?.job === null
+    ? true
+    : validateContractCheckEndpointResult(report?.job, 'job', errors, { requirePolls: true });
+
+  if (report?.ok === true && (!requestOk || !responseOk || !jobOk)) {
+    errors.push('ok cannot be true when request, response, or job failed');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
 export function validateTrace(trace) {
   const errors = [];
 
@@ -274,6 +303,86 @@ export function validateTrace(trace) {
     });
   }
 
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+function validateContractCheckRequest(request, errors) {
+  if (!isObject(request)) {
+    errors.push('request must be an object');
+    return false;
+  }
+  if (typeof request.valid !== 'boolean') {
+    errors.push('request.valid must be a boolean');
+    return false;
+  }
+  if (!Array.isArray(request.errors)) {
+    errors.push('request.errors must be an array');
+  } else if (request.valid === false && request.errors.length === 0) {
+    errors.push('request.errors must include details when request.valid is false');
+  }
+  if (request.valid === true) {
+    const requestValidation = validateGniProcessingRequest(request.value);
+    if (!requestValidation.valid) {
+      errors.push(...requestValidation.errors.map((error) => `request.value.${error}`));
+      return false;
+    }
+  }
+  return request.valid === true;
+}
+
+function validateContractCheckEndpointResult(result, label, errors, { requirePolls }) {
+  const statuses = ['directive_ready', 'provider_pending', 'provider_empty', 'provider_error', 'invalid_directive', 'invalid_job_status'];
+  if (!isObject(result)) {
+    errors.push(`${label} must be an object or null`);
+    return false;
+  }
+  if (!statuses.includes(result.status)) {
+    errors.push(`${label}.status must be one of ${statuses.join(', ')}`);
+  }
+  if (!Array.isArray(result.errors)) {
+    errors.push(`${label}.errors must be an array`);
+  }
+  if (requirePolls && (!Number.isInteger(result.polls) || result.polls < 1)) {
+    errors.push(`${label}.polls must be a positive integer when ${label} is present`);
+  }
+  if (Array.isArray(result.errors) && ['provider_error', 'invalid_directive', 'invalid_job_status'].includes(result.status) && result.errors.length === 0) {
+    errors.push(`${label}.errors must include details when status is ${result.status}`);
+  }
+  errors.push(...validateProviderJob(result.providerJob, `${label}.providerJob`));
+
+  if (result.status === 'directive_ready') {
+    const directiveValidation = validateContractCheckDirectiveReport(result.directive, `${label}.directive`);
+    if (!directiveValidation.valid) {
+      errors.push(...directiveValidation.errors);
+      return false;
+    }
+  }
+
+  return ['directive_ready', 'provider_pending', 'provider_empty'].includes(result.status)
+    && (Array.isArray(result.errors) ? result.errors.length === 0 : false);
+}
+
+function validateContractCheckDirectiveReport(directive, label) {
+  const errors = [];
+  if (!isObject(directive)) {
+    return {
+      valid: false,
+      errors: [`${label} must be an object`]
+    };
+  }
+  if (directive.valid !== true) {
+    errors.push(`${label}.valid must be true when status is directive_ready`);
+  }
+  if (!Array.isArray(directive.errors)) {
+    errors.push(`${label}.errors must be an array`);
+  }
+  const directiveValidation = validateDirective(directive.value);
+  if (!directiveValidation.valid) {
+    errors.push(...directiveValidation.errors.map((error) => `${label}.value.${error}`));
+  }
   return {
     valid: errors.length === 0,
     errors

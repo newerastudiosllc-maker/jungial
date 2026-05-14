@@ -200,6 +200,7 @@ The current contract schemas live in `data/schemas/`:
 - `gni_processing_request.schema.json`
 - `gni_directive.schema.json`
 - `gni_bridge_result.schema.json`
+- `gni_contract_check_report.schema.json`
 - `gni_directive_queue.schema.json`
 - `gni_queue_process_result.schema.json`
 

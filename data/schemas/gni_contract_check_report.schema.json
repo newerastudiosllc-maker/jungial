@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/gni_contract_check_report.schema.json",
+  "title": "GniContractCheckReportV1",
+  "type": "object",
+  "required": ["schema", "ok", "endpoint", "request", "response", "job"],
+  "properties": {
+    "schema": { "const": "GniContractCheckReportV1" },
+    "ok": { "type": "boolean" },
+    "endpoint": { "type": "string", "minLength": 1 },
+    "request": {
+      "type": "object",
+      "required": ["valid", "errors", "value"],
+      "properties": {
+        "valid": { "type": "boolean" },
+        "errors": { "type": "array", "items": { "type": "string" } },
+        "value": { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+    "response": { "$ref": "#/$defs/endpointResult" },
+    "job": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "allOf": [
+            { "$ref": "#/$defs/endpointResult" },
+            {
+              "type": "object",
+              "required": ["polls"],
+              "properties": {
+                "polls": { "type": "integer", "minimum": 1 }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "endpointResult": {
+      "type": "object",
+      "required": ["status", "errors"],
+      "properties": {
+        "status": {
+          "enum": [
+            "directive_ready",
+            "provider_pending",
+            "provider_empty",
+            "provider_error",
+            "invalid_directive",
+            "invalid_job_status"
+          ]
+        },
+        "providerJob": {
+          "type": ["object", "null"],
+          "properties": {
+            "id": { "type": "string", "minLength": 1 },
+            "statusUrl": { "type": "string" },
+            "pollAfterMs": { "type": "integer", "minimum": 0 }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "directive": {
+          "type": "object",
+          "properties": {
+            "valid": { "type": "boolean" },
+            "errors": { "type": "array", "items": { "type": "string" } },
+            "value": { "type": "object" }
+          },
+          "required": ["valid", "errors", "value"],
+          "additionalProperties": false
+        },
+        "errors": { "type": "array", "items": { "type": "string" } },
+        "polls": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    }
+  }
+}
