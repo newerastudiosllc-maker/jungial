@@ -14,6 +14,7 @@ UE5 was not available on PATH in this workspace, and no local C++ compiler was a
 npm test
 npm run simulate
 npm run validate
+npm run ready
 npm run campaign
 npm run scenarios
 npm run scenario:check
