@@ -31,7 +31,16 @@ export class GniHttpProvider {
       throw new Error(`GNI HTTP provider failed with ${response.status}: ${body}`.trim());
     }
 
-    if (response.status === 202 || response.status === 204) {
+    if (response.status === 202) {
+      const body = typeof response.json === 'function' ? await response.json() : {};
+      return {
+        schema: 'GniProviderPendingV1',
+        status: 'pending',
+        providerJob: normalizeProviderJob(body)
+      };
+    }
+
+    if (response.status === 204) {
       return null;
     }
 
@@ -54,6 +63,26 @@ export class GniHttpProvider {
 
     return headers;
   }
+}
+
+function normalizeProviderJob(body = {}) {
+  const id = body.jobId ?? body.id ?? null;
+  if (typeof id !== 'string' || id.trim().length === 0) {
+    return null;
+  }
+
+  const job = {
+    id: id.trim()
+  };
+
+  if (typeof body.statusUrl === 'string' && body.statusUrl.trim().length > 0) {
+    job.statusUrl = body.statusUrl.trim();
+  }
+  if (Number.isFinite(body.pollAfterMs)) {
+    job.pollAfterMs = Math.max(0, Math.round(body.pollAfterMs));
+  }
+
+  return job;
 }
 
 function createTimeoutSignal(timeoutMs) {

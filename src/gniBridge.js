@@ -41,6 +41,15 @@ export class GniBridge {
     if (this.provider) {
       try {
         const rawResponse = await callGniProvider(this.provider, request, sessionBundle);
+        if (isGniProviderPendingResponse(rawResponse)) {
+          return this.#result({
+            request,
+            status: 'provider_empty',
+            source: 'provider',
+            rawResponse,
+            providerJob: rawResponse.providerJob ?? null
+          });
+        }
         if (!rawResponse) {
           return this.#result({ request, status: 'provider_empty', source: 'provider' });
         }
@@ -79,6 +88,7 @@ export class GniBridge {
     source,
     rawResponse = null,
     directive = null,
+    providerJob = null,
     errors = []
   }) {
     return {
@@ -88,9 +98,14 @@ export class GniBridge {
       request,
       rawResponse,
       directive,
+      providerJob,
       errors
     };
   }
+}
+
+export function isGniProviderPendingResponse(response) {
+  return response?.schema === 'GniProviderPendingV1' && response.status === 'pending';
 }
 
 export async function callGniProvider(provider, request, sessionBundle) {

@@ -35,6 +35,16 @@
     "directive": {
       "type": ["object", "null"]
     },
+    "providerJob": {
+      "type": ["object", "null"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "statusUrl": { "type": "string" },
+        "pollAfterMs": { "type": "integer", "minimum": 0 }
+      },
+      "required": ["id"],
+      "additionalProperties": false
+    },
     "errors": {
       "type": "array",
       "items": { "type": "string" }

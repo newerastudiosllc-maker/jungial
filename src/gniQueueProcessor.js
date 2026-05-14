@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url';
 import { readFile } from 'node:fs/promises';
 
 import { ArchitectState } from './ai.js';
-import { callGniProvider } from './gniBridge.js';
+import { callGniProvider, isGniProviderPendingResponse } from './gniBridge.js';
 import { createDeterministicClock } from './clock.js';
 import { GniHttpProvider } from './gniHttpProvider.js';
 import { GniDirectiveQueue } from './gniQueue.js';
@@ -32,11 +32,32 @@ export async function processPendingGniQueue({
 
     try {
       const rawResponse = await callGniProvider(provider, entry.request, entry.request.payload);
-      if (!rawResponse) {
-        queue.enqueue({ request: entry.request, reason: 'provider_empty', at: nowIso(clock) });
+      if (isGniProviderPendingResponse(rawResponse)) {
+        queue.enqueue({
+          request: entry.request,
+          reason: 'provider_empty',
+          at: nowIso(clock),
+          providerJob: rawResponse.providerJob
+        });
         processed.push({
           id: entry.id,
           status: 'provider_empty',
+          providerJob: rawResponse.providerJob ?? null,
+          errors: []
+        });
+        continue;
+      }
+      if (!rawResponse) {
+        queue.enqueue({
+          request: entry.request,
+          reason: 'provider_empty',
+          at: nowIso(clock),
+          providerJob: entry.providerJob
+        });
+        processed.push({
+          id: entry.id,
+          status: 'provider_empty',
+          providerJob: entry.providerJob ?? null,
           errors: []
         });
         continue;
@@ -53,7 +74,12 @@ export async function processPendingGniQueue({
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      queue.enqueue({ request: entry.request, reason: 'provider_error', at: nowIso(clock) });
+      queue.enqueue({
+        request: entry.request,
+        reason: 'provider_error',
+        at: nowIso(clock),
+        providerJob: entry.providerJob
+      });
       processed.push({
         id: entry.id,
         status: 'provider_error',

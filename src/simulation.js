@@ -164,7 +164,8 @@ export async function runSimulation({
   if (!appliedGniDirective && gniBridgeResult.request) {
     const queued = gniQueue.enqueue({
       request: gniBridgeResult.request,
-      reason: gniBridgeResult.status
+      reason: gniBridgeResult.status,
+      providerJob: gniBridgeResult.providerJob
     });
     traceRecorder.record('gni.request.queued', {
       id: queued.id,

@@ -50,6 +50,26 @@ test('GNI queue stores pending requests without duplicating session ids', () => 
   assert.equal(queue.snapshot().pending[0].reason, 'retry');
 });
 
+test('GNI queue stores provider job metadata for async pending requests', () => {
+  const queue = new GniDirectiveQueue();
+
+  queue.enqueue({
+    request: REQUEST,
+    reason: 'provider_empty',
+    providerJob: {
+      id: 'gni-job-001',
+      statusUrl: 'https://gni.local/jobs/gni-job-001',
+      pollAfterMs: 2500
+    }
+  });
+
+  assert.deepEqual(queue.snapshot().pending[0].providerJob, {
+    id: 'gni-job-001',
+    statusUrl: 'https://gni.local/jobs/gni-job-001',
+    pollAfterMs: 2500
+  });
+});
+
 test('GNI queue resolves pending request with normalized directive', () => {
   const queue = new GniDirectiveQueue();
   queue.enqueue({

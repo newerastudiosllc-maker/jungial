@@ -170,3 +170,35 @@ test('simulation stores pending GNI requests when provider returns no directive'
     await rm(dir, { recursive: true, force: true });
   }
 });
+
+test('simulation stores provider job metadata when GNI accepts async work', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-sim-gni-job-'));
+  const savePath = join(dir, 'session.json');
+
+  try {
+    const result = await runSimulation({
+      seed: 777,
+      savePath,
+      gniProvider: async () => ({
+        schema: 'GniProviderPendingV1',
+        status: 'pending',
+        providerJob: {
+          id: 'gni-job-001',
+          statusUrl: 'https://gni.local/jobs/gni-job-001',
+          pollAfterMs: 2500
+        }
+      })
+    });
+    const saved = await loadGameState(savePath);
+
+    assert.equal(result.gniBridgeResult.status, 'provider_empty');
+    assert.deepEqual(result.gniQueue.pending[0].providerJob, {
+      id: 'gni-job-001',
+      statusUrl: 'https://gni.local/jobs/gni-job-001',
+      pollAfterMs: 2500
+    });
+    assert.deepEqual(saved.gniQueue.pending[0].providerJob, result.gniQueue.pending[0].providerJob);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});

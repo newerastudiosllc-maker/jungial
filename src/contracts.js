@@ -160,6 +160,7 @@ export function validateGniBridgeResult(result) {
   if (result?.rawResponse !== null && !isObject(result?.rawResponse)) {
     errors.push('rawResponse must be an object or null');
   }
+  errors.push(...validateProviderJob(result?.providerJob, 'providerJob'));
   if (!Array.isArray(result?.errors)) {
     errors.push('errors must be an array');
   } else {
@@ -386,6 +387,7 @@ function validateQueueProcessEntry(entry, label) {
   if (entry?.directiveUpdate !== undefined && entry.directiveUpdate !== null && !isObject(entry.directiveUpdate)) {
     errors.push(`${label}.directiveUpdate must be an object or null`);
   }
+  errors.push(...validateProviderJob(entry?.providerJob, `${label}.providerJob`));
 
   return errors;
 }
@@ -416,6 +418,7 @@ function validateQueueEntry(entry, label, expectedStatus) {
   if (!requestValidation.valid) {
     errors.push(...requestValidation.errors.map((error) => `${label}.request.${error}`));
   }
+  errors.push(...validateProviderJob(entry?.providerJob, `${label}.providerJob`));
 
   if (expectedStatus === 'resolved') {
     if (!isNullableString(entry?.resolvedAt)) {
@@ -427,6 +430,29 @@ function validateQueueEntry(entry, label, expectedStatus) {
     }
   }
 
+  return errors;
+}
+
+function validateProviderJob(providerJob, label) {
+  const errors = [];
+  if (providerJob === undefined || providerJob === null) {
+    return errors;
+  }
+  if (!isObject(providerJob)) {
+    return [`${label} must be an object or null`];
+  }
+  if (!isNonEmptyString(providerJob.id)) {
+    errors.push(`${label}.id is required`);
+  }
+  if (providerJob.statusUrl !== undefined && typeof providerJob.statusUrl !== 'string') {
+    errors.push(`${label}.statusUrl must be a string`);
+  }
+  if (
+    providerJob.pollAfterMs !== undefined
+    && (!Number.isInteger(providerJob.pollAfterMs) || providerJob.pollAfterMs < 0)
+  ) {
+    errors.push(`${label}.pollAfterMs must be a non-negative integer`);
+  }
   return errors;
 }
 

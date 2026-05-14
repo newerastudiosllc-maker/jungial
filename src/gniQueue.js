@@ -6,7 +6,7 @@ export class GniDirectiveQueue {
     this.resolved = (snapshot.resolved ?? []).map((entry) => clone(entry));
   }
 
-  enqueue({ request, reason = 'pending', at = null } = {}) {
+  enqueue({ request, reason = 'pending', at = null, providerJob = null } = {}) {
     const id = pendingIdFor(request);
     const existing = this.pending.find((entry) => entry.id === id);
 
@@ -14,6 +14,7 @@ export class GniDirectiveQueue {
       existing.reason = reason;
       existing.updatedAt = at;
       existing.attempts += 1;
+      existing.providerJob = providerJob ? clone(providerJob) : existing.providerJob ?? null;
       return clone(existing);
     }
 
@@ -24,6 +25,7 @@ export class GniDirectiveQueue {
       attempts: 1,
       createdAt: at,
       updatedAt: at,
+      providerJob: providerJob ? clone(providerJob) : null,
       request: clone(request)
     };
     this.pending.push(entry);

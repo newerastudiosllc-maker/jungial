@@ -79,28 +79,57 @@ test('GNI HTTP provider raises useful errors for non-2xx responses', async () =>
 });
 
 test('GNI HTTP provider treats accepted or empty responses as pending work', async () => {
-  for (const status of [202, 204]) {
-    const provider = new GniHttpProvider({
-      endpoint: 'https://gni.local/direct',
-      fetchImpl: async () => ({
-        ok: true,
-        status
-      })
-    });
+  const acceptedProvider = new GniHttpProvider({
+    endpoint: 'https://gni.local/direct',
+    fetchImpl: async () => ({
+      ok: true,
+      status: 202,
+      async json() {
+        return {
+          jobId: 'gni-job-001',
+          statusUrl: 'https://gni.local/jobs/gni-job-001',
+          pollAfterMs: 2500
+        };
+      }
+    })
+  });
+  const emptyProvider = new GniHttpProvider({
+    endpoint: 'https://gni.local/direct',
+    fetchImpl: async () => ({
+      ok: true,
+      status: 204
+    })
+  });
 
-    const response = await provider.processRequest(REQUEST);
+  const acceptedResponse = await acceptedProvider.processRequest(REQUEST);
+  const emptyResponse = await emptyProvider.processRequest(REQUEST);
 
-    assert.equal(response, null);
-  }
+  assert.deepEqual(acceptedResponse, {
+    schema: 'GniProviderPendingV1',
+    status: 'pending',
+    providerJob: {
+      id: 'gni-job-001',
+      statusUrl: 'https://gni.local/jobs/gni-job-001',
+      pollAfterMs: 2500
+    }
+  });
+  assert.equal(emptyResponse, null);
 });
 
-test('GNI bridge queues accepted HTTP provider responses without marking them errors', async () => {
+test('GNI bridge queues accepted HTTP provider responses with provider job metadata', async () => {
   const bridge = new GniBridge({
     provider: new GniHttpProvider({
       endpoint: 'https://gni.local/direct',
       fetchImpl: async () => ({
         ok: true,
-        status: 202
+        status: 202,
+        async json() {
+          return {
+            jobId: 'gni-job-001',
+            statusUrl: 'https://gni.local/jobs/gni-job-001',
+            pollAfterMs: 2500
+          };
+        }
       })
     })
   });
@@ -110,6 +139,11 @@ test('GNI bridge queues accepted HTTP provider responses without marking them er
   assert.equal(result.status, 'provider_empty');
   assert.equal(result.source, 'provider');
   assert.equal(result.directive, null);
+  assert.deepEqual(result.providerJob, {
+    id: 'gni-job-001',
+    statusUrl: 'https://gni.local/jobs/gni-job-001',
+    pollAfterMs: 2500
+  });
   assert.deepEqual(result.errors, []);
 });
 

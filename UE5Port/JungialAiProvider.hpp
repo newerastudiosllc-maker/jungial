@@ -28,6 +28,9 @@ struct FGniBridgeResultV1
     String Source; // none, provided, provider, emulator
     FGniProcessingRequestV1 Request;
     FJungialDirectiveV1 Directive;
+    String ProviderJobId;
+    String ProviderJobStatusUrl;
+    int32 ProviderJobPollAfterMs = 0;
     Array<String> Errors;
 };
 
@@ -40,6 +43,9 @@ struct FGniDirectiveQueueEntryV1
     String CreatedAt;
     String UpdatedAt;
     String ResolvedAt;
+    String ProviderJobId;
+    String ProviderJobStatusUrl;
+    int32 ProviderJobPollAfterMs = 0;
     FGniProcessingRequestV1 Request;
     FJungialDirectiveV1 Directive;
 };

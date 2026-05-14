@@ -118,7 +118,17 @@ provider.processSessionBundle = async (sessionBundle) => {}
 provider.complete = async (request) => {}
 ```
 
-`GniHttpProvider` in `src/gniHttpProvider.js` is a generic POST adapter for early integration work. It sends `GniProcessingRequestV1` as JSON to `--gni-endpoint`, reads an optional bearer token from `--gni-token-env` (default: `GNI_API_KEY`), treats HTTP `202`/`204` as pending work, and lets the bridge capture provider errors without mutating gameplay state.
+`GniHttpProvider` in `src/gniHttpProvider.js` is a generic POST adapter for early integration work. It sends `GniProcessingRequestV1` as JSON to `--gni-endpoint`, reads an optional bearer token from `--gni-token-env` (default: `GNI_API_KEY`), treats HTTP `202`/`204` as pending work, and lets the bridge capture provider errors without mutating gameplay state. A `202` response may include async job metadata:
+
+```json
+{
+  "jobId": "gni-job-001",
+  "statusUrl": "https://gni.local/jobs/gni-job-001",
+  "pollAfterMs": 2500
+}
+```
+
+That metadata is normalized into `providerJob` and saved in `GniBridgeResultV1` plus the pending `GniDirectiveQueueV1` entry.
 
 `GniDirectiveQueue` in `src/gniQueue.js` records pending GNI requests when the provider is empty, offline, or still processing. The simulation saves a `GniDirectiveQueueV1` snapshot beside the bridge result so later UE5, VR, or console builds can resume async AI work without blocking the chamber or dream return loop.
 

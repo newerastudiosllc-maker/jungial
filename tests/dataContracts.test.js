@@ -188,6 +188,47 @@ test('GNI bridge result validation rejects impossible status envelopes', () => {
   });
 });
 
+test('GNI provider job metadata validation rejects malformed async handles', () => {
+  const request = validGniRequest();
+
+  const bridgeResult = validateGniBridgeResult({
+    schema: 'GniBridgeResultV1',
+    status: 'provider_empty',
+    source: 'provider',
+    request,
+    rawResponse: {
+      schema: 'GniProviderPendingV1',
+      status: 'pending',
+      providerJob: { id: '' }
+    },
+    directive: null,
+    providerJob: { id: '', pollAfterMs: -1 },
+    errors: []
+  });
+  const queue = validateGniDirectiveQueue({
+    schema: 'GniDirectiveQueueV1',
+    pending: [{
+      id: 'gni_pending_session-one',
+      status: 'pending',
+      reason: 'provider_empty',
+      attempts: 1,
+      createdAt: null,
+      updatedAt: null,
+      providerJob: { id: 'gni-job-001', pollAfterMs: -1 },
+      request
+    }],
+    resolved: []
+  });
+
+  assert.deepEqual(bridgeResult.errors, [
+    'providerJob.id is required',
+    'providerJob.pollAfterMs must be a non-negative integer'
+  ]);
+  assert.deepEqual(queue.errors, [
+    'pending[0].providerJob.pollAfterMs must be a non-negative integer'
+  ]);
+});
+
 test('GNI directive queue validation accepts pending and resolved envelopes', () => {
   const request = {
     schema: 'GniProcessingRequestV1',

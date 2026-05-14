@@ -103,7 +103,8 @@ export async function runCampaign({
     if (!appliedDirective && gniBridgeResult.request) {
       const queued = gniQueue.enqueue({
         request: gniBridgeResult.request,
-        reason: gniBridgeResult.status
+        reason: gniBridgeResult.status,
+        providerJob: gniBridgeResult.providerJob
       });
       trace.record('gni.request.queued', {
         cycle: cycleNumber,
