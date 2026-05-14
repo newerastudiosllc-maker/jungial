@@ -176,6 +176,33 @@ export function validateGniBridgeResult(result) {
   };
 }
 
+export function validateGniDirectiveQueue(queue) {
+  const errors = [];
+
+  if (queue?.schema !== 'GniDirectiveQueueV1') {
+    errors.push('schema must be GniDirectiveQueueV1');
+  }
+  if (!Array.isArray(queue?.pending)) {
+    errors.push('pending must be an array');
+  } else {
+    queue.pending.forEach((entry, index) => {
+      errors.push(...validateQueueEntry(entry, `pending[${index}]`, 'pending'));
+    });
+  }
+  if (!Array.isArray(queue?.resolved)) {
+    errors.push('resolved must be an array');
+  } else {
+    queue.resolved.forEach((entry, index) => {
+      errors.push(...validateQueueEntry(entry, `resolved[${index}]`, 'resolved'));
+    });
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
 export function normalizeDirective(response) {
   return {
     schema: 'JungialDirectiveV1',
@@ -199,6 +226,46 @@ export function normalizeDirective(response) {
 
 export function clampNumber(value, min, max) {
   return Math.max(min, Math.min(max, value));
+}
+
+function validateQueueEntry(entry, label, expectedStatus) {
+  const errors = [];
+
+  if (!isNonEmptyString(entry?.id)) {
+    errors.push(`${label}.id is required`);
+  }
+  if (entry?.status !== expectedStatus) {
+    errors.push(`${label}.status must be ${expectedStatus}`);
+  }
+  if (!isNonEmptyString(entry?.reason)) {
+    errors.push(`${label}.reason is required`);
+  }
+  if (!Number.isInteger(entry?.attempts) || entry.attempts < 1) {
+    errors.push(`${label}.attempts must be a positive integer`);
+  }
+  if (!isNullableString(entry?.createdAt)) {
+    errors.push(`${label}.createdAt must be a string or null`);
+  }
+  if (!isNullableString(entry?.updatedAt)) {
+    errors.push(`${label}.updatedAt must be a string or null`);
+  }
+
+  const requestValidation = validateGniProcessingRequest(entry?.request);
+  if (!requestValidation.valid) {
+    errors.push(...requestValidation.errors.map((error) => `${label}.request.${error}`));
+  }
+
+  if (expectedStatus === 'resolved') {
+    if (!isNullableString(entry?.resolvedAt)) {
+      errors.push(`${label}.resolvedAt must be a string or null`);
+    }
+    const directiveValidation = validateDirective(entry?.directive);
+    if (!directiveValidation.valid) {
+      errors.push(...directiveValidation.errors.map((error) => `${label}.directive.${error}`));
+    }
+  }
+
+  return errors;
 }
 
 function validateOptionalNumberMap(input, label, { min, max, allowedKeys = null }) {
@@ -266,6 +333,10 @@ function isObject(value) {
 
 function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0;
+}
+
+function isNullableString(value) {
+  return value === null || typeof value === 'string';
 }
 
 function round(value) {

@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import {
   validateDirective,
   validateGniBridgeResult,
+  validateGniDirectiveQueue,
   validateGniProcessingRequest,
   validateSessionBundle
 } from './contracts.js';
@@ -18,6 +19,8 @@ export function validateContractDocument(document) {
       return validateDirective(document);
     case 'GniBridgeResultV1':
       return validateGniBridgeResult(document);
+    case 'GniDirectiveQueueV1':
+      return validateGniDirectiveQueue(document);
     default:
       return {
         valid: false,

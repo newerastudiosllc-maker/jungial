@@ -19,6 +19,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - `UJungialWitnessComponent`: builds `SessionBundleV1`.
 - `UJungialArchitectSubsystem`: applies safe `JungialDirectiveV1` data and persists long-range state.
 - `UGniBridgeSubsystem`: validates bundles, creates `GniProcessingRequestV1`, selects provider/emulator/fixture source, and returns normalized directives.
+- `UGniDirectiveQueueSubsystem`: persists pending GNI requests and resolved directives across level loads, suspend/resume, and offline provider windows.
 - `IJungialAiProvider`: implemented first by an emulator, then by GNI.
 - `FGniHttpProviderAdapter`: early network-backed provider that POSTs request envelopes while final GNI transport details settle.
 
@@ -33,6 +34,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - Multi-cycle campaign tests should prove Architect state affects later Dreamflow selection through explicit director multipliers.
 - Baseline updates should be intentional and reviewed because they represent accepted changes to Jungial's procedural behavior.
 - GNI provider calls should stay behind the bridge so failed/empty responses cannot mutate gameplay state.
+- Empty or delayed GNI responses should be queued in SaveGame-backed state instead of blocking travel, VR comfort flow, or console suspend/resume.
 - HTTP-backed GNI calls should be injectable and mockable so packaged builds can test without network access.
 - GNI/GNI-emulator outputs must be normalized before touching gameplay state.
 - GNI contract fixtures should pass strict validation before provider changes are accepted.

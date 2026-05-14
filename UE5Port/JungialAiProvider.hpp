@@ -31,6 +31,25 @@ struct FGniBridgeResultV1
     Array<String> Errors;
 };
 
+struct FGniDirectiveQueueEntryV1
+{
+    String Id;
+    String Status; // pending or resolved
+    String Reason;
+    int32 Attempts = 0;
+    String CreatedAt;
+    String UpdatedAt;
+    String ResolvedAt;
+    FGniProcessingRequestV1 Request;
+    FJungialDirectiveV1 Directive;
+};
+
+struct FGniDirectiveQueueV1
+{
+    Array<FGniDirectiveQueueEntryV1> Pending;
+    Array<FGniDirectiveQueueEntryV1> Resolved;
+};
+
 class IJungialAiProvider
 {
 public:
@@ -53,6 +72,25 @@ public:
         // Route to Provider, fixture, or emulator.
         // Normalize provider output as JungialDirectiveV1 before gameplay sees it.
         return FGniBridgeResultV1();
+    }
+};
+
+class UGniDirectiveQueueSubsystem
+{
+public:
+    FGniDirectiveQueueV1 Snapshot;
+
+    void EnqueuePending(const FGniProcessingRequestV1& Request, const String& Reason)
+    {
+        // Persist in SaveGame state and retry from a platform-safe async task.
+        // Duplicate session IDs should update Attempts rather than appending.
+    }
+
+    bool ResolvePending(const String& Id, const FJungialDirectiveV1& Directive)
+    {
+        // Normalize Directive before moving the entry from Pending to Resolved.
+        // Return false when the response no longer matches a pending request.
+        return false;
     }
 };
 

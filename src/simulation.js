@@ -12,6 +12,7 @@ import { TraceRecorder, writeTrace } from './trace.js';
 import { applyPlayerInput } from './input.js';
 import { GniHttpProvider } from './gniHttpProvider.js';
 import { buildThresholdPresentation } from './presentation.js';
+import { GniDirectiveQueue } from './gniQueue.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -127,6 +128,7 @@ export async function runSimulation({
   });
   const architectUpdate = architect.update(bundle);
   const gniBridge = new GniBridge({ adapter: gni, provider: gniProvider });
+  const gniQueue = new GniDirectiveQueue();
   const gniBridgeResult = await gniBridge.processSessionBundle({
     sessionBundle: bundle,
     providedDirective: gniResponse,
@@ -160,6 +162,18 @@ export async function runSimulation({
   }
 
   const appliedGniDirective = gniBridgeResult.directive;
+  if (!appliedGniDirective && gniBridgeResult.request) {
+    const queued = gniQueue.enqueue({
+      request: gniBridgeResult.request,
+      reason: gniBridgeResult.status
+    });
+    traceRecorder.record('gni.request.queued', {
+      id: queued.id,
+      reason: queued.reason,
+      sessionId: gniBridgeResult.request.payload.sessionId
+    });
+  }
+
   const directiveUpdate = appliedGniDirective ? architect.applyDirective(appliedGniDirective) : null;
   if (appliedGniDirective) {
     transcript.push(`GNI directive applied: ${Object.keys(appliedGniDirective.dreamWeightDeltas).length} dream delta(s).`);
@@ -170,6 +184,7 @@ export async function runSimulation({
   }
 
   const thresholdPresentation = buildThresholdPresentation({ chamber, feeling });
+  const gniQueueSnapshot = gniQueue.snapshot();
   traceRecorder.record('simulation.saved', { savePath, tracePath: tracePath ?? null });
   const traceSnapshot = traceRecorder.snapshot();
   await saveGameState(savePath, {
@@ -184,6 +199,7 @@ export async function runSimulation({
     trace: traceSnapshot,
     lastSessionBundle: bundle,
     pendingGniRequest: gniRequest,
+    gniQueue: gniQueueSnapshot,
     gniBridgeResult,
     appliedGniDirective
   }, { clock });
@@ -202,6 +218,7 @@ export async function runSimulation({
     directiveUpdate,
     gniRequest,
     gniBridgeResult,
+    gniQueue: gniQueueSnapshot,
     appliedGniDirective,
     thresholdPresentation,
     trace: traceSnapshot,

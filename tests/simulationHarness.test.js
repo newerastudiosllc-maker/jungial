@@ -145,3 +145,28 @@ test('simulation can accept an injected GNI provider boundary', async () => {
     await rm(dir, { recursive: true, force: true });
   }
 });
+
+test('simulation stores pending GNI requests when provider returns no directive', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-gni-pending-'));
+  const savePath = join(dir, 'latest.json');
+
+  try {
+    const result = await runSimulation({
+      seed: 21,
+      savePath,
+      gniProvider: {
+        async processRequest() {
+          return null;
+        }
+      }
+    });
+    const saved = await loadGameState(savePath);
+
+    assert.equal(result.appliedGniDirective, null);
+    assert.equal(result.gniBridgeResult.status, 'provider_empty');
+    assert.equal(result.gniQueue.pending.length, 1);
+    assert.equal(saved.gniQueue.pending[0].reason, 'provider_empty');
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});

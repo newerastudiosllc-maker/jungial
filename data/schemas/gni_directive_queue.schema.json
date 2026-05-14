@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/gni_directive_queue.schema.json",
+  "title": "GniDirectiveQueueV1",
+  "type": "object",
+  "required": ["schema", "pending", "resolved"],
+  "properties": {
+    "schema": { "const": "GniDirectiveQueueV1" },
+    "pending": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/pendingEntry" }
+    },
+    "resolved": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/resolvedEntry" }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "pendingEntry": {
+      "type": "object",
+      "required": [
+        "id",
+        "status",
+        "reason",
+        "attempts",
+        "createdAt",
+        "updatedAt",
+        "request"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "status": { "const": "pending" },
+        "reason": { "type": "string" },
+        "attempts": { "type": "integer", "minimum": 1 },
+        "createdAt": { "type": ["string", "null"] },
+        "updatedAt": { "type": ["string", "null"] },
+        "request": { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+    "resolvedEntry": {
+      "type": "object",
+      "required": [
+        "id",
+        "status",
+        "reason",
+        "attempts",
+        "createdAt",
+        "updatedAt",
+        "resolvedAt",
+        "request",
+        "directive"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "status": { "const": "resolved" },
+        "reason": { "type": "string" },
+        "attempts": { "type": "integer", "minimum": 1 },
+        "createdAt": { "type": ["string", "null"] },
+        "updatedAt": { "type": ["string", "null"] },
+        "resolvedAt": { "type": ["string", "null"] },
+        "request": { "type": "object" },
+        "directive": { "type": "object" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -8,6 +8,7 @@ import { ARCHETYPES } from '../src/constants.js';
 import {
   validateDirective,
   validateGniBridgeResult,
+  validateGniDirectiveQueue,
   validateGniProcessingRequest,
   validateSessionBundle
 } from '../src/contracts.js';
@@ -131,6 +132,67 @@ test('GNI request and bridge result validation accept provider-ready contracts',
 
   assert.deepEqual(validateGniProcessingRequest(request), { valid: true, errors: [] });
   assert.deepEqual(validateGniBridgeResult(bridgeResult), { valid: true, errors: [] });
+});
+
+test('GNI directive queue validation accepts pending and resolved envelopes', () => {
+  const request = {
+    schema: 'GniProcessingRequestV1',
+    schemaVersion: 1,
+    provider: 'GNI',
+    endpoint: 'gni://local-dev-placeholder',
+    model: 'gni-dream-director-dev',
+    contract: {
+      inputFormat: 'SessionBundleV1',
+      outputFormat: 'JungialDirectiveV1',
+      allowedDirectives: ['adjust_dream_weights']
+    },
+    payload: {
+      schema: 'SessionBundleV1',
+      schemaVersion: 1,
+      sessionId: 'session-one',
+      dominantArchetype: 'Seeker',
+      coherence: 0.6,
+      vibeState: 'calm_hopeful_boundless_bright_warm',
+      recentSymbols: ['portal'],
+      recentActions: ['open_portal'],
+      roomConfigSnapshot: { portalOpen: true },
+      selectedDream: { id: 'garden' },
+      archetypeVector: { Seeker: 1 }
+    }
+  };
+
+  const queue = {
+    schema: 'GniDirectiveQueueV1',
+    pending: [{
+      id: 'gni_pending_session-one',
+      status: 'pending',
+      reason: 'provider_empty',
+      attempts: 1,
+      createdAt: null,
+      updatedAt: null,
+      request
+    }],
+    resolved: [{
+      id: 'gni_pending_session-one',
+      status: 'resolved',
+      reason: 'pending',
+      attempts: 1,
+      createdAt: null,
+      updatedAt: null,
+      resolvedAt: '2080-01-01T00:02:00.000Z',
+      request,
+      directive: {
+        schema: 'JungialDirectiveV1',
+        schemaVersion: 1,
+        dreamWeightDeltas: { garden: 0.2 },
+        symbolEchoes: ['light'],
+        maskPressure: {},
+        pacingDelta: {}
+      }
+    }]
+  };
+
+  assert.deepEqual(validateGniDirectiveQueue(queue), { valid: true, errors: [] });
 });
 
 async function readJson(path) {

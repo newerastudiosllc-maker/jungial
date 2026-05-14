@@ -11,6 +11,7 @@ const FIXTURE_FILES = Object.freeze([
   'session_bundle_v1.json',
   'gni_request_v1.json',
   'gni_directive_v1.json',
+  'gni_directive_queue_v1.json',
   'trace_summary_v1.json'
 ]);
 
@@ -26,15 +27,22 @@ export async function exportContractFixtures({
     emulateGni: true,
     clock: createDeterministicClock({ startIso: clockStartIso })
   });
+  const pendingRun = await runSimulation({
+    seed,
+    savePath: join(outDir, 'fixture-pending-run.save.json'),
+    clock: createDeterministicClock({ startIso: clockStartIso })
+  });
 
   const sessionBundle = run.gniRequest.payload;
   const gniRequest = run.gniRequest;
   const gniDirective = run.appliedGniDirective;
+  const gniDirectiveQueue = pendingRun.gniQueue;
   const traceSummary = inspectTrace(run.trace);
   const payloads = {
     'session_bundle_v1.json': sessionBundle,
     'gni_request_v1.json': gniRequest,
     'gni_directive_v1.json': gniDirective,
+    'gni_directive_queue_v1.json': gniDirectiveQueue,
     'trace_summary_v1.json': traceSummary
   };
 

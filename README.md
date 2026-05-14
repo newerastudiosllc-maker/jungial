@@ -111,6 +111,8 @@ provider.complete = async (request) => {}
 
 `GniHttpProvider` in `src/gniHttpProvider.js` is a generic POST adapter for early integration work. It sends `GniProcessingRequestV1` as JSON to `--gni-endpoint`, reads an optional bearer token from `--gni-token-env` (default: `GNI_API_KEY`), and lets the bridge capture provider errors without mutating gameplay state.
 
+`GniDirectiveQueue` in `src/gniQueue.js` records pending GNI requests when the provider is empty, offline, or still processing. The simulation saves a `GniDirectiveQueueV1` snapshot beside the bridge result so later UE5, VR, or console builds can resume async AI work without blocking the chamber or dream return loop.
+
 `GniEmulator` in `src/gniEmulator.js` lets the prototype test AI-shaped behavior before real GNI is ready. Use `--emulate-gni` to have the simulation produce and apply a deterministic directive from the current `SessionBundleV1`.
 
 The game sends `SessionBundleV1`:
@@ -143,6 +145,7 @@ The current contract schemas live in `data/schemas/`:
 - `gni_processing_request.schema.json`
 - `gni_directive.schema.json`
 - `gni_bridge_result.schema.json`
+- `gni_directive_queue.schema.json`
 
 ## Versioning And Replay
 
@@ -180,7 +183,7 @@ Export GNI contract fixtures:
 npm run fixtures
 ```
 
-This writes `fixtures/session_bundle_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
+This writes `fixtures/session_bundle_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
 
 Validate generated fixtures and mock GNI directives against the strict contract gate:
 
@@ -211,6 +214,7 @@ npm run contracts
 - `WitnessState` -> local/session observer component
 - `ArchitectState` -> SaveGame-backed director service
 - `GniAdapter` -> `IJungialAiProvider` implementation
+- `GniDirectiveQueue` -> SaveGame-backed async GNI request queue
 - `JournalOfMirrors` -> SaveGame-backed library model
 - `MaskRegistry` -> emergent presence spawner
 
