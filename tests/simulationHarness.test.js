@@ -4,7 +4,7 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
-import { parseSimulationArgs, runSimulation } from '../src/simulation.js';
+import { createGniProviderFromOptions, parseSimulationArgs, runSimulation } from '../src/simulation.js';
 import { loadGameState } from '../src/persistence.js';
 
 test('simulation can apply a mocked GNI directive and persist the result', async () => {
@@ -49,6 +49,9 @@ test('simulation CLI args parse seed, save path, JSON mode, and mock GNI respons
     '--save=saves/test.json',
     '--gni-response=data/mock.json',
     '--emulate-gni',
+    '--gni-endpoint=https://gni.local/direct',
+    '--gni-token-env=TEST_GNI_TOKEN',
+    '--gni-timeout-ms=2500',
     '--clock-start=2040-01-02T03:04:05.000Z',
     '--clock-step-ms=250',
     '--trace=saves/trace.json',
@@ -60,11 +63,37 @@ test('simulation CLI args parse seed, save path, JSON mode, and mock GNI respons
     savePath: 'saves/test.json',
     gniResponsePath: 'data/mock.json',
     emulateGni: true,
+    gniEndpoint: 'https://gni.local/direct',
+    gniTokenEnv: 'TEST_GNI_TOKEN',
+    gniTimeoutMs: 2500,
     clockStartIso: '2040-01-02T03:04:05.000Z',
     clockStepMs: 250,
     tracePath: 'saves/trace.json',
     json: true
   });
+});
+
+test('simulation can build a GNI HTTP provider from CLI options without exposing secrets', () => {
+  const previous = process.env.TEST_GNI_TOKEN;
+  process.env.TEST_GNI_TOKEN = 'token-from-env';
+
+  try {
+    const provider = createGniProviderFromOptions({
+      gniEndpoint: 'https://gni.local/direct',
+      gniTokenEnv: 'TEST_GNI_TOKEN',
+      gniTimeoutMs: 500
+    });
+
+    assert.equal(provider.endpoint, 'https://gni.local/direct');
+    assert.equal(provider.bearerToken, 'token-from-env');
+    assert.equal(provider.timeoutMs, 500);
+  } finally {
+    if (previous === undefined) {
+      delete process.env.TEST_GNI_TOKEN;
+    } else {
+      process.env.TEST_GNI_TOKEN = previous;
+    }
+  }
 });
 
 test('simulation can use deterministic GNI emulator when no real directive is provided', async () => {

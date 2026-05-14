@@ -10,6 +10,7 @@ import { SymbolGrammar } from './symbolGrammar.js';
 import { createDeterministicClock } from './clock.js';
 import { TraceRecorder, writeTrace } from './trace.js';
 import { applyPlayerInput } from './input.js';
+import { GniHttpProvider } from './gniHttpProvider.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -216,6 +217,12 @@ export function parseSimulationArgs(args) {
       options.gniResponsePath = arg.slice('--gni-response='.length);
     } else if (arg === '--emulate-gni') {
       options.emulateGni = true;
+    } else if (arg.startsWith('--gni-endpoint=')) {
+      options.gniEndpoint = arg.slice('--gni-endpoint='.length);
+    } else if (arg.startsWith('--gni-token-env=')) {
+      options.gniTokenEnv = arg.slice('--gni-token-env='.length);
+    } else if (arg.startsWith('--gni-timeout-ms=')) {
+      options.gniTimeoutMs = Number(arg.slice('--gni-timeout-ms='.length));
     } else if (arg.startsWith('--clock-start=')) {
       options.clockStartIso = arg.slice('--clock-start='.length);
     } else if (arg.startsWith('--clock-step-ms=')) {
@@ -230,6 +237,19 @@ export function parseSimulationArgs(args) {
   return options;
 }
 
+export function createGniProviderFromOptions(options = {}) {
+  if (!options.gniEndpoint) {
+    return null;
+  }
+
+  const tokenEnv = options.gniTokenEnv ?? 'GNI_API_KEY';
+  return new GniHttpProvider({
+    endpoint: options.gniEndpoint,
+    bearerToken: process.env[tokenEnv] ?? '',
+    timeoutMs: options.gniTimeoutMs ?? 10000
+  });
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const options = parseSimulationArgs(process.argv.slice(2));
   const gniResponse = options.gniResponsePath
@@ -242,6 +262,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     seed: options.seed,
     savePath: options.savePath,
     gniResponse,
+    gniProvider: createGniProviderFromOptions(options),
     emulateGni: options.emulateGni,
     clock,
     tracePath: options.tracePath

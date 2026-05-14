@@ -31,6 +31,7 @@ node src/simulation.js --seed=777 --gni-response=data/mock_gni_directive.json --
 node src/simulation.js --seed=777 --emulate-gni
 node src/simulation.js --seed=777 --emulate-gni --clock-start=2040-01-02T03:04:05.000Z
 node src/simulation.js --seed=777 --emulate-gni --trace=saves/latest-trace.json
+node src/simulation.js --gni-endpoint=https://example.local/gni --gni-token-env=GNI_API_KEY
 ```
 
 The mock directive is normalized before the Architect receives it. Unsafe fields are ignored, numeric pressure is clamped, and dream weights cannot be driven below a small positive floor.
@@ -107,6 +108,8 @@ provider.processRequest = async (request) => {}
 provider.processSessionBundle = async (sessionBundle) => {}
 provider.complete = async (request) => {}
 ```
+
+`GniHttpProvider` in `src/gniHttpProvider.js` is a generic POST adapter for early integration work. It sends `GniProcessingRequestV1` as JSON to `--gni-endpoint`, reads an optional bearer token from `--gni-token-env` (default: `GNI_API_KEY`), and lets the bridge capture provider errors without mutating gameplay state.
 
 `GniEmulator` in `src/gniEmulator.js` lets the prototype test AI-shaped behavior before real GNI is ready. Use `--emulate-gni` to have the simulation produce and apply a deterministic directive from the current `SessionBundleV1`.
 
