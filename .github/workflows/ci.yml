@@ -1,0 +1,35 @@
+name: Jungial CI
+
+on:
+  push:
+    branches:
+      - main
+      - "codex/**"
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Test
+        run: npm test
+
+      - name: Validate content
+        run: npm run validate
+
+      - name: Validate GNI contracts
+        run: npm run contracts
+
+      - name: Check scenario baseline
+        run: npm run scenario:check
+
+      - name: Run default simulation
+        run: npm run simulate
