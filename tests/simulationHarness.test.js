@@ -34,6 +34,8 @@ test('simulation can apply a mocked GNI directive and persist the result', async
 
     assert.equal(result.appliedGniDirective.dreamWeightDeltas.mirror_hall, 0.5);
     assert.equal(saved.architectState.globalDreamWeights.mirror_hall, 1.5);
+    assert.equal(saved.thresholdPresentation.schema, 'ThresholdPresentationV1');
+    assert.equal(result.thresholdPresentation.portal.open, true);
     assert.equal(saved.architectState.symbolFrequency.mirror, 1);
     assert.equal(saved.architectState.maskPressure.double, 0.25);
     assert.equal(saved.gniBridgeResult.source, 'provided');

@@ -138,6 +138,7 @@ Game systems do not call GNI directly. They pass through the bridge/adapter so t
 The current contract schemas live in `data/schemas/`:
 
 - `input_intent.schema.json`
+- `threshold_presentation.schema.json`
 - `session_bundle.schema.json`
 - `gni_processing_request.schema.json`
 - `gni_directive.schema.json`
@@ -156,6 +157,10 @@ For QA-style reproducibility, pass `--clock-start=<ISO time>` and optional `--cl
 `src/input.js` normalizes speech, keyboard, controller, VR, and system input into `JungialInputIntentV1`. The chamber can awaken from a platform intent such as `speak_word` or `awaken_threshold`, so console/VR builds do not need microphone permission to trigger the same symbolic event.
 
 Replay, simulation, and campaign runs all pass through this router.
+
+## Presentation Packets
+
+`src/presentation.js` builds `ThresholdPresentationV1` from chamber and feeling state. This is the renderer-facing packet for lights, fog, bloom, audio mood, movement feel, note material, Heartlight state, portal state, visible tool-sigils, and spawned forms. Simulation saves include this packet so UE5, VR, console UI, or a browser prototype can render from a stable shape without mutating gameplay state.
 
 ## Trace/Audit Output
 

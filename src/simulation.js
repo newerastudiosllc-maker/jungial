@@ -11,6 +11,7 @@ import { createDeterministicClock } from './clock.js';
 import { TraceRecorder, writeTrace } from './trace.js';
 import { applyPlayerInput } from './input.js';
 import { GniHttpProvider } from './gniHttpProvider.js';
+import { buildThresholdPresentation } from './presentation.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -168,6 +169,7 @@ export async function runSimulation({
     });
   }
 
+  const thresholdPresentation = buildThresholdPresentation({ chamber, feeling });
   traceRecorder.record('simulation.saved', { savePath, tracePath: tracePath ?? null });
   const traceSnapshot = traceRecorder.snapshot();
   await saveGameState(savePath, {
@@ -178,6 +180,7 @@ export async function runSimulation({
     architectState: architect.snapshot(),
     dreamJourney,
     symbolGrammar: symbolGrammar.snapshot(),
+    thresholdPresentation,
     trace: traceSnapshot,
     lastSessionBundle: bundle,
     pendingGniRequest: gniRequest,
@@ -200,6 +203,7 @@ export async function runSimulation({
     gniRequest,
     gniBridgeResult,
     appliedGniDirective,
+    thresholdPresentation,
     trace: traceSnapshot,
     savePath
   };

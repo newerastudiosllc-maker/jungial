@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/threshold_presentation.schema.json",
+  "title": "ThresholdPresentationV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "room",
+    "note",
+    "heartlight",
+    "portal",
+    "toolSigils",
+    "forms",
+    "atmosphere"
+  ],
+  "properties": {
+    "schema": { "const": "ThresholdPresentationV1" },
+    "room": { "type": "object" },
+    "note": { "type": "object" },
+    "heartlight": { "type": "object" },
+    "portal": { "type": "object" },
+    "toolSigils": { "type": "object" },
+    "forms": { "type": "array" },
+    "atmosphere": { "type": "object" }
+  },
+  "additionalProperties": false
+}

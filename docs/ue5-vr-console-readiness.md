@@ -11,6 +11,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - `UFeelingEngineComponent`: maps feeling axes to lighting, fog, post-process, audio, and movement parameters.
 - `AThresholdChamberActor`: owns chamber objects, Heartlight, note, portal, and tool-sigil actors.
 - `UJungialInputRouter`: converts speech, keyboard, controller, and VR events into `JungialInputIntentV1`.
+- `UJungialPresentationMapper`: builds renderer-facing packets without mutating gameplay state.
 - `UDreamflowComponent`: selects dream modules and four-beat `DreamJourneyV1` paths.
 - `UJungialCampaignRunner`: executes repeated Threshold-to-dream cycles while preserving Architect state.
 - `UJungialSymbolGrammar`: tracks recurrence, contradiction, tension, and symbol echoes.
@@ -45,6 +46,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - Save migrations must be explicit and testable.
 - Trace output should be available in development builds and easy to disable or sample in shipping builds.
 - Atmosphere changes should be parameter curves, not one-off hard-coded scene edits.
+- Renderer, audio, UI, and haptic layers should consume presentation packets rather than raw gameplay objects.
 - Speech events should be captured as intent/symbol events so platforms without microphone permission still work.
 - Console and VR builds should send the same symbolic intents as speech builds instead of branching chamber logic by platform.
 
