@@ -79,11 +79,52 @@ test('contract validator routes known Jungial contract schemas', () => {
       lastSessionDigest: null
     }
   });
+  const sessionCovenantResult = validateContractDocument({
+    schema: 'SessionCovenantV1',
+    schemaVersion: 1,
+    mode: 'tonight_shape',
+    toneTags: ['strange'],
+    intensityCeiling: 0.45,
+    hardBoundaryTags: ['real_world_self_harm'],
+    softBoundaryTags: [],
+    allowedPressureTags: [],
+    returnAnchor: { kind: 'image', value: 'small lamp' },
+    groundingPreference: 'quiet_room',
+    memoryScope: 'session_only'
+  });
+  const passageResult = validateContractDocument({
+    schema: 'PassageV1',
+    schemaVersion: 1,
+    id: 'door_breathing_low',
+    motifs: ['door', 'breath', 'threshold'],
+    pressureTags: ['unknown', 'invitation'],
+    formTags: ['locked_door'],
+    intensityBand: 'strange',
+    allowedResponseKinds: ['approach'],
+    returnAnchorTags: ['lamp'],
+    variationFamily: 'threshold_doors',
+    baseWeight: 1
+  });
+  const echoTraceResult = validateContractDocument({
+    schema: 'EchoTraceV1',
+    schemaVersion: 1,
+    passageId: 'door_breathing_low',
+    motifsTouched: ['door'],
+    gestureTags: ['approach'],
+    tempo: 'unhurried',
+    pressureAccepted: 0.5,
+    returnAnchorUsed: false,
+    boundarySignals: [],
+    dreamflowDeltas: {}
+  });
 
   assert.deepEqual(directiveResult, { valid: true, errors: [] });
   assert.deepEqual(traceResult, { valid: true, errors: [] });
   assert.deepEqual(gniContractCheckResult, { valid: true, errors: [] });
   assert.deepEqual(dreamerProfileResult, { valid: true, errors: [] });
+  assert.deepEqual(sessionCovenantResult, { valid: true, errors: [] });
+  assert.deepEqual(passageResult, { valid: true, errors: [] });
+  assert.deepEqual(echoTraceResult, { valid: true, errors: [] });
 });
 
 test('contract validator validates save game payload and nested GNI state', () => {

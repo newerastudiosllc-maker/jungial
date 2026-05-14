@@ -30,6 +30,19 @@
       "type": "object",
       "additionalProperties": { "type": "number" }
     },
-    "dreamerMemoryContext": { "$ref": "dreamer_memory_context.schema.json" }
+    "dreamerMemoryContext": { "$ref": "dreamer_memory_context.schema.json" },
+    "sessionCovenant": { "$ref": "session_covenant.schema.json" },
+    "passageContext": {
+      "type": "object",
+      "properties": {
+        "schema": { "const": "PassageContextV1" },
+        "schemaVersion": { "const": 1 },
+        "recentMotifs": { "type": "array", "items": { "type": "string" } },
+        "recentGestureTags": { "type": "array", "items": { "type": "string" } },
+        "activePassageId": { "type": ["string", "null"] },
+        "echoThreadIds": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    }
   }
 }

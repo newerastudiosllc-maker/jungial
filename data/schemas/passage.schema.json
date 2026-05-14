@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/passage.schema.json",
+  "title": "PassageV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "schemaVersion",
+    "id",
+    "motifs",
+    "pressureTags",
+    "formTags",
+    "intensityBand",
+    "allowedResponseKinds",
+    "returnAnchorTags",
+    "variationFamily",
+    "baseWeight"
+  ],
+  "properties": {
+    "schema": { "const": "PassageV1" },
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "motifs": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "pressureTags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "formTags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "intensityBand": { "enum": ["gentle", "strange", "dark", "horrific", "abyssal"] },
+    "allowedResponseKinds": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "returnAnchorTags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "variationFamily": { "type": "string", "minLength": 1 },
+    "baseWeight": { "type": "number", "exclusiveMinimum": 0 }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/echo_trace.schema.json",
+  "title": "EchoTraceV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "schemaVersion",
+    "passageId",
+    "motifsTouched",
+    "gestureTags",
+    "tempo",
+    "pressureAccepted",
+    "returnAnchorUsed",
+    "boundarySignals",
+    "dreamflowDeltas"
+  ],
+  "properties": {
+    "schema": { "const": "EchoTraceV1" },
+    "schemaVersion": { "const": 1 },
+    "passageId": { "type": "string", "minLength": 1 },
+    "motifsTouched": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "gestureTags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "tempo": { "type": "string", "minLength": 1 },
+    "pressureAccepted": { "type": "number", "minimum": 0, "maximum": 1 },
+    "returnAnchorUsed": { "type": "boolean" },
+    "boundarySignals": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "dreamflowDeltas": { "type": "object", "additionalProperties": { "type": "number" } }
+  },
+  "additionalProperties": false
+}

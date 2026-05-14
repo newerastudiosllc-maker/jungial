@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { ARCHETYPES } from '../src/constants.js';
 import {
   validateDirective,
+  validateEchoTrace,
   validateDreamerMemoryContext,
   validateDreamerProfile,
   validateGniBridgeResult,
@@ -14,11 +15,14 @@ import {
   validateGniDirectiveQueue,
   validateGniQueueProcessResult,
   validateGniProcessingRequest,
+  validatePassage,
   validateSaveGame,
+  validateSessionCovenant,
   validateSessionBundle
 } from '../src/contracts.js';
 import { DreamerProfile } from '../src/dreamerProfile.js';
 import { loadBundledContentCatalog, validateContentCatalog } from '../src/contentCatalog.js';
+import { createSessionCovenant } from '../src/sessionCovenant.js';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 
@@ -74,6 +78,88 @@ test('session bundle validation accepts compact Witness handoff data', () => {
   });
 
   assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('session covenant validation accepts bounded session preferences', () => {
+  const result = validateSessionCovenant(createSessionCovenant({
+    toneTags: ['strange', 'dark'],
+    intensityCeiling: 0.6,
+    hardBoundaryTags: ['body_horror'],
+    softBoundaryTags: ['teeth'],
+    allowedPressureTags: ['shadow'],
+    returnAnchor: { kind: 'image', value: 'small lamp' }
+  }));
+
+  assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('session covenant validation rejects raw speech fields', () => {
+  const result = validateSessionCovenant({
+    ...createSessionCovenant(),
+    rawSpeech: ['I should not be stored']
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, ['covenant.rawSpeech is not allowed']);
+});
+
+test('Passage validation accepts dream-native content contracts', () => {
+  const result = validatePassage({
+    schema: 'PassageV1',
+    schemaVersion: 1,
+    id: 'door_breathing_low',
+    motifs: ['door', 'breath', 'threshold'],
+    pressureTags: ['unknown', 'invitation'],
+    formTags: ['locked_door'],
+    intensityBand: 'strange',
+    allowedResponseKinds: ['approach', 'speak'],
+    returnAnchorTags: ['lamp'],
+    variationFamily: 'threshold_doors',
+    baseWeight: 1
+  });
+
+  assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('EchoTrace validation accepts compact symbolic observation', () => {
+  const result = validateEchoTrace({
+    schema: 'EchoTraceV1',
+    schemaVersion: 1,
+    passageId: 'door_breathing_low',
+    motifsTouched: ['door', 'breath', 'threshold'],
+    gestureTags: ['spoke_before_touching', 'speak'],
+    tempo: 'hesitant_then_committed',
+    pressureAccepted: 0.42,
+    returnAnchorUsed: false,
+    boundarySignals: ['long_pause'],
+    dreamflowDeltas: {}
+  });
+
+  assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('session bundle validation checks optional covenant and Passage context', () => {
+  const result = validateSessionBundle({
+    schema: 'SessionBundleV1',
+    schemaVersion: 1,
+    sessionId: 'session-one',
+    dominantArchetype: 'Seeker',
+    coherence: 0.5,
+    vibeState: 'calm_hopeful_boundless_bright_warm',
+    recentSymbols: ['portal'],
+    recentActions: ['open_portal'],
+    roomConfigSnapshot: { awakened: true },
+    archetypeVector: { Seeker: 1 },
+    sessionCovenant: {
+      ...createSessionCovenant(),
+      intensityCeiling: 3
+    }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'sessionCovenant.intensityCeiling must be between 0 and 1'
+  ]);
 });
 
 test('GNI directive validation catches unsafe provider output before normalization', () => {

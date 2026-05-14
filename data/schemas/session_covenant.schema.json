@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/session_covenant.schema.json",
+  "title": "SessionCovenantV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "schemaVersion",
+    "mode",
+    "toneTags",
+    "intensityCeiling",
+    "hardBoundaryTags",
+    "softBoundaryTags",
+    "allowedPressureTags",
+    "returnAnchor",
+    "groundingPreference",
+    "memoryScope"
+  ],
+  "properties": {
+    "schema": { "const": "SessionCovenantV1" },
+    "schemaVersion": { "const": 1 },
+    "mode": { "enum": ["first_listening", "tonight_shape"] },
+    "toneTags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "intensityCeiling": { "type": "number", "minimum": 0, "maximum": 1 },
+    "hardBoundaryTags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "softBoundaryTags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "allowedPressureTags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "returnAnchor": {
+      "type": "object",
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": { "type": "string", "minLength": 1 },
+        "value": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "groundingPreference": { "type": "string", "minLength": 1 },
+    "memoryScope": { "enum": ["session_only", "profile_aggregate"] }
+  },
+  "additionalProperties": false
+}

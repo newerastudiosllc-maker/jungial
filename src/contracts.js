@@ -37,6 +37,24 @@ export function validateSessionBundle(bundle) {
       errors.push(...memoryValidation.errors.map((error) => `dreamerMemoryContext.${error}`));
     }
   }
+  if (bundle?.sessionCovenant !== undefined) {
+    const covenantValidation = validateSessionCovenant(bundle.sessionCovenant);
+    if (!covenantValidation.valid) {
+      errors.push(...covenantValidation.errors.map((error) => `sessionCovenant.${error}`));
+    }
+  }
+  if (bundle?.passageContext !== undefined) {
+    if (!isObject(bundle.passageContext)) {
+      errors.push('passageContext must be an object');
+    } else {
+      if (!Array.isArray(bundle.passageContext.recentMotifs)) {
+        errors.push('passageContext.recentMotifs must be an array');
+      }
+      if (!Array.isArray(bundle.passageContext.recentGestureTags)) {
+        errors.push('passageContext.recentGestureTags must be an array');
+      }
+    }
+  }
 
   return {
     valid: errors.length === 0,
@@ -146,6 +164,154 @@ export function validateDreamerProfile(profile) {
       errors.push('memory.lastSessionDigest must be a string or null');
     }
   }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function validateSessionCovenant(covenant) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'mode',
+    'toneTags',
+    'intensityCeiling',
+    'hardBoundaryTags',
+    'softBoundaryTags',
+    'allowedPressureTags',
+    'returnAnchor',
+    'groundingPreference',
+    'memoryScope'
+  ];
+
+  if (covenant?.schema !== 'SessionCovenantV1') {
+    errors.push('schema must be SessionCovenantV1');
+  }
+  if (covenant?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  errors.push(...validateKnownKeys(covenant, allowedKeys, 'covenant'));
+  if (!['first_listening', 'tonight_shape'].includes(covenant?.mode)) {
+    errors.push('mode must be first_listening or tonight_shape');
+  }
+  for (const key of ['toneTags', 'hardBoundaryTags', 'softBoundaryTags', 'allowedPressureTags']) {
+    errors.push(...validateStringList(covenant?.[key], key));
+  }
+  if (!Number.isFinite(covenant?.intensityCeiling) || covenant.intensityCeiling < 0 || covenant.intensityCeiling > 1) {
+    errors.push('intensityCeiling must be between 0 and 1');
+  }
+  if (!isObject(covenant?.returnAnchor)) {
+    errors.push('returnAnchor must be an object');
+  } else {
+    if (!isNonEmptyString(covenant.returnAnchor.kind)) {
+      errors.push('returnAnchor.kind is required');
+    }
+    if (!isNonEmptyString(covenant.returnAnchor.value)) {
+      errors.push('returnAnchor.value is required');
+    }
+  }
+  if (!isNonEmptyString(covenant?.groundingPreference)) {
+    errors.push('groundingPreference is required');
+  }
+  if (!['session_only', 'profile_aggregate'].includes(covenant?.memoryScope)) {
+    errors.push('memoryScope must be session_only or profile_aggregate');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function validatePassage(passage) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'id',
+    'motifs',
+    'pressureTags',
+    'formTags',
+    'intensityBand',
+    'allowedResponseKinds',
+    'returnAnchorTags',
+    'variationFamily',
+    'baseWeight'
+  ];
+
+  if (passage?.schema !== 'PassageV1') {
+    errors.push('schema must be PassageV1');
+  }
+  if (passage?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  errors.push(...validateKnownKeys(passage, allowedKeys, 'passage'));
+  if (!isNonEmptyString(passage?.id)) {
+    errors.push('id is required');
+  }
+  for (const key of ['motifs', 'pressureTags', 'formTags', 'allowedResponseKinds', 'returnAnchorTags']) {
+    errors.push(...validateStringList(passage?.[key], key));
+  }
+  if (!['gentle', 'strange', 'dark', 'horrific', 'abyssal'].includes(passage?.intensityBand)) {
+    errors.push('intensityBand is unsupported');
+  }
+  if (!isNonEmptyString(passage?.variationFamily)) {
+    errors.push('variationFamily is required');
+  }
+  if (!Number.isFinite(passage?.baseWeight) || passage.baseWeight <= 0) {
+    errors.push('baseWeight must be positive');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function validateEchoTrace(trace) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'passageId',
+    'motifsTouched',
+    'gestureTags',
+    'tempo',
+    'pressureAccepted',
+    'returnAnchorUsed',
+    'boundarySignals',
+    'dreamflowDeltas'
+  ];
+
+  if (trace?.schema !== 'EchoTraceV1') {
+    errors.push('schema must be EchoTraceV1');
+  }
+  if (trace?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  errors.push(...validateKnownKeys(trace, allowedKeys, 'echoTrace'));
+  if (!isNonEmptyString(trace?.passageId)) {
+    errors.push('passageId is required');
+  }
+  for (const key of ['motifsTouched', 'gestureTags', 'boundarySignals']) {
+    errors.push(...validateStringList(trace?.[key], key));
+  }
+  if (!isNonEmptyString(trace?.tempo)) {
+    errors.push('tempo is required');
+  }
+  if (!Number.isFinite(trace?.pressureAccepted) || trace.pressureAccepted < 0 || trace.pressureAccepted > 1) {
+    errors.push('pressureAccepted must be between 0 and 1');
+  }
+  if (typeof trace?.returnAnchorUsed !== 'boolean') {
+    errors.push('returnAnchorUsed must be a boolean');
+  }
+  errors.push(...validateOptionalNumberMap(trace?.dreamflowDeltas, 'dreamflowDeltas', {
+    min: -1,
+    max: 1
+  }));
 
   return {
     valid: errors.length === 0,
@@ -574,6 +740,16 @@ export function validateSaveGame(saveGame) {
     saveGame.payload.dreamerProfile,
     'payload.dreamerProfile',
     validateDreamerProfile
+  ));
+  errors.push(...validateOptionalNestedContract(
+    saveGame.payload.sessionCovenant,
+    'payload.sessionCovenant',
+    validateSessionCovenant
+  ));
+  errors.push(...validateOptionalNestedContract(
+    saveGame.payload.echoTrace,
+    'payload.echoTrace',
+    validateEchoTrace
   ));
   errors.push(...validateOptionalNestedContract(
     saveGame.payload.trace,

@@ -5,12 +5,15 @@ import {
   validateDirective,
   validateDreamerMemoryContext,
   validateDreamerProfile,
+  validateEchoTrace,
   validateGniBridgeResult,
   validateGniContractCheckReport,
   validateGniDirectiveQueue,
   validateGniQueueProcessResult,
   validateGniProcessingRequest,
+  validatePassage,
   validateSaveGame,
+  validateSessionCovenant,
   validateSessionBundle,
   validateTrace
 } from './contracts.js';
@@ -27,6 +30,12 @@ export function validateContractDocument(document) {
       return validateDreamerProfile(document);
     case 'DreamerMemoryContextV1':
       return validateDreamerMemoryContext(document);
+    case 'SessionCovenantV1':
+      return validateSessionCovenant(document);
+    case 'PassageV1':
+      return validatePassage(document);
+    case 'EchoTraceV1':
+      return validateEchoTrace(document);
     case 'GniBridgeResultV1':
       return validateGniBridgeResult(document);
     case 'GniContractCheckReportV1':
