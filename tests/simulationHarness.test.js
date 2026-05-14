@@ -262,3 +262,44 @@ test('simulation attaches hidden Dreamer memory context to GNI and persists upda
     await rm(dir, { recursive: true, force: true });
   }
 });
+
+test('simulation saves covenant EchoTrace and sends redacted Passage context to GNI', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-passage-sim-'));
+  const savePath = join(dir, 'session.json');
+  const requests = [];
+
+  try {
+    const result = await runSimulation({
+      seed: 777,
+      savePath,
+      sessionCovenant: {
+        toneTags: ['strange', 'dark'],
+        intensityCeiling: 0.62,
+        softBoundaryTags: ['teeth']
+      },
+      passageResponse: {
+        kind: 'speak',
+        rawSpeech: 'this should not be sent',
+        gestureTags: ['spoke_before_touching'],
+        pressureAccepted: 0.42
+      },
+      gniProvider: {
+        async processRequest(request) {
+          requests.push(request);
+          return null;
+        }
+      }
+    });
+    const saved = await loadGameState(savePath);
+
+    assert.equal(result.sessionCovenant.schema, 'SessionCovenantV1');
+    assert.equal(result.echoTrace.schema, 'EchoTraceV1');
+    assert.equal(saved.sessionCovenant.schema, 'SessionCovenantV1');
+    assert.equal(saved.echoTrace.schema, 'EchoTraceV1');
+    assert.equal(requests[0].payload.sessionCovenant.schema, 'SessionCovenantV1');
+    assert.equal(requests[0].payload.passageContext.schema, 'PassageContextV1');
+    assert.equal(JSON.stringify(requests[0]).includes('this should not be sent'), false);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});

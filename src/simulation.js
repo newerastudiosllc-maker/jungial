@@ -13,6 +13,8 @@ import { applyPlayerInput } from './input.js';
 import { GniHttpProvider } from './gniHttpProvider.js';
 import { buildThresholdPresentation } from './presentation.js';
 import { DreamerProfile } from './dreamerProfile.js';
+import { createSessionCovenant } from './sessionCovenant.js';
+import { createEchoTrace, selectPassage, toGniPassageContext } from './passageLattice.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -29,12 +31,16 @@ export async function runSimulation({
   tracePath = undefined,
   dreamerProfile = null,
   saveSlotId = 'default',
-  saveMode = 'continue'
+  saveMode = 'continue',
+  sessionCovenant = null,
+  passageResponse = null,
+  recentEchoTraces = []
 } = {}) {
   const traceRecorder = trace ?? new TraceRecorder({ clock: clock?.fork?.() ?? undefined });
   traceRecorder.record('simulation.started', { seed, emulateGni, hasGniResponse: Boolean(gniResponse) });
 
   const {
+    catalog: contentCatalog,
     archetypes,
     feeling,
     chamber,
@@ -49,6 +55,7 @@ export async function runSimulation({
   const dreamer = dreamerProfile
     ? new DreamerProfile(dreamerProfile, { clock: clock?.fork?.() ?? undefined })
     : null;
+  const activeSessionCovenant = createSessionCovenant(sessionCovenant ?? {});
 
   const transcript = [];
   transcript.push('Threshold Chamber: silent, dim, confined.');
@@ -76,6 +83,27 @@ export async function runSimulation({
   });
   transcript.push('The Key of Portals turns without sound.');
   traceRecorder.record('portal.opened', { room: chamber.snapshot() });
+
+  const passageSelection = selectPassage({
+    passages: contentCatalog.passages,
+    covenant: activeSessionCovenant,
+    seed,
+    recentEchoTraces,
+    dreamerMemoryContext: dreamer?.toGniMemoryContext({ slotId: saveSlotId, mode: saveMode }) ?? null,
+    architectState: architect.snapshot()
+  });
+  const activePassage = passageSelection.passage;
+  const echoTrace = createEchoTrace({
+    passage: activePassage,
+    response: passageResponse ?? { kind: 'approach', gestureTags: ['approached'], pressureAccepted: 0.4 }
+  });
+  transcript.push(`A Passage gathers: ${activePassage.id}.`);
+  traceRecorder.record('passage.gathered', {
+    passageId: activePassage.id,
+    motifs: activePassage.motifs,
+    intensityBand: activePassage.intensityBand
+  });
+  traceRecorder.record('echo.trace.created', echoTrace);
 
   const dreamJourney = selectDreamJourney({
     dreamflow,
@@ -133,6 +161,11 @@ export async function runSimulation({
       mode: saveMode
     });
   }
+  bundle.sessionCovenant = activeSessionCovenant;
+  bundle.passageContext = toGniPassageContext({
+    activePassage,
+    recentEchoTraces: [...recentEchoTraces, echoTrace]
+  });
   traceRecorder.record('witness.bundle.created', {
     sessionId: bundle.sessionId,
     dominantArchetype: bundle.dominantArchetype,
@@ -196,7 +229,7 @@ export async function runSimulation({
     });
   }
   const dreamerProfileSnapshot = dreamer
-    ? dreamer.recordSession({ sessionBundle: bundle, dreamJourney, mask })
+    ? dreamer.recordSession({ sessionBundle: bundle, dreamJourney, mask, echoTrace })
     : null;
 
   const thresholdPresentation = buildThresholdPresentation({ chamber, feeling });
@@ -218,6 +251,9 @@ export async function runSimulation({
     gniQueue: gniQueueSnapshot,
     gniBridgeResult,
     appliedGniDirective,
+    sessionCovenant: activeSessionCovenant,
+    echoTrace,
+    activePassage,
     ...(dreamerProfileSnapshot ? { dreamerProfile: dreamerProfileSnapshot } : {})
   }, { clock });
   transcript.push(`Saved session JSON to ${savePath}.`);
@@ -239,6 +275,9 @@ export async function runSimulation({
     appliedGniDirective,
     thresholdPresentation,
     trace: traceSnapshot,
+    sessionCovenant: activeSessionCovenant,
+    activePassage,
+    echoTrace,
     dreamerProfile: dreamerProfileSnapshot,
     savePath
   };

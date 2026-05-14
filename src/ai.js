@@ -156,6 +156,12 @@ export class GniAdapter {
         archetypeVector: { ...(sessionBundle.archetypeVector ?? {}) },
         ...(sessionBundle.dreamerMemoryContext
           ? { dreamerMemoryContext: structuredClone(sessionBundle.dreamerMemoryContext) }
+          : {}),
+        ...(sessionBundle.sessionCovenant
+          ? { sessionCovenant: structuredClone(sessionBundle.sessionCovenant) }
+          : {}),
+        ...(sessionBundle.passageContext
+          ? { passageContext: structuredClone(sessionBundle.passageContext) }
           : {})
       }
     };
