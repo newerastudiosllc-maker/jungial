@@ -94,6 +94,17 @@ public:
     }
 };
 
+class UGniQueueProcessorSubsystem
+{
+public:
+    bool ProcessPendingQueue(UGniDirectiveQueueSubsystem& Queue, UJungialArchitectSubsystem& Architect)
+    {
+        // Ask IJungialAiProvider for completed directives outside render-critical flow.
+        // Apply only normalized JungialDirectiveV1 data to Architect, then save Snapshot.
+        return false;
+    }
+};
+
 class FGniProviderAdapter final : public IJungialAiProvider
 {
 public:

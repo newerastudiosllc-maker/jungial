@@ -40,7 +40,7 @@ export class GniBridge {
 
     if (this.provider) {
       try {
-        const rawResponse = await callProvider(this.provider, request, sessionBundle);
+        const rawResponse = await callGniProvider(this.provider, request, sessionBundle);
         if (!rawResponse) {
           return this.#result({ request, status: 'provider_empty', source: 'provider' });
         }
@@ -93,7 +93,7 @@ export class GniBridge {
   }
 }
 
-async function callProvider(provider, request, sessionBundle) {
+export async function callGniProvider(provider, request, sessionBundle) {
   if (typeof provider === 'function') {
     return provider(request, sessionBundle);
   }

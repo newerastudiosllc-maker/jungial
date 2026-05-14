@@ -1,0 +1,127 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdtemp, rm } from 'node:fs/promises';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
+
+import { ArchitectState } from '../src/ai.js';
+import { GniDirectiveQueue } from '../src/gniQueue.js';
+import { processPendingGniQueue, processSavedGniQueue } from '../src/gniQueueProcessor.js';
+import { loadGameState, saveGameState } from '../src/persistence.js';
+
+const REQUEST = Object.freeze({
+  schema: 'GniProcessingRequestV1',
+  schemaVersion: 1,
+  provider: 'GNI',
+  endpoint: 'gni://local-dev-placeholder',
+  model: 'gni-dream-director-dev',
+  contract: {
+    inputFormat: 'SessionBundleV1',
+    outputFormat: 'JungialDirectiveV1',
+    allowedDirectives: ['adjust_dream_weights']
+  },
+  payload: {
+    schema: 'SessionBundleV1',
+    schemaVersion: 1,
+    sessionId: 'session-one',
+    dominantArchetype: 'Seeker',
+    coherence: 0.6,
+    vibeState: 'calm_hopeful_boundless_bright_warm',
+    recentSymbols: ['portal'],
+    recentActions: ['open_portal'],
+    roomConfigSnapshot: { portalOpen: true },
+    selectedDream: { id: 'garden' },
+    archetypeVector: { Seeker: 1 }
+  }
+});
+
+test('pending GNI queue processor resolves directives and applies architect state', async () => {
+  const queue = new GniDirectiveQueue();
+  queue.enqueue({ request: REQUEST, reason: 'pending' });
+  const architect = new ArchitectState({ globalDreamWeights: { garden: 1 } });
+
+  const result = await processPendingGniQueue({
+    queueSnapshot: queue.snapshot(),
+    architectState: architect,
+    provider: async (request) => {
+      assert.equal(request.payload.sessionId, 'session-one');
+      return {
+        dreamWeightDeltas: { garden: 0.5 },
+        symbolEchoes: ['mirror'],
+        pacingDelta: { intensity: 0.1 }
+      };
+    }
+  });
+
+  assert.equal(result.processed[0].status, 'directive_ready');
+  assert.equal(result.queue.pending.length, 0);
+  assert.equal(result.queue.resolved.length, 1);
+  assert.equal(result.architectState.globalDreamWeights.garden, 1.5);
+  assert.equal(architect.snapshot().symbolFrequency.mirror, 1);
+});
+
+test('pending GNI queue processor keeps empty provider responses queued', async () => {
+  const queue = new GniDirectiveQueue();
+  queue.enqueue({ request: REQUEST, reason: 'pending' });
+
+  const result = await processPendingGniQueue({
+    queueSnapshot: queue.snapshot(),
+    architectState: new ArchitectState(),
+    provider: async () => null
+  });
+
+  assert.equal(result.processed[0].status, 'provider_empty');
+  assert.equal(result.queue.pending.length, 1);
+  assert.equal(result.queue.pending[0].attempts, 2);
+  assert.equal(result.queue.pending[0].reason, 'provider_empty');
+});
+
+test('pending GNI queue processor captures provider errors without mutating architect state', async () => {
+  const queue = new GniDirectiveQueue();
+  queue.enqueue({ request: REQUEST, reason: 'pending' });
+  const architect = new ArchitectState({ globalDreamWeights: { garden: 1 } });
+
+  const result = await processPendingGniQueue({
+    queueSnapshot: queue.snapshot(),
+    architectState: architect,
+    provider: async () => {
+      throw new Error('GNI unavailable');
+    }
+  });
+
+  assert.equal(result.processed[0].status, 'provider_error');
+  assert.deepEqual(result.processed[0].errors, ['GNI unavailable']);
+  assert.equal(result.queue.pending[0].reason, 'provider_error');
+  assert.equal(result.architectState.globalDreamWeights.garden, 1);
+});
+
+test('saved GNI queue processor persists resolved directives back into save payload', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-queue-process-'));
+  const savePath = join(dir, 'save.json');
+  const queue = new GniDirectiveQueue();
+  queue.enqueue({ request: REQUEST, reason: 'pending' });
+
+  try {
+    await saveGameState(savePath, {
+      gniQueue: queue.snapshot(),
+      architectState: new ArchitectState({ globalDreamWeights: { garden: 1 } }).snapshot()
+    });
+
+    const result = await processSavedGniQueue({
+      savePath,
+      provider: async () => ({
+        dreamWeightDeltas: { garden: 0.25 },
+        symbolEchoes: ['threshold']
+      })
+    });
+    const saved = await loadGameState(savePath);
+
+    assert.equal(result.processed[0].status, 'directive_ready');
+    assert.equal(saved.gniQueue.pending.length, 0);
+    assert.equal(saved.gniQueue.resolved.length, 1);
+    assert.equal(saved.architectState.globalDreamWeights.garden, 1.25);
+    assert.equal(saved.lastGniQueueProcessResult.schema, 'GniDirectiveQueueProcessResultV1');
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});

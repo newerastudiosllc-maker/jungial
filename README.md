@@ -113,6 +113,8 @@ provider.complete = async (request) => {}
 
 `GniDirectiveQueue` in `src/gniQueue.js` records pending GNI requests when the provider is empty, offline, or still processing. The simulation saves a `GniDirectiveQueueV1` snapshot beside the bridge result so later UE5, VR, or console builds can resume async AI work without blocking the chamber or dream return loop.
 
+`processPendingGniQueue()` and `processSavedGniQueue()` in `src/gniQueueProcessor.js` are the later-response path. They take pending queue entries, call the same GNI provider shapes used by the bridge, normalize any returned directive, apply it through `ArchitectState`, and persist the updated queue/Architect state when working from a save file.
+
 `GniEmulator` in `src/gniEmulator.js` lets the prototype test AI-shaped behavior before real GNI is ready. Use `--emulate-gni` to have the simulation produce and apply a deterministic directive from the current `SessionBundleV1`.
 
 The game sends `SessionBundleV1`:
@@ -136,6 +138,8 @@ GNI should return `JungialDirectiveV1`:
 Game systems do not call GNI directly. They pass through the bridge/adapter so the AI can process structured state without owning mutable runtime state.
 
 `src/contracts.js` is the guardrail layer. It validates `SessionBundleV1` shape and normalizes `JungialDirectiveV1` before the Architect applies anything.
+
+For an async provider, the safe flow is: save `GniDirectiveQueueV1`, let a background/service task resolve it, then write back the normalized queue and Architect snapshot. The in-world Witness still only observes; it does not wait for or narrate provider status.
 
 The current contract schemas live in `data/schemas/`:
 
