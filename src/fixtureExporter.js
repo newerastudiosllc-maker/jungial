@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'node:url';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { createDeterministicClock } from './clock.js';
@@ -15,6 +15,8 @@ const FIXTURE_FILES = Object.freeze([
   'gni_bridge_result_v1.json',
   'gni_directive_queue_v1.json',
   'gni_queue_process_result_v1.json',
+  'fixture-run.save.json',
+  'fixture-pending-run.save.json',
   'trace_summary_v1.json'
 ]);
 
@@ -41,6 +43,8 @@ export async function exportContractFixtures({
   const gniDirective = run.appliedGniDirective;
   const gniBridgeResult = run.gniBridgeResult;
   const gniDirectiveQueue = pendingRun.gniQueue;
+  const fixtureRunSave = JSON.parse(await readFile(join(outDir, 'fixture-run.save.json'), 'utf8'));
+  const fixturePendingRunSave = JSON.parse(await readFile(join(outDir, 'fixture-pending-run.save.json'), 'utf8'));
   const gniQueueProcessResult = await processPendingGniQueue({
     queueSnapshot: gniDirectiveQueue,
     architectState: {
@@ -64,6 +68,8 @@ export async function exportContractFixtures({
     'gni_bridge_result_v1.json': gniBridgeResult,
     'gni_directive_queue_v1.json': gniDirectiveQueue,
     'gni_queue_process_result_v1.json': gniQueueProcessResult,
+    'fixture-run.save.json': fixtureRunSave,
+    'fixture-pending-run.save.json': fixturePendingRunSave,
     'trace_summary_v1.json': traceSummary
   };
 

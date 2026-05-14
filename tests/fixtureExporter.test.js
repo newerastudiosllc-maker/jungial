@@ -23,6 +23,8 @@ test('fixture exporter writes stable GNI handoff fixtures', async () => {
       'gni_bridge_result_v1.json',
       'gni_directive_queue_v1.json',
       'gni_queue_process_result_v1.json',
+      'fixture-run.save.json',
+      'fixture-pending-run.save.json',
       'trace_summary_v1.json'
     ]);
     assert.match(manifest.hash, /^[a-f0-9]{64}$/);
