@@ -9,7 +9,14 @@ const forbidden = [
   /therapyEngine/i,
   /playerDiagnosis/i,
   /behaviorScore/i,
-  /mirrorSession/i
+  /mirrorSession/i,
+  /fearScore/i,
+  /panicBudget/i,
+  /therapyWeather/i,
+  /diagnosisPressure/i,
+  /traumaWeather/i,
+  /psychologicalProfile/i,
+  /exposureLevel/i
 ];
 
 const runtimeFiles = [
@@ -17,7 +24,8 @@ const runtimeFiles = [
   'src/passageLattice.js',
   'src/simulation.js',
   'src/ai.js',
-  'src/dreamerProfile.js'
+  'src/dreamerProfile.js',
+  'src/dreamWeather.js'
 ];
 
 test('runtime naming stays dream-native for adaptive Passage systems', async () => {
