@@ -44,6 +44,15 @@ npm run gni:process -- --save=saves/latest-session.json --out=saves/processed-se
 npm run gni:process -- --save=saves/latest-session.json --out=saves/mock-processed-session.json --gni-response=data/mock_gni_directive.json --clock-start=2040-01-02T03:04:05.000Z
 ```
 
+To run a local mock GNI HTTP target while the real provider is being built:
+
+```powershell
+npm run mock:gni -- --port=8787 --mode=directive --directive=data/mock_gni_directive.json
+node src/simulation.js --gni-endpoint=http://127.0.0.1:8787/gni
+```
+
+Use `--mode=async` to make the mock server return HTTP `202` with a `jobId`, `statusUrl`, and `pollAfterMs` instead of an immediate directive.
+
 To run a deterministic replay script:
 
 ```powershell
