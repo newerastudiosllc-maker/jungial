@@ -22,15 +22,20 @@ struct FGniProcessingRequestV1
     FSessionBundleV1 Payload;
 };
 
+struct FGniProviderJobV1
+{
+    String Id;
+    String StatusUrl;
+    int32 PollAfterMs = 0;
+};
+
 struct FGniBridgeResultV1
 {
     String Status; // pending, directive_ready, invalid_session, provider_empty, provider_error
     String Source; // none, provided, provider, emulator
     FGniProcessingRequestV1 Request;
     FJungialDirectiveV1 Directive;
-    String ProviderJobId;
-    String ProviderJobStatusUrl;
-    int32 ProviderJobPollAfterMs = 0;
+    FGniProviderJobV1 ProviderJob;
     Array<String> Errors;
 };
 
@@ -43,11 +48,17 @@ struct FGniDirectiveQueueEntryV1
     String CreatedAt;
     String UpdatedAt;
     String ResolvedAt;
-    String ProviderJobId;
-    String ProviderJobStatusUrl;
-    int32 ProviderJobPollAfterMs = 0;
+    FGniProviderJobV1 ProviderJob;
     FGniProcessingRequestV1 Request;
     FJungialDirectiveV1 Directive;
+};
+
+struct FGniProviderJobStatusV1
+{
+    String Status; // pending, queued, processing, ready, failed
+    FGniProviderJobV1 ProviderJob;
+    FJungialDirectiveV1 Directive;
+    Array<String> Errors;
 };
 
 struct FGniDirectiveQueueV1
@@ -64,6 +75,9 @@ public:
     // Game systems pass a compact request to the provider.
     // The provider returns constrained data, never executable behavior.
     virtual FJungialDirectiveV1 ProcessRequest(const FGniProcessingRequestV1& Request) = 0;
+
+    // Async providers can accept work, save ProviderJob, and resolve later.
+    virtual FGniProviderJobStatusV1 PollProviderJob(const FGniProviderJobV1& ProviderJob) = 0;
 };
 
 class UGniBridgeSubsystem
@@ -86,10 +100,11 @@ class UGniDirectiveQueueSubsystem
 public:
     FGniDirectiveQueueV1 Snapshot;
 
-    void EnqueuePending(const FGniProcessingRequestV1& Request, const String& Reason)
+    void EnqueuePending(const FGniProcessingRequestV1& Request, const String& Reason, const FGniProviderJobV1& ProviderJob)
     {
         // Persist in SaveGame state and retry from a platform-safe async task.
         // Duplicate session IDs should update Attempts rather than appending.
+        // HTTP 202 job metadata should be stored as ProviderJob for later polling.
     }
 
     bool ResolvePending(const String& Id, const FJungialDirectiveV1& Directive)
@@ -105,8 +120,11 @@ class UGniQueueProcessorSubsystem
 public:
     bool ProcessPendingQueue(UGniDirectiveQueueSubsystem& Queue, UJungialArchitectSubsystem& Architect)
     {
-        // Ask IJungialAiProvider for completed directives outside render-critical flow.
+        // Prefer PollProviderJob() when a queue entry has ProviderJob.StatusUrl.
+        // Fall back to ProcessRequest() only when no provider job exists.
+        // Run outside render-critical flow; never poll from actor Tick in VR.
         // Apply only normalized JungialDirectiveV1 data to Architect, then save Snapshot.
+        // Append a developer trace entry named "gni.queue.processed" with status counts.
         return false;
     }
 };
@@ -123,5 +141,13 @@ public:
         // Validate response against JungialDirectiveV1.
         // Return empty directive while GNI is still under development.
         return FJungialDirectiveV1();
+    }
+
+    FGniProviderJobStatusV1 PollProviderJob(const FGniProviderJobV1& ProviderJob) override
+    {
+        // GET ProviderJob.StatusUrl using the same auth headers as ProcessRequest.
+        // Treat 202 or 204 as still pending.
+        // Treat ready/completed responses as a JungialDirectiveV1 candidate.
+        return FGniProviderJobStatusV1();
     }
 };
