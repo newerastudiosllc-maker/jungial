@@ -7,6 +7,8 @@ import { fileURLToPath } from 'node:url';
 import { ARCHETYPES } from '../src/constants.js';
 import {
   validateDirective,
+  validateDreamerMemoryContext,
+  validateDreamerProfile,
   validateGniBridgeResult,
   validateGniContractCheckReport,
   validateGniDirectiveQueue,
@@ -15,6 +17,7 @@ import {
   validateSaveGame,
   validateSessionBundle
 } from '../src/contracts.js';
+import { DreamerProfile } from '../src/dreamerProfile.js';
 import { loadBundledContentCatalog, validateContentCatalog } from '../src/contentCatalog.js';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -135,6 +138,145 @@ test('GNI request and bridge result validation accept provider-ready contracts',
 
   assert.deepEqual(validateGniProcessingRequest(request), { valid: true, errors: [] });
   assert.deepEqual(validateGniBridgeResult(bridgeResult), { valid: true, errors: [] });
+});
+
+test('Dreamer profile and memory context validation accept redacted hidden memory', () => {
+  const profile = new DreamerProfile({
+    profileId: 'dreamer-one',
+    rootSeed: 'root-seed-one'
+  });
+  profile.recordSession({
+    sessionBundle: {
+      schema: 'SessionBundleV1',
+      schemaVersion: 1,
+      sessionId: 'session-one',
+      dominantArchetype: 'Seeker',
+      coherence: 0.6,
+      vibeState: 'calm_hopeful_boundless_bright_warm',
+      recentSymbols: ['portal'],
+      recentActions: ['open_portal'],
+      roomConfigSnapshot: { portalOpen: true },
+      selectedDream: { id: 'garden', symbolicTags: ['growth'] },
+      archetypeVector: { Seeker: 1 }
+    }
+  });
+
+  assert.deepEqual(validateDreamerProfile(profile.snapshot()), { valid: true, errors: [] });
+  assert.deepEqual(validateDreamerMemoryContext(profile.toGniMemoryContext({ slotId: 'slot-a' })), { valid: true, errors: [] });
+});
+
+test('Dreamer profile validation rejects raw private memory shapes', () => {
+  const result = validateDreamerProfile({
+    schema: 'DreamerProfileV1',
+    schemaVersion: 1,
+    profileId: 'dreamer-one',
+    rootSeed: 'root-seed-one',
+    createdAt: '2060-01-01T00:00:00.000Z',
+    updatedAt: '2060-01-01T00:00:00.000Z',
+    consent: { profileMemory: true, crossSaveEchoes: false },
+    memory: {
+      sessionCount: 1,
+      symbols: { portal: { count: 0, weight: 1, lastSeenAt: null } },
+      archetypes: {},
+      actions: {},
+      dreamModules: {},
+      masks: {},
+      vibeStates: {},
+      lastSessionDigest: null,
+      rawSpeech: ['I am afraid']
+    }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'memory.rawSpeech is not allowed',
+    'memory.symbols.portal.count must be a positive integer'
+  ]);
+});
+
+test('GNI request validation checks optional Dreamer memory context', () => {
+  const result = validateGniProcessingRequest({
+    schema: 'GniProcessingRequestV1',
+    schemaVersion: 1,
+    provider: 'GNI',
+    endpoint: 'gni://local-dev-placeholder',
+    model: 'gni-dream-director-dev',
+    contract: {
+      inputFormat: 'SessionBundleV1',
+      outputFormat: 'JungialDirectiveV1',
+      allowedDirectives: ['adjust_dream_weights']
+    },
+    payload: {
+      schema: 'SessionBundleV1',
+      schemaVersion: 1,
+      sessionId: 'session-one',
+      dominantArchetype: 'Seeker',
+      coherence: 0.6,
+      vibeState: 'calm_hopeful_boundless_bright_warm',
+      recentSymbols: ['portal'],
+      recentActions: ['open_portal'],
+      roomConfigSnapshot: { portalOpen: true },
+      archetypeVector: { Seeker: 1 },
+      dreamerMemoryContext: {
+        schema: 'DreamerMemoryContextV1',
+        schemaVersion: 1,
+        profileId: null,
+        slotId: '',
+        saveMode: 'continue',
+        sessionCount: 1,
+        strongSymbols: [],
+        recurringArchetypes: [],
+        familiarMasks: [],
+        familiarDreamModules: [],
+        familiarActions: [],
+        vibeEchoes: [],
+        lastSessionDigest: null
+      }
+    }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'payload.dreamerMemoryContext.slotId is required'
+  ]);
+});
+
+test('save game validation checks optional Dreamer profile payload', () => {
+  const result = validateSaveGame({
+    schema: 'JungialSaveGame',
+    version: 1,
+    savedAt: '2080-01-01T00:00:00.000Z',
+    migrations: [],
+    payload: {
+      room: {},
+      archetypeState: {},
+      feelingState: {},
+      journal: {},
+      architectState: {},
+      dreamerProfile: {
+        schema: 'DreamerProfileV1',
+        schemaVersion: 1,
+        profileId: '',
+        rootSeed: 'root-seed-one',
+        createdAt: '2080-01-01T00:00:00.000Z',
+        updatedAt: '2080-01-01T00:00:00.000Z',
+        consent: { profileMemory: true, crossSaveEchoes: false },
+        memory: {
+          sessionCount: 0,
+          symbols: {},
+          archetypes: {},
+          actions: {},
+          dreamModules: {},
+          masks: {},
+          vibeStates: {},
+          lastSessionDigest: null
+        }
+      }
+    }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, ['payload.dreamerProfile.profileId is required']);
 });
 
 test('GNI contract check report validation accepts endpoint check summaries', () => {

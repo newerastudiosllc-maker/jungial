@@ -12,6 +12,7 @@ import { TraceRecorder, writeTrace } from './trace.js';
 import { applyPlayerInput } from './input.js';
 import { GniHttpProvider } from './gniHttpProvider.js';
 import { buildThresholdPresentation } from './presentation.js';
+import { DreamerProfile } from './dreamerProfile.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -25,7 +26,10 @@ export async function runSimulation({
   catalog = undefined,
   clock = undefined,
   trace = undefined,
-  tracePath = undefined
+  tracePath = undefined,
+  dreamerProfile = null,
+  saveSlotId = 'default',
+  saveMode = 'continue'
 } = {}) {
   const traceRecorder = trace ?? new TraceRecorder({ clock: clock?.fork?.() ?? undefined });
   traceRecorder.record('simulation.started', { seed, emulateGni, hasGniResponse: Boolean(gniResponse) });
@@ -42,6 +46,9 @@ export async function runSimulation({
     gni,
     gniQueue
   } = createJungialRuntime({ seed, catalog, clock });
+  const dreamer = dreamerProfile
+    ? new DreamerProfile(dreamerProfile, { clock: clock?.fork?.() ?? undefined })
+    : null;
 
   const transcript = [];
   transcript.push('Threshold Chamber: silent, dim, confined.');
@@ -120,6 +127,12 @@ export async function runSimulation({
   });
 
   const bundle = witness.toSessionBundle({ selectedDream });
+  if (dreamer) {
+    bundle.dreamerMemoryContext = dreamer.toGniMemoryContext({
+      slotId: saveSlotId,
+      mode: saveMode
+    });
+  }
   traceRecorder.record('witness.bundle.created', {
     sessionId: bundle.sessionId,
     dominantArchetype: bundle.dominantArchetype,
@@ -182,6 +195,9 @@ export async function runSimulation({
       update: directiveUpdate
     });
   }
+  const dreamerProfileSnapshot = dreamer
+    ? dreamer.recordSession({ sessionBundle: bundle, dreamJourney, mask })
+    : null;
 
   const thresholdPresentation = buildThresholdPresentation({ chamber, feeling });
   const gniQueueSnapshot = gniQueue.snapshot();
@@ -201,7 +217,8 @@ export async function runSimulation({
     pendingGniRequest: gniRequest,
     gniQueue: gniQueueSnapshot,
     gniBridgeResult,
-    appliedGniDirective
+    appliedGniDirective,
+    ...(dreamerProfileSnapshot ? { dreamerProfile: dreamerProfileSnapshot } : {})
   }, { clock });
   transcript.push(`Saved session JSON to ${savePath}.`);
 
@@ -222,6 +239,7 @@ export async function runSimulation({
     appliedGniDirective,
     thresholdPresentation,
     trace: traceSnapshot,
+    dreamerProfile: dreamerProfileSnapshot,
     savePath
   };
 }

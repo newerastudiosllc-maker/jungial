@@ -3,6 +3,8 @@ import { readFile } from 'node:fs/promises';
 
 import {
   validateDirective,
+  validateDreamerMemoryContext,
+  validateDreamerProfile,
   validateGniBridgeResult,
   validateGniContractCheckReport,
   validateGniDirectiveQueue,
@@ -21,6 +23,10 @@ export function validateContractDocument(document) {
       return validateGniProcessingRequest(document);
     case 'JungialDirectiveV1':
       return validateDirective(document);
+    case 'DreamerProfileV1':
+      return validateDreamerProfile(document);
+    case 'DreamerMemoryContextV1':
+      return validateDreamerMemoryContext(document);
     case 'GniBridgeResultV1':
       return validateGniBridgeResult(document);
     case 'GniContractCheckReportV1':

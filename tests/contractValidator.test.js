@@ -60,10 +60,30 @@ test('contract validator routes known Jungial contract schemas', () => {
     response: { status: 'provider_empty', errors: [] },
     job: null
   });
+  const dreamerProfileResult = validateContractDocument({
+    schema: 'DreamerProfileV1',
+    schemaVersion: 1,
+    profileId: 'dreamer-one',
+    rootSeed: 'root-seed-one',
+    createdAt: '2080-01-01T00:00:00.000Z',
+    updatedAt: '2080-01-01T00:00:00.000Z',
+    consent: { profileMemory: true, crossSaveEchoes: false },
+    memory: {
+      sessionCount: 0,
+      symbols: {},
+      archetypes: {},
+      actions: {},
+      dreamModules: {},
+      masks: {},
+      vibeStates: {},
+      lastSessionDigest: null
+    }
+  });
 
   assert.deepEqual(directiveResult, { valid: true, errors: [] });
   assert.deepEqual(traceResult, { valid: true, errors: [] });
   assert.deepEqual(gniContractCheckResult, { valid: true, errors: [] });
+  assert.deepEqual(dreamerProfileResult, { valid: true, errors: [] });
 });
 
 test('contract validator validates save game payload and nested GNI state', () => {

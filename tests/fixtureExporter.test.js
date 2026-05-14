@@ -18,6 +18,8 @@ test('fixture exporter writes stable GNI handoff fixtures', async () => {
 
     assert.deepEqual(manifest.files, [
       'session_bundle_v1.json',
+      'dreamer_profile_v1.json',
+      'dreamer_memory_context_v1.json',
       'gni_request_v1.json',
       'gni_directive_v1.json',
       'gni_bridge_result_v1.json',
@@ -31,6 +33,8 @@ test('fixture exporter writes stable GNI handoff fixtures', async () => {
     assert.match(manifest.hash, /^[a-f0-9]{64}$/);
 
     const bundle = JSON.parse(await readFile(join(dir, 'session_bundle_v1.json'), 'utf8'));
+    const dreamerProfile = JSON.parse(await readFile(join(dir, 'dreamer_profile_v1.json'), 'utf8'));
+    const memoryContext = JSON.parse(await readFile(join(dir, 'dreamer_memory_context_v1.json'), 'utf8'));
     const request = JSON.parse(await readFile(join(dir, 'gni_request_v1.json'), 'utf8'));
     const directive = JSON.parse(await readFile(join(dir, 'gni_directive_v1.json'), 'utf8'));
     const bridgeResult = JSON.parse(await readFile(join(dir, 'gni_bridge_result_v1.json'), 'utf8'));
@@ -40,6 +44,9 @@ test('fixture exporter writes stable GNI handoff fixtures', async () => {
 
     assert.equal(bundle.schema, 'SessionBundleV1');
     assert.equal(bundle.schemaVersion, 1);
+    assert.equal(dreamerProfile.schema, 'DreamerProfileV1');
+    assert.equal(memoryContext.schema, 'DreamerMemoryContextV1');
+    assert.equal(memoryContext.profileId, null);
     assert.equal(request.schema, 'GniProcessingRequestV1');
     assert.equal(request.schemaVersion, 1);
     assert.equal(request.contract.outputFormat, 'JungialDirectiveV1');

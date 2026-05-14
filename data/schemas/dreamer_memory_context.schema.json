@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/dreamer_memory_context.schema.json",
+  "title": "DreamerMemoryContextV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "schemaVersion",
+    "profileId",
+    "slotId",
+    "saveMode",
+    "sessionCount",
+    "strongSymbols",
+    "recurringArchetypes",
+    "familiarMasks",
+    "familiarDreamModules",
+    "familiarActions",
+    "vibeEchoes",
+    "lastSessionDigest"
+  ],
+  "properties": {
+    "schema": { "const": "DreamerMemoryContextV1" },
+    "schemaVersion": { "const": 1 },
+    "profileId": { "type": ["string", "null"] },
+    "slotId": { "type": "string", "minLength": 1 },
+    "saveMode": { "enum": ["fresh", "continue", "new_incarnation"] },
+    "sessionCount": { "type": "integer", "minimum": 0 },
+    "strongSymbols": { "$ref": "#/$defs/stringList" },
+    "recurringArchetypes": { "$ref": "#/$defs/stringList" },
+    "familiarMasks": { "$ref": "#/$defs/stringList" },
+    "familiarDreamModules": { "$ref": "#/$defs/stringList" },
+    "familiarActions": { "$ref": "#/$defs/stringList" },
+    "vibeEchoes": { "$ref": "#/$defs/stringList" },
+    "lastSessionDigest": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "stringList": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

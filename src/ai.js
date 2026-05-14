@@ -153,7 +153,10 @@ export class GniAdapter {
         recentActions: [...(sessionBundle.recentActions ?? [])],
         roomConfigSnapshot: sessionBundle.roomConfigSnapshot ?? null,
         selectedDream: sessionBundle.selectedDream ?? null,
-        archetypeVector: { ...(sessionBundle.archetypeVector ?? {}) }
+        archetypeVector: { ...(sessionBundle.archetypeVector ?? {}) },
+        ...(sessionBundle.dreamerMemoryContext
+          ? { dreamerMemoryContext: structuredClone(sessionBundle.dreamerMemoryContext) }
+          : {})
       }
     };
   }

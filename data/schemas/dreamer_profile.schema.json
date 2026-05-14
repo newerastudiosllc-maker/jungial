@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/dreamer_profile.schema.json",
+  "title": "DreamerProfileV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "schemaVersion",
+    "profileId",
+    "rootSeed",
+    "createdAt",
+    "updatedAt",
+    "consent",
+    "memory"
+  ],
+  "properties": {
+    "schema": { "const": "DreamerProfileV1" },
+    "schemaVersion": { "const": 1 },
+    "profileId": { "type": "string", "minLength": 1 },
+    "rootSeed": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "minLength": 1 },
+    "updatedAt": { "type": "string", "minLength": 1 },
+    "consent": {
+      "type": "object",
+      "required": ["profileMemory", "crossSaveEchoes"],
+      "properties": {
+        "profileMemory": { "type": "boolean" },
+        "crossSaveEchoes": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "memory": {
+      "type": "object",
+      "required": [
+        "sessionCount",
+        "symbols",
+        "archetypes",
+        "actions",
+        "dreamModules",
+        "masks",
+        "vibeStates",
+        "lastSessionDigest"
+      ],
+      "properties": {
+        "sessionCount": { "type": "integer", "minimum": 0 },
+        "symbols": { "$ref": "#/$defs/memoryMap" },
+        "archetypes": { "$ref": "#/$defs/memoryMap" },
+        "actions": { "$ref": "#/$defs/memoryMap" },
+        "dreamModules": { "$ref": "#/$defs/memoryMap" },
+        "masks": { "$ref": "#/$defs/memoryMap" },
+        "vibeStates": { "$ref": "#/$defs/memoryMap" },
+        "lastSessionDigest": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "memoryMap": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["count", "weight", "lastSeenAt"],
+        "properties": {
+          "count": { "type": "integer", "minimum": 1 },
+          "weight": { "type": "number" },
+          "lastSeenAt": { "type": ["string", "null"] }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

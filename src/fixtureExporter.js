@@ -8,9 +8,12 @@ import { stableHash } from './stableHash.js';
 import { inspectTrace } from './traceInspector.js';
 import { processPendingGniQueue } from './gniQueueProcessor.js';
 import { checkGniContract } from './gniContractCheck.js';
+import { DreamerProfile } from './dreamerProfile.js';
 
 const FIXTURE_FILES = Object.freeze([
   'session_bundle_v1.json',
+  'dreamer_profile_v1.json',
+  'dreamer_memory_context_v1.json',
   'gni_request_v1.json',
   'gni_directive_v1.json',
   'gni_bridge_result_v1.json',
@@ -41,6 +44,24 @@ export async function exportContractFixtures({
   });
 
   const sessionBundle = run.gniRequest.payload;
+  const dreamer = new DreamerProfile({
+    profileId: 'fixture-dreamer',
+    rootSeed: 'fixture-root-seed',
+    consent: {
+      profileMemory: true,
+      crossSaveEchoes: false
+    }
+  }, {
+    clock: createDeterministicClock({ startIso: clockStartIso })
+  });
+  const dreamerProfile = dreamer.recordSession({
+    sessionBundle,
+    dreamJourney: run.dreamJourney
+  });
+  const dreamerMemoryContext = dreamer.toGniMemoryContext({
+    slotId: 'fixture-slot',
+    mode: 'continue'
+  });
   const gniRequest = run.gniRequest;
   const gniDirective = run.appliedGniDirective;
   const gniBridgeResult = run.gniBridgeResult;
@@ -75,6 +96,8 @@ export async function exportContractFixtures({
   const traceSummary = inspectTrace(run.trace);
   const payloads = {
     'session_bundle_v1.json': sessionBundle,
+    'dreamer_profile_v1.json': dreamerProfile,
+    'dreamer_memory_context_v1.json': dreamerMemoryContext,
     'gni_request_v1.json': gniRequest,
     'gni_directive_v1.json': gniDirective,
     'gni_bridge_result_v1.json': gniBridgeResult,

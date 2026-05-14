@@ -197,6 +197,8 @@ The current contract schemas live in `data/schemas/`:
 - `input_intent.schema.json`
 - `threshold_presentation.schema.json`
 - `session_bundle.schema.json`
+- `dreamer_profile.schema.json`
+- `dreamer_memory_context.schema.json`
 - `gni_processing_request.schema.json`
 - `gni_directive.schema.json`
 - `gni_bridge_result.schema.json`

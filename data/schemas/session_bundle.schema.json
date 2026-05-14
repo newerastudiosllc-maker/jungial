@@ -29,6 +29,7 @@
     "archetypeVector": {
       "type": "object",
       "additionalProperties": { "type": "number" }
-    }
+    },
+    "dreamerMemoryContext": { "$ref": "dreamer_memory_context.schema.json" }
   }
 }

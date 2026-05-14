@@ -24,6 +24,7 @@
         "gniBridgeResult": { "type": "object" },
         "appliedGniDirective": { "type": ["object", "null"] },
         "lastGniQueueProcessResult": { "type": "object" },
+        "dreamerProfile": { "$ref": "dreamer_profile.schema.json" },
         "trace": { "$ref": "trace.schema.json" }
       }
     }

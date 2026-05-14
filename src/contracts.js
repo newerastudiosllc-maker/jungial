@@ -31,6 +31,121 @@ export function validateSessionBundle(bundle) {
   if (!isObject(bundle?.archetypeVector)) {
     errors.push('archetypeVector is required');
   }
+  if (bundle?.dreamerMemoryContext !== undefined) {
+    const memoryValidation = validateDreamerMemoryContext(bundle.dreamerMemoryContext);
+    if (!memoryValidation.valid) {
+      errors.push(...memoryValidation.errors.map((error) => `dreamerMemoryContext.${error}`));
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function validateDreamerMemoryContext(context) {
+  const errors = [];
+  const requiredLists = [
+    'strongSymbols',
+    'recurringArchetypes',
+    'familiarMasks',
+    'familiarDreamModules',
+    'familiarActions',
+    'vibeEchoes'
+  ];
+
+  if (context?.schema !== 'DreamerMemoryContextV1') {
+    errors.push('schema must be DreamerMemoryContextV1');
+  }
+  if (context?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  if (!(context?.profileId === null || isNonEmptyString(context?.profileId))) {
+    errors.push('profileId must be a non-empty string or null');
+  }
+  if (!isNonEmptyString(context?.slotId)) {
+    errors.push('slotId is required');
+  }
+  if (!['fresh', 'continue', 'new_incarnation'].includes(context?.saveMode)) {
+    errors.push('saveMode must be fresh, continue, or new_incarnation');
+  }
+  if (!Number.isInteger(context?.sessionCount) || context.sessionCount < 0) {
+    errors.push('sessionCount must be a non-negative integer');
+  }
+  for (const key of requiredLists) {
+    errors.push(...validateStringList(context?.[key], key));
+  }
+  if (!isNullableString(context?.lastSessionDigest)) {
+    errors.push('lastSessionDigest must be a string or null');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function validateDreamerProfile(profile) {
+  const errors = [];
+
+  if (profile?.schema !== 'DreamerProfileV1') {
+    errors.push('schema must be DreamerProfileV1');
+  }
+  if (profile?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  if (!isNonEmptyString(profile?.profileId)) {
+    errors.push('profileId is required');
+  }
+  if (!isNonEmptyString(profile?.rootSeed)) {
+    errors.push('rootSeed is required');
+  }
+  if (!isNonEmptyString(profile?.createdAt)) {
+    errors.push('createdAt is required');
+  }
+  if (!isNonEmptyString(profile?.updatedAt)) {
+    errors.push('updatedAt is required');
+  }
+
+  if (!isObject(profile?.consent)) {
+    errors.push('consent must be an object');
+  } else {
+    if (typeof profile.consent.profileMemory !== 'boolean') {
+      errors.push('consent.profileMemory must be a boolean');
+    }
+    if (typeof profile.consent.crossSaveEchoes !== 'boolean') {
+      errors.push('consent.crossSaveEchoes must be a boolean');
+    }
+  }
+
+  if (!isObject(profile?.memory)) {
+    errors.push('memory must be an object');
+  } else {
+    const allowedMemoryKeys = [
+      'sessionCount',
+      'symbols',
+      'archetypes',
+      'actions',
+      'dreamModules',
+      'masks',
+      'vibeStates',
+      'lastSessionDigest'
+    ];
+    errors.push(...validateKnownKeys(profile.memory, allowedMemoryKeys, 'memory'));
+    if (!Number.isInteger(profile.memory.sessionCount) || profile.memory.sessionCount < 0) {
+      errors.push('memory.sessionCount must be a non-negative integer');
+    }
+    errors.push(...validateMemoryMap(profile.memory.symbols, 'memory.symbols'));
+    errors.push(...validateMemoryMap(profile.memory.archetypes, 'memory.archetypes'));
+    errors.push(...validateMemoryMap(profile.memory.actions, 'memory.actions'));
+    errors.push(...validateMemoryMap(profile.memory.dreamModules, 'memory.dreamModules'));
+    errors.push(...validateMemoryMap(profile.memory.masks, 'memory.masks'));
+    errors.push(...validateMemoryMap(profile.memory.vibeStates, 'memory.vibeStates'));
+    if (!isNullableString(profile.memory.lastSessionDigest)) {
+      errors.push('memory.lastSessionDigest must be a string or null');
+    }
+  }
 
   return {
     valid: errors.length === 0,
@@ -456,6 +571,11 @@ export function validateSaveGame(saveGame) {
     validateGniQueueProcessResult
   ));
   errors.push(...validateOptionalNestedContract(
+    saveGame.payload.dreamerProfile,
+    'payload.dreamerProfile',
+    validateDreamerProfile
+  ));
+  errors.push(...validateOptionalNestedContract(
     saveGame.payload.trace,
     'payload.trace',
     validateTrace
@@ -498,6 +618,42 @@ function validateOptionalNestedContract(value, label, validator) {
   }
   const validation = validator(value);
   return validation.valid ? [] : validation.errors.map((error) => `${label}.${error}`);
+}
+
+function validateMemoryMap(map, label) {
+  const errors = [];
+  if (!isObject(map)) {
+    return [`${label} must be an object`];
+  }
+  for (const [key, value] of Object.entries(map)) {
+    if (!isObject(value)) {
+      errors.push(`${label}.${key} must be an object`);
+      continue;
+    }
+    if (!Number.isInteger(value.count) || value.count < 1) {
+      errors.push(`${label}.${key}.count must be a positive integer`);
+    }
+    if (!Number.isFinite(value.weight)) {
+      errors.push(`${label}.${key}.weight must be a finite number`);
+    }
+    if (!isNullableString(value.lastSeenAt)) {
+      errors.push(`${label}.${key}.lastSeenAt must be a string or null`);
+    }
+  }
+  return errors;
+}
+
+function validateStringList(value, label) {
+  const errors = [];
+  if (!Array.isArray(value)) {
+    return [`${label} must be an array`];
+  }
+  value.forEach((item, index) => {
+    if (!isNonEmptyString(item)) {
+      errors.push(`${label}[${index}] must be a non-empty string`);
+    }
+  });
+  return errors;
 }
 
 function validateQueueProcessEntry(entry, label) {

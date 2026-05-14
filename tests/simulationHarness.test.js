@@ -202,3 +202,59 @@ test('simulation stores provider job metadata when GNI accepts async work', asyn
     await rm(dir, { recursive: true, force: true });
   }
 });
+
+test('simulation attaches hidden Dreamer memory context to GNI and persists updated profile', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-dreamer-profile-'));
+  const savePath = join(dir, 'session.json');
+  const requests = [];
+
+  try {
+    const result = await runSimulation({
+      seed: 777,
+      savePath,
+      saveSlotId: 'slot-a',
+      saveMode: 'continue',
+      dreamerProfile: {
+        schema: 'DreamerProfileV1',
+        schemaVersion: 1,
+        profileId: 'dreamer-one',
+        rootSeed: 'root-seed-one',
+        createdAt: '2050-01-01T00:00:00.000Z',
+        updatedAt: '2050-01-01T00:00:00.000Z',
+        consent: {
+          profileMemory: true,
+          crossSaveEchoes: false
+        },
+        memory: {
+          sessionCount: 1,
+          symbols: {
+            mirror: { count: 3, weight: 3, lastSeenAt: '2050-01-01T00:00:00.000Z' }
+          },
+          archetypes: {},
+          actions: {},
+          dreamModules: {},
+          masks: {},
+          vibeStates: {},
+          lastSessionDigest: 'previous-digest'
+        }
+      },
+      gniProvider: {
+        async processRequest(request) {
+          requests.push(request);
+          return null;
+        }
+      }
+    });
+    const saved = await loadGameState(savePath);
+
+    assert.equal(requests.length, 1);
+    assert.equal(requests[0].payload.dreamerMemoryContext.schema, 'DreamerMemoryContextV1');
+    assert.equal(requests[0].payload.dreamerMemoryContext.profileId, null);
+    assert.equal(requests[0].payload.dreamerMemoryContext.strongSymbols[0], 'mirror');
+    assert.equal(result.dreamerProfile.memory.sessionCount, 2);
+    assert.equal(saved.dreamerProfile.memory.sessionCount, 2);
+    assert.equal(saved.dreamerProfile.memory.dreamModules.white_void.count, 1);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
