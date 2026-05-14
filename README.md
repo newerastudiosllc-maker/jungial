@@ -55,7 +55,7 @@ To run a multi-cycle campaign with Architect feedback:
 npm run campaign
 ```
 
-The campaign keeps one Architect across cycles, applies optional GNI/emulated-GNI directives after each return, and feeds Architect dream weights back into later Dreamflow selection.
+The campaign keeps one Architect across cycles, applies optional GNI/emulated-GNI directives after each return, queues pending provider work in `GniDirectiveQueueV1`, and feeds Architect dream weights back into later Dreamflow selection.
 
 Programmatic callers can resume from a saved payload by passing `initialState` to `runCampaign()`, or from disk by setting `resumePath` in a campaign config. Resumed runs hydrate the room, archetype state, feeling state, journal, and Architect memory before the next cycle starts.
 

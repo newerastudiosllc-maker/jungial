@@ -52,3 +52,33 @@ test('campaign harness is deterministic with the same seed and clock', async () 
   assert.deepEqual(first.cycles, second.cycles);
   assert.deepEqual(first.architectState, second.architectState);
 });
+
+test('campaign harness stores pending GNI requests across multiple cycles', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-campaign-gni-queue-'));
+  const savePath = join(dir, 'campaign.json');
+
+  try {
+    const result = await runCampaign({
+      cycles: 2,
+      seed: 91,
+      savePath,
+      clock: createDeterministicClock({ startIso: '2070-03-01T00:00:00.000Z' }),
+      gniProvider: {
+        async processRequest() {
+          return null;
+        }
+      }
+    });
+    const saved = await loadGameState(savePath);
+
+    assert.equal(result.gniQueue.pending.length, 2);
+    assert.equal(saved.gniQueue.pending.length, 2);
+    assert.deepEqual(result.gniQueue.pending.map((entry) => entry.reason), [
+      'provider_empty',
+      'provider_empty'
+    ]);
+    assert.equal(result.trace.entries.filter((entry) => entry.type === 'gni.request.queued').length, 2);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});

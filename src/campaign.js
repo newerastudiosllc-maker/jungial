@@ -7,6 +7,7 @@ import { loadGameState, saveGameState } from './persistence.js';
 import { selectDreamJourney } from './dreamJourney.js';
 import { createDreamWeightOverrides } from './directorPolicy.js';
 import { GniBridge } from './gniBridge.js';
+import { GniDirectiveQueue } from './gniQueue.js';
 import { SymbolGrammar } from './symbolGrammar.js';
 import { TraceRecorder } from './trace.js';
 import { applyPlayerInput } from './input.js';
@@ -32,6 +33,7 @@ export async function runCampaign({
   });
   const trace = new TraceRecorder({ clock: clock?.fork?.() ?? undefined });
   const gniBridge = new GniBridge({ adapter: runtime.gni, provider: gniProvider });
+  const gniQueue = new GniDirectiveQueue(resumeState?.gniQueue);
   const symbolGrammar = new SymbolGrammar();
   const campaignCycles = [];
 
@@ -99,6 +101,19 @@ export async function runCampaign({
       sessionId: gniBridgeResult.request.payload.sessionId
     });
     const appliedDirective = gniBridgeResult.directive;
+    if (!appliedDirective && gniBridgeResult.request) {
+      const queued = gniQueue.enqueue({
+        request: gniBridgeResult.request,
+        reason: gniBridgeResult.status
+      });
+      trace.record('gni.request.queued', {
+        cycle: cycleNumber,
+        id: queued.id,
+        reason: queued.reason,
+        sessionId: gniBridgeResult.request.payload.sessionId
+      });
+    }
+
     const directiveUpdate = appliedDirective ? runtime.architect.applyDirective(appliedDirective) : null;
     if (gniBridgeResult.source === 'emulator') {
       trace.record('gni.emulator.directive.created', {
@@ -135,6 +150,7 @@ export async function runCampaign({
       sessionBundle: bundle,
       architectUpdate,
       gniBridgeResult,
+      gniQueue: gniQueue.snapshot(),
       appliedDirective,
       directiveUpdate,
       architectState: runtime.architect.snapshot()
@@ -151,10 +167,12 @@ export async function runCampaign({
 
   trace.record('campaign.completed', { cycles });
   const traceSnapshot = trace.snapshot();
+  const gniQueueSnapshot = gniQueue.snapshot();
   const result = {
     schema: 'JungialCampaignResultV1',
     seed,
     cycles: campaignCycles,
+    gniQueue: gniQueueSnapshot,
     symbolGrammar: symbolGrammar.snapshot(),
     architectState: runtime.architect.snapshot(),
     journal: runtime.journal.snapshot(),
@@ -165,6 +183,7 @@ export async function runCampaign({
     await saveGameState(savePath, {
       campaign: result,
       architectState: runtime.architect.snapshot(),
+      gniQueue: gniQueueSnapshot,
       journal: runtime.journal.snapshot(),
       trace: traceSnapshot,
       room: runtime.chamber.snapshot(),
