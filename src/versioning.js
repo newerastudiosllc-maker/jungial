@@ -13,11 +13,14 @@ export function wrapSaveGame(payload, { savedAt = new Date().toISOString() } = {
 }
 
 export function migrateSaveGame(input) {
-  if (input?.schema === 'JungialSaveGame' && input.version === CURRENT_SAVE_VERSION) {
-    return {
-      ...input,
-      migrations: [...(input.migrations ?? [])]
-    };
+  if (input?.schema === 'JungialSaveGame') {
+    if (input.version === CURRENT_SAVE_VERSION) {
+      return {
+        ...input,
+        migrations: [...(input.migrations ?? [])]
+      };
+    }
+    throw new Error(`Unsupported JungialSaveGame version ${input.version ?? 'missing'}`);
   }
 
   return {

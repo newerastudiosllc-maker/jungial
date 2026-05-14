@@ -47,7 +47,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 
 - No filesystem content loading inside gameplay constructors.
 - No runtime code execution from AI directives.
-- Save migrations must be explicit and testable.
+- Save migrations must be explicit and testable; unsupported future save versions should fail loudly instead of being coerced.
 - Trace output should be available in development builds and easy to disable or sample in shipping builds.
 - Atmosphere changes should be parameter curves, not one-off hard-coded scene edits.
 - Renderer, audio, UI, and haptic layers should consume presentation packets rather than raw gameplay objects.

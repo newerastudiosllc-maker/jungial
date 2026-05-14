@@ -163,7 +163,7 @@ The current contract schemas live in `data/schemas/`:
 
 ## Versioning And Replay
 
-Save files are wrapped as `JungialSaveGame` with version metadata. Legacy unversioned saves migrate into the current envelope when loaded.
+Save files are wrapped as `JungialSaveGame` with version metadata. Legacy unversioned saves migrate into the current envelope when loaded; unsupported versioned envelopes are rejected so future saves are not silently rewrapped into the wrong payload shape.
 
 Dreamflow can now produce a four-beat `DreamJourneyV1`: entry, pressure, mirror, return. Replay scripts exercise deterministic inputs, GNI directives, dream outcomes, journal text shape, and ArchitectState.
 

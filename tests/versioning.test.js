@@ -32,6 +32,19 @@ test('legacy unversioned saves migrate into current version envelope', () => {
   assert.equal(migrated.payload.room.awakened, false);
 });
 
+test('unsupported future save versions are rejected instead of rewrapped', () => {
+  assert.throws(
+    () => migrateSaveGame({
+      schema: 'JungialSaveGame',
+      version: CURRENT_SAVE_VERSION + 1,
+      savedAt: '2080-01-01T00:00:00.000Z',
+      migrations: [],
+      payload: { room: { awakened: true } }
+    }),
+    /Unsupported JungialSaveGame version 2/
+  );
+});
+
 test('session bundle validation requires versioned schema metadata', () => {
   const result = validateSessionBundle({
     schema: 'SessionBundleV1',
