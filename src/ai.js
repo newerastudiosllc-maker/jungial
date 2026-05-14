@@ -158,7 +158,7 @@ export class GniAdapter {
           ? { dreamerMemoryContext: structuredClone(sessionBundle.dreamerMemoryContext) }
           : {}),
         ...(sessionBundle.sessionCovenant
-          ? { sessionCovenant: structuredClone(sessionBundle.sessionCovenant) }
+          ? { sessionCovenant: toGniSessionCovenant(sessionBundle.sessionCovenant) }
           : {}),
         ...(sessionBundle.passageContext
           ? { passageContext: structuredClone(sessionBundle.passageContext) }
@@ -173,6 +173,17 @@ export class GniAdapter {
   parseDirective(response) {
     return normalizeDirective(response);
   }
+}
+
+function toGniSessionCovenant(sessionCovenant) {
+  const covenant = structuredClone(sessionCovenant);
+  if (covenant.returnAnchor) {
+    covenant.returnAnchor = {
+      ...covenant.returnAnchor,
+      value: 'redacted_anchor'
+    };
+  }
+  return covenant;
 }
 
 function clamp01(value) {

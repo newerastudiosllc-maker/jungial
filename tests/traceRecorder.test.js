@@ -74,6 +74,11 @@ test('simulation trace explains dream journey and GNI handoff without in-world e
       'simulation.saved'
     ]);
     assert.equal(result.trace.entries.find((entry) => entry.type === 'dream.journey.selected').payload.beats.length, 4);
+    const weatherEntry = result.trace.entries.find((entry) => entry.type === 'dream.weather.created');
+    assert.equal(weatherEntry.payload.weatherId, result.dreamWeather.weatherId);
+    assert.equal(weatherEntry.payload.traceId, result.weatherTrace.traceId);
+    assert.deepEqual(weatherEntry.payload.sourceTags, result.weatherTrace.sourceTags);
+    assert.deepEqual(weatherEntry.payload.suppressedTags, result.weatherTrace.suppressedTags);
     assert.equal(saved.trace.entries.length, result.trace.entries.length);
   } finally {
     await rm(dir, { recursive: true, force: true });

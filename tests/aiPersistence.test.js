@@ -11,6 +11,7 @@ import { WitnessState, ArchitectState, GniAdapter } from '../src/ai.js';
 import { JournalOfMirrors } from '../src/library.js';
 import { saveGameState, loadGameState } from '../src/persistence.js';
 import { loadBundledContentCatalog } from '../src/contentCatalog.js';
+import { validateGniProcessingRequest } from '../src/contracts.js';
 
 test('witness bundles local context and architect updates global weights', async () => {
   const catalog = loadBundledContentCatalog();
@@ -83,6 +84,42 @@ test('GNI adapter includes Dream Weather context when present', () => {
 
   assert.deepEqual(request.payload.dreamWeatherContext, dreamWeatherContext);
   assert.notEqual(request.payload.dreamWeatherContext, dreamWeatherContext);
+});
+
+test('GNI adapter redacts session covenant return anchor values for provider requests', () => {
+  const adapter = new GniAdapter({ endpoint: 'local-gni-placeholder' });
+  const request = adapter.createProcessingRequest({
+    schema: 'SessionBundleV1',
+    schemaVersion: 1,
+    sessionId: 'session-private-anchor',
+    dominantArchetype: 'Seeker',
+    vibeState: 'calm_hopeful_boundless_bright_warm',
+    coherence: 0.5,
+    recentSymbols: [],
+    recentActions: [],
+    roomConfigSnapshot: {},
+    selectedDream: null,
+    archetypeVector: {},
+    sessionCovenant: {
+      schema: 'SessionCovenantV1',
+      schemaVersion: 1,
+      mode: 'tonight_shape',
+      intensityCeiling: 0.4,
+      toneTags: ['strange'],
+      softBoundaryTags: [],
+      hardBoundaryTags: [],
+      allowedPressureTags: ['unknown'],
+      groundingPreference: 'quiet',
+      memoryScope: 'session_only',
+      returnAnchor: { kind: 'location', value: 'my private street address' }
+    }
+  });
+
+  assert.equal(validateGniProcessingRequest(request).valid, true);
+  assert.equal(request.payload.sessionCovenant.schema, 'SessionCovenantV1');
+  assert.equal(request.payload.sessionCovenant.returnAnchor.kind, 'location');
+  assert.equal(request.payload.sessionCovenant.returnAnchor.value, 'redacted_anchor');
+  assert.equal(JSON.stringify(request).includes('my private street address'), false);
 });
 
 test('persistence saves and loads room, archetypes, journal, and architect state as JSON', async () => {

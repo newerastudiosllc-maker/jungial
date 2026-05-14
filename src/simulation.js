@@ -160,9 +160,12 @@ export async function runSimulation({
   });
   traceRecorder.record('dream.weather.created', {
     weatherId: dreamWeather.weatherId,
+    traceId: weatherTrace.traceId,
     mood: dreamWeather.mood,
     pressure: dreamWeather.pressure,
-    weatherTags: dreamWeather.weatherTags
+    weatherTags: dreamWeather.weatherTags,
+    sourceTags: weatherTrace.sourceTags,
+    suppressedTags: weatherTrace.suppressedTags
   });
 
   const mask = masks.selectEligibleMask(archetypes);
