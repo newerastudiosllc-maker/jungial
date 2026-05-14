@@ -235,6 +235,10 @@ test('simulation attaches hidden Dreamer memory context to GNI and persists upda
           dreamModules: {},
           masks: {},
           vibeStates: {},
+          passages: {},
+          motifs: {},
+          gestures: {},
+          echoThreads: {},
           lastSessionDigest: 'previous-digest'
         }
       },

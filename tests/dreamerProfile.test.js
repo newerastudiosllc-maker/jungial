@@ -60,6 +60,35 @@ test('DreamerProfile records symbolic aggregates without storing raw private con
   assert.equal(snapshotText.includes('privateSpeech'), false);
 });
 
+test('Dreamer profile records Passage motifs and gestures as aggregates only', () => {
+  const profile = new DreamerProfile({
+    profileId: 'dreamer-one',
+    rootSeed: 'root-one'
+  });
+
+  const snapshot = profile.recordSession({
+    sessionBundle: SESSION_BUNDLE,
+    echoTrace: {
+      schema: 'EchoTraceV1',
+      schemaVersion: 1,
+      passageId: 'door_breathing_low',
+      motifsTouched: ['door', 'threshold'],
+      gestureTags: ['approach', 'speak'],
+      tempo: 'hesitant_then_committed',
+      pressureAccepted: 0.42,
+      returnAnchorUsed: false,
+      boundarySignals: ['long_pause'],
+      dreamflowDeltas: {}
+    }
+  });
+
+  assert.equal(snapshot.memory.passages.door_breathing_low.count, 1);
+  assert.equal(snapshot.memory.motifs.door.count, 1);
+  assert.equal(snapshot.memory.gestures.speak.count, 1);
+  assert.equal(JSON.stringify(snapshot).includes('rawSpeech'), false);
+  assert.deepEqual(profile.toGniMemoryContext({ slotId: 'slot-a' }).familiarMotifs, ['door', 'threshold']);
+});
+
 test('DreamerProfile derives divergent seeds for fresh saves and incarnations', () => {
   const profile = new DreamerProfile({
     profileId: 'dreamer-one',

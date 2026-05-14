@@ -15,6 +15,10 @@
     "familiarMasks",
     "familiarDreamModules",
     "familiarActions",
+    "familiarPassages",
+    "familiarMotifs",
+    "familiarGestures",
+    "echoThreadIds",
     "vibeEchoes",
     "lastSessionDigest"
   ],
@@ -30,6 +34,10 @@
     "familiarMasks": { "$ref": "#/$defs/stringList" },
     "familiarDreamModules": { "$ref": "#/$defs/stringList" },
     "familiarActions": { "$ref": "#/$defs/stringList" },
+    "familiarPassages": { "$ref": "#/$defs/stringList" },
+    "familiarMotifs": { "$ref": "#/$defs/stringList" },
+    "familiarGestures": { "$ref": "#/$defs/stringList" },
+    "echoThreadIds": { "$ref": "#/$defs/stringList" },
     "vibeEchoes": { "$ref": "#/$defs/stringList" },
     "lastSessionDigest": { "type": ["string", "null"] }
   },

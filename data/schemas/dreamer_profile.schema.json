@@ -39,6 +39,10 @@
         "dreamModules",
         "masks",
         "vibeStates",
+        "passages",
+        "motifs",
+        "gestures",
+        "echoThreads",
         "lastSessionDigest"
       ],
       "properties": {
@@ -49,6 +53,10 @@
         "dreamModules": { "$ref": "#/$defs/memoryMap" },
         "masks": { "$ref": "#/$defs/memoryMap" },
         "vibeStates": { "$ref": "#/$defs/memoryMap" },
+        "passages": { "$ref": "#/$defs/memoryMap" },
+        "motifs": { "$ref": "#/$defs/memoryMap" },
+        "gestures": { "$ref": "#/$defs/memoryMap" },
+        "echoThreads": { "$ref": "#/$defs/memoryMap" },
         "lastSessionDigest": { "type": ["string", "null"] }
       },
       "additionalProperties": false

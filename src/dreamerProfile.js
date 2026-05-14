@@ -26,11 +26,15 @@ export class DreamerProfile {
       dreamModules: cloneMap(snapshot.memory?.dreamModules),
       masks: cloneMap(snapshot.memory?.masks),
       vibeStates: cloneMap(snapshot.memory?.vibeStates),
+      passages: cloneMap(snapshot.memory?.passages),
+      motifs: cloneMap(snapshot.memory?.motifs),
+      gestures: cloneMap(snapshot.memory?.gestures),
+      echoThreads: cloneMap(snapshot.memory?.echoThreads),
       lastSessionDigest: snapshot.memory?.lastSessionDigest ?? null
     };
   }
 
-  recordSession({ sessionBundle, dreamJourney = null, mask = null } = {}) {
+  recordSession({ sessionBundle, dreamJourney = null, mask = null, echoTrace = null } = {}) {
     if (!this.consent.profileMemory || !sessionBundle) {
       return this.snapshot();
     }
@@ -57,6 +61,15 @@ export class DreamerProfile {
     if (sessionBundle.vibeState) {
       incrementMemory(this.memory.vibeStates, sessionBundle.vibeState, { at });
     }
+    if (echoTrace?.passageId) {
+      incrementMemory(this.memory.passages, echoTrace.passageId, { at });
+    }
+    for (const motif of echoTrace?.motifsTouched ?? []) {
+      incrementMemory(this.memory.motifs, motif, { at });
+    }
+    for (const gesture of echoTrace?.gestureTags ?? []) {
+      incrementMemory(this.memory.gestures, gesture, { at });
+    }
 
     this.memory.lastSessionDigest = stableHash({
       sessionId: sessionBundle.sessionId,
@@ -65,7 +78,15 @@ export class DreamerProfile {
       symbols: collectSymbols(sessionBundle, dreamJourney),
       actions: sessionBundle.recentActions ?? [],
       dreamModules: [...collectDreamModules(sessionBundle, dreamJourney)],
-      maskId: mask?.id ?? null
+      maskId: mask?.id ?? null,
+      echoTrace: echoTrace
+        ? {
+            passageId: echoTrace.passageId,
+            motifsTouched: echoTrace.motifsTouched,
+            gestureTags: echoTrace.gestureTags,
+            boundarySignals: echoTrace.boundarySignals
+          }
+        : null
     });
 
     return this.snapshot();
@@ -94,6 +115,10 @@ export class DreamerProfile {
       familiarMasks: topKeys(this.memory.masks, limit),
       familiarDreamModules: topKeys(this.memory.dreamModules, limit),
       familiarActions: topKeys(this.memory.actions, limit),
+      familiarPassages: topKeys(this.memory.passages, limit),
+      familiarMotifs: topKeys(this.memory.motifs, limit),
+      familiarGestures: topKeys(this.memory.gestures, limit),
+      echoThreadIds: topKeys(this.memory.echoThreads, limit),
       vibeEchoes: topKeys(this.memory.vibeStates, limit),
       lastSessionDigest: this.memory.lastSessionDigest
     };
@@ -116,6 +141,10 @@ export class DreamerProfile {
         dreamModules: cloneMap(this.memory.dreamModules),
         masks: cloneMap(this.memory.masks),
         vibeStates: cloneMap(this.memory.vibeStates),
+        passages: cloneMap(this.memory.passages),
+        motifs: cloneMap(this.memory.motifs),
+        gestures: cloneMap(this.memory.gestures),
+        echoThreads: cloneMap(this.memory.echoThreads),
         lastSessionDigest: this.memory.lastSessionDigest
       }
     };

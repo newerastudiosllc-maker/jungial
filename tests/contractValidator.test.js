@@ -76,6 +76,10 @@ test('contract validator routes known Jungial contract schemas', () => {
       dreamModules: {},
       masks: {},
       vibeStates: {},
+      passages: {},
+      motifs: {},
+      gestures: {},
+      echoThreads: {},
       lastSessionDigest: null
     }
   });

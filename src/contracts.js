@@ -70,6 +70,10 @@ export function validateDreamerMemoryContext(context) {
     'familiarMasks',
     'familiarDreamModules',
     'familiarActions',
+    'familiarPassages',
+    'familiarMotifs',
+    'familiarGestures',
+    'echoThreadIds',
     'vibeEchoes'
   ];
 
@@ -148,6 +152,10 @@ export function validateDreamerProfile(profile) {
       'dreamModules',
       'masks',
       'vibeStates',
+      'passages',
+      'motifs',
+      'gestures',
+      'echoThreads',
       'lastSessionDigest'
     ];
     errors.push(...validateKnownKeys(profile.memory, allowedMemoryKeys, 'memory'));
@@ -160,6 +168,10 @@ export function validateDreamerProfile(profile) {
     errors.push(...validateMemoryMap(profile.memory.dreamModules, 'memory.dreamModules'));
     errors.push(...validateMemoryMap(profile.memory.masks, 'memory.masks'));
     errors.push(...validateMemoryMap(profile.memory.vibeStates, 'memory.vibeStates'));
+    errors.push(...validateMemoryMap(profile.memory.passages, 'memory.passages'));
+    errors.push(...validateMemoryMap(profile.memory.motifs, 'memory.motifs'));
+    errors.push(...validateMemoryMap(profile.memory.gestures, 'memory.gestures'));
+    errors.push(...validateMemoryMap(profile.memory.echoThreads, 'memory.echoThreads'));
     if (!isNullableString(profile.memory.lastSessionDigest)) {
       errors.push('memory.lastSessionDigest must be a string or null');
     }

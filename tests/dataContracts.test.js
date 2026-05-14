@@ -268,6 +268,10 @@ test('Dreamer profile validation rejects raw private memory shapes', () => {
       dreamModules: {},
       masks: {},
       vibeStates: {},
+      passages: {},
+      motifs: {},
+      gestures: {},
+      echoThreads: {},
       lastSessionDigest: null,
       rawSpeech: ['I am afraid']
     }
@@ -315,6 +319,10 @@ test('GNI request validation checks optional Dreamer memory context', () => {
         familiarMasks: [],
         familiarDreamModules: [],
         familiarActions: [],
+        familiarPassages: [],
+        familiarMotifs: [],
+        familiarGestures: [],
+        echoThreadIds: [],
         vibeEchoes: [],
         lastSessionDigest: null
       }
@@ -355,6 +363,10 @@ test('save game validation checks optional Dreamer profile payload', () => {
           dreamModules: {},
           masks: {},
           vibeStates: {},
+          passages: {},
+          motifs: {},
+          gestures: {},
+          echoThreads: {},
           lastSessionDigest: null
         }
       }
