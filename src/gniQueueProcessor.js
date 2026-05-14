@@ -1,5 +1,8 @@
+import { fileURLToPath } from 'node:url';
+
 import { ArchitectState } from './ai.js';
 import { callGniProvider } from './gniBridge.js';
+import { GniHttpProvider } from './gniHttpProvider.js';
 import { GniDirectiveQueue } from './gniQueue.js';
 import { loadGameState, saveGameState } from './persistence.js';
 
@@ -99,6 +102,43 @@ export async function processSavedGniQueue({
   };
 }
 
+export function parseGniQueueProcessorArgs(args) {
+  const options = {};
+
+  for (const arg of args) {
+    if (arg.startsWith('--save=')) {
+      options.savePath = arg.slice('--save='.length);
+    } else if (arg.startsWith('--out=')) {
+      options.outputPath = arg.slice('--out='.length);
+    } else if (arg.startsWith('--gni-endpoint=')) {
+      options.gniEndpoint = arg.slice('--gni-endpoint='.length);
+    } else if (arg.startsWith('--gni-token-env=')) {
+      options.gniTokenEnv = arg.slice('--gni-token-env='.length);
+    } else if (arg.startsWith('--gni-timeout-ms=')) {
+      options.gniTimeoutMs = Number(arg.slice('--gni-timeout-ms='.length));
+    } else if (arg.startsWith('--limit=')) {
+      options.limit = Number(arg.slice('--limit='.length));
+    } else if (arg === '--json') {
+      options.json = true;
+    }
+  }
+
+  return options;
+}
+
+export function createGniQueueProviderFromOptions(options = {}) {
+  if (!options.gniEndpoint) {
+    return null;
+  }
+
+  const tokenEnv = options.gniTokenEnv ?? 'GNI_API_KEY';
+  return new GniHttpProvider({
+    endpoint: options.gniEndpoint,
+    bearerToken: process.env[tokenEnv] ?? '',
+    timeoutMs: options.gniTimeoutMs ?? 10000
+  });
+}
+
 function toArchitectState(input) {
   if (typeof input?.applyDirective === 'function' && typeof input?.snapshot === 'function') {
     return input;
@@ -108,4 +148,31 @@ function toArchitectState(input) {
 
 function nowIso(clock) {
   return clock?.nowIso?.() ?? null;
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const options = parseGniQueueProcessorArgs(process.argv.slice(2));
+  if (!options.savePath) {
+    console.error('Usage: node src/gniQueueProcessor.js --save=<save.json> [--out=<save.json>] [--gni-endpoint=<url>] [--gni-token-env=GNI_API_KEY] [--limit=1] [--json]');
+    process.exit(1);
+  }
+
+  const result = await processSavedGniQueue({
+    savePath: options.savePath,
+    outputPath: options.outputPath ?? options.savePath,
+    provider: createGniQueueProviderFromOptions(options),
+    limit: options.limit ?? Infinity
+  });
+
+  if (options.json) {
+    console.log(JSON.stringify(result, null, 2));
+  } else {
+    const counts = result.processed.reduce((acc, item) => {
+      acc[item.status] = (acc[item.status] ?? 0) + 1;
+      return acc;
+    }, {});
+    console.log(`Processed ${result.processed.length} pending GNI request(s).`);
+    console.log(`Status counts: ${JSON.stringify(counts)}`);
+    console.log(`Saved session JSON to ${result.savePath}.`);
+  }
 }

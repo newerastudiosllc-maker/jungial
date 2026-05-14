@@ -6,7 +6,12 @@ import { tmpdir } from 'node:os';
 
 import { ArchitectState } from '../src/ai.js';
 import { GniDirectiveQueue } from '../src/gniQueue.js';
-import { processPendingGniQueue, processSavedGniQueue } from '../src/gniQueueProcessor.js';
+import {
+  createGniQueueProviderFromOptions,
+  parseGniQueueProcessorArgs,
+  processPendingGniQueue,
+  processSavedGniQueue
+} from '../src/gniQueueProcessor.js';
 import { loadGameState, saveGameState } from '../src/persistence.js';
 
 const REQUEST = Object.freeze({
@@ -123,5 +128,42 @@ test('saved GNI queue processor persists resolved directives back into save payl
     assert.equal(saved.lastGniQueueProcessResult.schema, 'GniDirectiveQueueProcessResultV1');
   } finally {
     await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('GNI queue processor CLI args and provider factory support HTTP handoff options', () => {
+  const previous = process.env.TEST_GNI_TOKEN;
+  process.env.TEST_GNI_TOKEN = 'token-from-env';
+
+  try {
+    const options = parseGniQueueProcessorArgs([
+      '--save=saves/latest-session.json',
+      '--out=saves/processed-session.json',
+      '--gni-endpoint=https://gni.local/process',
+      '--gni-token-env=TEST_GNI_TOKEN',
+      '--gni-timeout-ms=2500',
+      '--limit=2',
+      '--json'
+    ]);
+    const provider = createGniQueueProviderFromOptions(options);
+
+    assert.deepEqual(options, {
+      savePath: 'saves/latest-session.json',
+      outputPath: 'saves/processed-session.json',
+      gniEndpoint: 'https://gni.local/process',
+      gniTokenEnv: 'TEST_GNI_TOKEN',
+      gniTimeoutMs: 2500,
+      limit: 2,
+      json: true
+    });
+    assert.equal(provider.endpoint, 'https://gni.local/process');
+    assert.equal(provider.bearerToken, 'token-from-env');
+    assert.equal(provider.timeoutMs, 2500);
+  } finally {
+    if (previous === undefined) {
+      delete process.env.TEST_GNI_TOKEN;
+    } else {
+      process.env.TEST_GNI_TOKEN = previous;
+    }
   }
 });

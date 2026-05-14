@@ -36,6 +36,13 @@ node src/simulation.js --gni-endpoint=https://example.local/gni --gni-token-env=
 
 The mock directive is normalized before the Architect receives it. Unsafe fields are ignored, numeric pressure is clamped, and dream weights cannot be driven below a small positive floor.
 
+To process a saved pending GNI queue later:
+
+```powershell
+npm run gni:process -- --save=saves/latest-session.json --gni-endpoint=https://example.local/gni --gni-token-env=GNI_API_KEY
+npm run gni:process -- --save=saves/latest-session.json --out=saves/processed-session.json --gni-endpoint=https://example.local/gni --json
+```
+
 To run a deterministic replay script:
 
 ```powershell
