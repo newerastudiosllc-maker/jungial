@@ -78,6 +78,41 @@ test('GNI HTTP provider raises useful errors for non-2xx responses', async () =>
   );
 });
 
+test('GNI HTTP provider treats accepted or empty responses as pending work', async () => {
+  for (const status of [202, 204]) {
+    const provider = new GniHttpProvider({
+      endpoint: 'https://gni.local/direct',
+      fetchImpl: async () => ({
+        ok: true,
+        status
+      })
+    });
+
+    const response = await provider.processRequest(REQUEST);
+
+    assert.equal(response, null);
+  }
+});
+
+test('GNI bridge queues accepted HTTP provider responses without marking them errors', async () => {
+  const bridge = new GniBridge({
+    provider: new GniHttpProvider({
+      endpoint: 'https://gni.local/direct',
+      fetchImpl: async () => ({
+        ok: true,
+        status: 202
+      })
+    })
+  });
+
+  const result = await bridge.processSessionBundle({ sessionBundle: REQUEST.payload });
+
+  assert.equal(result.status, 'provider_empty');
+  assert.equal(result.source, 'provider');
+  assert.equal(result.directive, null);
+  assert.deepEqual(result.errors, []);
+});
+
 test('GNI bridge captures HTTP provider errors without mutating gameplay state', async () => {
   const bridge = new GniBridge({
     provider: new GniHttpProvider({

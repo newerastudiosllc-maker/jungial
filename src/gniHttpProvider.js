@@ -31,6 +31,10 @@ export class GniHttpProvider {
       throw new Error(`GNI HTTP provider failed with ${response.status}: ${body}`.trim());
     }
 
+    if (response.status === 202 || response.status === 204) {
+      return null;
+    }
+
     if (typeof response.json !== 'function') {
       throw new Error('GNI HTTP provider response did not expose json()');
     }

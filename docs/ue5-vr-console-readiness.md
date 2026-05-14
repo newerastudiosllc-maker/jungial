@@ -37,6 +37,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - Empty or delayed GNI responses should be queued in SaveGame-backed state instead of blocking travel, VR comfort flow, or console suspend/resume.
 - Queue processing should happen from a platform-safe async/service layer that writes back normalized directives and Architect snapshots, never from an actor tick that can hitch VR rendering.
 - HTTP-backed GNI calls should be injectable and mockable so packaged builds can test without network access.
+- HTTP `202`/`204` responses from GNI should be treated as pending async work and routed into the SaveGame-backed queue.
 - GNI/GNI-emulator outputs must be normalized before touching gameplay state.
 - GNI contract fixtures should pass strict validation before provider changes are accepted.
 - Content validation must run before packaged builds and before accepting AI-authored content.
