@@ -1,0 +1,114 @@
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
+import { DREAD_BUDGET_AXES, createDreamWeather, createWeatherTrace, normalizeDreadBudget, toGniWeatherContext } from "../src/dreamWeather.js";
+import { createSessionCovenant } from "../src/sessionCovenant.js";
+
+describe("dream weather", () => {
+  it("creates default DreamWeatherV1 with gentle stillness and low pressure", () => {
+    const weather = createDreamWeather({ seed: 11 });
+
+    assert.equal(weather.schema, "DreamWeatherV1");
+    assert.equal(weather.schemaVersion, 1);
+    assert.equal(weather.weatherId, "weather-11");
+    assert.equal(weather.mood, "stillness");
+    assert.equal(weather.pressure, "low");
+    assert.equal(weather.ceiling, 0.35);
+    assert.ok(weather.weatherTags.includes("silence"));
+    assert.ok(weather.weatherTags.includes("threshold"));
+
+    for (const axis of DREAD_BUDGET_AXES) {
+      assert.ok(weather.dreadBudget[axis] >= 0, `${axis} should be at least 0`);
+      assert.ok(weather.dreadBudget[axis] <= 0.35, `${axis} should stay within the gentle ceiling`);
+    }
+  });
+
+  it("clamps every dread axis to the covenant ceiling when intensity band is gentle", () => {
+    const covenant = {
+      intensityBand: "gentle"
+    };
+    const weather = createDreamWeather({
+      seed: 17,
+      covenant,
+      dreadBudget: Object.fromEntries(DREAD_BUDGET_AXES.map((axis) => [axis, 1]))
+    });
+
+    for (const axis of DREAD_BUDGET_AXES) {
+      assert.equal(weather.dreadBudget[axis], 0.35);
+    }
+    assert.equal(weather.ceiling, 0.35);
+  });
+
+  it("suppresses pursuit tag and dread axis when pursuit is a hard boundary", () => {
+    const covenant = createSessionCovenant({
+      hardBoundaryTags: ["pursuit"]
+    });
+    const weather = createDreamWeather({
+      seed: 23,
+      covenant,
+      weatherTags: ["silence", "pursuit"],
+      dreadBudget: { pursuit: 0.25, watching: 0.2 }
+    });
+
+    assert.equal(weather.weatherTags.includes("pursuit"), false);
+    assert.equal(weather.dreadBudget.pursuit, 0);
+    assert.ok(weather.suppressedTags.includes("pursuit"));
+  });
+
+  it("is deterministic from the same input and seed", () => {
+    const input = {
+      seed: "same-night",
+      covenant: { intensity: { band: "curious" } },
+      weatherTags: ["mist", "mirror", "mist"],
+      dreadBudget: { cosmicDread: 0.4, watching: 0.3 }
+    };
+
+    assert.deepEqual(createDreamWeather(input), createDreamWeather(input));
+  });
+
+  it("redacts raw and private input from GNI weather context", () => {
+    const dreamWeather = createDreamWeather({
+      seed: 31,
+      rawText: "I saw my exact street address",
+      private: { name: "not for model" },
+      weatherTags: ["silence", "threshold"]
+    });
+    const weatherTrace = createWeatherTrace({
+      weather: dreamWeather,
+      sourceTags: ["raw_private_symbol"],
+      suppressedTags: ["pursuit"],
+      seed: 31
+    });
+
+    const context = toGniWeatherContext({ dreamWeather, weatherTrace });
+
+    assert.deepEqual(Object.keys(context).sort(), [
+      "dreadBudget",
+      "pressure",
+      "schema",
+      "schemaVersion",
+      "suppressedTags",
+      "weatherTags"
+    ]);
+    assert.equal(context.schema, "DreamWeatherContextV1");
+    assert.equal(context.schemaVersion, 1);
+    assert.deepEqual(context.weatherTags, dreamWeather.weatherTags);
+    assert.equal(context.pressure, dreamWeather.pressure);
+    assert.deepEqual(context.dreadBudget, dreamWeather.dreadBudget);
+    assert.deepEqual(context.suppressedTags, ["pursuit"]);
+    assert.equal(JSON.stringify(context).includes("exact street address"), false);
+    assert.equal(JSON.stringify(context).includes("not for model"), false);
+    assert.equal(Object.hasOwn(context, "weatherTrace"), false);
+  });
+
+  it("normalizes missing dread budget axes as zero and clamps to the ceiling", () => {
+    assert.deepEqual(normalizeDreadBudget({ pursuit: 0.9, loss: -1 }, 0.35), {
+      pursuit: 0.35,
+      bodyUnease: 0,
+      cosmicDread: 0,
+      disorientation: 0,
+      loss: 0,
+      watching: 0,
+      claustrophobia: 0
+    });
+  });
+});
