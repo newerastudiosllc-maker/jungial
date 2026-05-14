@@ -245,6 +245,41 @@ export function validateGniQueueProcessResult(result) {
   };
 }
 
+export function validateTrace(trace) {
+  const errors = [];
+
+  if (trace?.schema !== 'JungialTraceV1') {
+    errors.push('schema must be JungialTraceV1');
+  }
+  if (!isNonEmptyString(trace?.runId)) {
+    errors.push('runId is required');
+  }
+  if (!Array.isArray(trace?.entries)) {
+    errors.push('entries must be an array');
+  } else {
+    trace.entries.forEach((entry, index) => {
+      const label = `entries[${index}]`;
+      if (!Number.isInteger(entry?.index) || entry.index < 1) {
+        errors.push(`${label}.index must be a positive integer`);
+      }
+      if (!isNonEmptyString(entry?.at)) {
+        errors.push(`${label}.at must be a non-empty string`);
+      }
+      if (!isNonEmptyString(entry?.type)) {
+        errors.push(`${label}.type must be a non-empty string`);
+      }
+      if (entry?.payload === undefined) {
+        errors.push(`${label}.payload is required`);
+      }
+    });
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
 export function validateSaveGame(saveGame) {
   const errors = [];
 
@@ -310,6 +345,11 @@ export function validateSaveGame(saveGame) {
     saveGame.payload.lastGniQueueProcessResult,
     'payload.lastGniQueueProcessResult',
     validateGniQueueProcessResult
+  ));
+  errors.push(...validateOptionalNestedContract(
+    saveGame.payload.trace,
+    'payload.trace',
+    validateTrace
   ));
 
   return {

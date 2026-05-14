@@ -11,6 +11,7 @@ import {
   validateGniDirectiveQueue,
   validateGniQueueProcessResult,
   validateGniProcessingRequest,
+  validateSaveGame,
   validateSessionBundle
 } from '../src/contracts.js';
 import { loadBundledContentCatalog, validateContentCatalog } from '../src/contentCatalog.js';
@@ -349,6 +350,39 @@ test('GNI queue process result validation rejects ready entries without directiv
   assert.equal(result.valid, false);
   assert.deepEqual(result.errors, [
     'processed[0].directive is required when status is directive_ready'
+  ]);
+});
+
+test('save game validation rejects malformed trace payloads', () => {
+  const result = validateSaveGame({
+    schema: 'JungialSaveGame',
+    version: 1,
+    savedAt: '2080-01-01T00:00:00.000Z',
+    migrations: [],
+    payload: {
+      room: {},
+      archetypeState: {},
+      feelingState: {},
+      journal: {},
+      architectState: {},
+      trace: {
+        schema: 'JungialTraceV1',
+        runId: 'trace-one',
+        entries: [{
+          index: 0,
+          at: '',
+          type: '',
+          payload: {}
+        }]
+      }
+    }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'payload.trace.entries[0].index must be a positive integer',
+    'payload.trace.entries[0].at must be a non-empty string',
+    'payload.trace.entries[0].type must be a non-empty string'
   ]);
 });
 

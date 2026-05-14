@@ -23,7 +23,8 @@
         "pendingGniRequest": { "type": "object" },
         "gniBridgeResult": { "type": "object" },
         "appliedGniDirective": { "type": ["object", "null"] },
-        "lastGniQueueProcessResult": { "type": "object" }
+        "lastGniQueueProcessResult": { "type": "object" },
+        "trace": { "$ref": "trace.schema.json" }
       }
     }
   }

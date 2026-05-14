@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os';
 import { validateContractDocument, validateContractFiles } from '../src/contractValidator.js';
 
 test('contract validator routes known Jungial contract schemas', () => {
-  const result = validateContractDocument({
+  const directiveResult = validateContractDocument({
     schema: 'JungialDirectiveV1',
     schemaVersion: 1,
     dreamWeightDeltas: { garden: 0.2 },
@@ -15,8 +15,19 @@ test('contract validator routes known Jungial contract schemas', () => {
     maskPressure: {},
     pacingDelta: {}
   });
+  const traceResult = validateContractDocument({
+    schema: 'JungialTraceV1',
+    runId: 'trace-one',
+    entries: [{
+      index: 1,
+      at: '2080-01-01T00:00:00.000Z',
+      type: 'gni.queue.processed',
+      payload: { statusCounts: { directive_ready: 1 } }
+    }]
+  });
 
-  assert.deepEqual(result, { valid: true, errors: [] });
+  assert.deepEqual(directiveResult, { valid: true, errors: [] });
+  assert.deepEqual(traceResult, { valid: true, errors: [] });
 });
 
 test('contract validator validates save game payload and nested GNI state', () => {

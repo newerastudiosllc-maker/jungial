@@ -8,7 +8,8 @@ import {
   validateGniQueueProcessResult,
   validateGniProcessingRequest,
   validateSaveGame,
-  validateSessionBundle
+  validateSessionBundle,
+  validateTrace
 } from './contracts.js';
 
 export function validateContractDocument(document) {
@@ -25,6 +26,8 @@ export function validateContractDocument(document) {
       return validateGniDirectiveQueue(document);
     case 'GniDirectiveQueueProcessResultV1':
       return validateGniQueueProcessResult(document);
+    case 'JungialTraceV1':
+      return validateTrace(document);
     case 'JungialSaveGame':
       return validateSaveGame(document);
     default:
