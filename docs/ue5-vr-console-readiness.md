@@ -15,6 +15,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - `UJungialSymbolGrammar`: tracks recurrence, contradiction, tension, and symbol echoes.
 - `UJungialWitnessComponent`: builds `SessionBundleV1`.
 - `UJungialArchitectSubsystem`: applies safe `JungialDirectiveV1` data and persists long-range state.
+- `UGniBridgeSubsystem`: validates bundles, creates `GniProcessingRequestV1`, selects provider/emulator/fixture source, and returns normalized directives.
 - `IJungialAiProvider`: implemented first by an emulator, then by GNI.
 
 ## Determinism Requirements
@@ -26,6 +27,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - Scenario matrices should gate changes to procedural logic with stable hashes for selected dream, journey, trace summary, and journal shape.
 - Multi-cycle campaign tests should prove Architect state affects later Dreamflow selection through explicit director multipliers.
 - Baseline updates should be intentional and reviewed because they represent accepted changes to Jungial's procedural behavior.
+- GNI provider calls should stay behind the bridge so failed/empty responses cannot mutate gameplay state.
 - GNI/GNI-emulator outputs must be normalized before touching gameplay state.
 - Content validation must run before packaged builds and before accepting AI-authored content.
 

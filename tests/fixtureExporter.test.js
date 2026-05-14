@@ -25,10 +25,14 @@ test('fixture exporter writes stable GNI handoff fixtures', async () => {
     assert.match(manifest.hash, /^[a-f0-9]{64}$/);
 
     const bundle = JSON.parse(await readFile(join(dir, 'session_bundle_v1.json'), 'utf8'));
+    const request = JSON.parse(await readFile(join(dir, 'gni_request_v1.json'), 'utf8'));
     const directive = JSON.parse(await readFile(join(dir, 'gni_directive_v1.json'), 'utf8'));
 
     assert.equal(bundle.schema, 'SessionBundleV1');
     assert.equal(bundle.schemaVersion, 1);
+    assert.equal(request.schema, 'GniProcessingRequestV1');
+    assert.equal(request.schemaVersion, 1);
+    assert.equal(request.contract.outputFormat, 'JungialDirectiveV1');
     assert.equal(directive.schema, 'JungialDirectiveV1');
     assert.equal(directive.schemaVersion, 1);
   } finally {

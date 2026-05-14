@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/gni_processing_request.schema.json",
+  "title": "GniProcessingRequestV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "schemaVersion",
+    "provider",
+    "endpoint",
+    "model",
+    "contract",
+    "payload"
+  ],
+  "properties": {
+    "schema": { "const": "GniProcessingRequestV1" },
+    "schemaVersion": { "const": 1 },
+    "provider": { "const": "GNI" },
+    "endpoint": { "type": "string" },
+    "model": { "type": "string" },
+    "contract": {
+      "type": "object",
+      "required": ["inputFormat", "outputFormat", "allowedDirectives"],
+      "properties": {
+        "inputFormat": { "const": "SessionBundleV1" },
+        "outputFormat": { "const": "JungialDirectiveV1" },
+        "allowedDirectives": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "schema",
+        "schemaVersion",
+        "sessionId",
+        "dominantArchetype",
+        "vibeState",
+        "coherence",
+        "recentSymbols",
+        "recentActions",
+        "roomConfigSnapshot",
+        "selectedDream"
+      ],
+      "properties": {
+        "schema": { "const": "SessionBundleV1" },
+        "schemaVersion": { "const": 1 },
+        "sessionId": { "type": "string" },
+        "dominantArchetype": { "type": "string" },
+        "vibeState": { "type": "string" },
+        "coherence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "recentSymbols": { "type": "array", "items": { "type": "string" } },
+        "recentActions": { "type": "array", "items": { "type": "string" } },
+        "roomConfigSnapshot": { "type": ["object", "null"] },
+        "selectedDream": { "type": ["object", "null"] }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

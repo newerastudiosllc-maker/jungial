@@ -26,6 +26,8 @@ test('campaign harness runs multiple dream cycles with Architect feedback', asyn
     assert.equal(result.cycles.length, 3);
     assert.equal(saved.campaign.cycles.length, 3);
     assert.ok(result.cycles[1].dreamJourney.beats.every((beat) => 'directorMultiplier' in beat.weightBreakdown));
+    assert.equal(result.cycles[0].gniBridgeResult.source, 'emulator');
+    assert.equal(result.cycles[0].gniBridgeResult.request.contract.inputFormat, 'SessionBundleV1');
     assert.ok(Object.keys(result.architectState.globalDreamWeights).length > 0);
     assert.ok(result.trace.entries.some((entry) => entry.type === 'campaign.cycle.completed'));
   } finally {

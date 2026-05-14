@@ -6,7 +6,7 @@ import { createJungialRuntime } from './runtime.js';
 import { saveGameState } from './persistence.js';
 import { selectDreamJourney } from './dreamJourney.js';
 import { createDreamWeightOverrides } from './directorPolicy.js';
-import { GniEmulator } from './gniEmulator.js';
+import { GniBridge } from './gniBridge.js';
 import { SymbolGrammar } from './symbolGrammar.js';
 import { TraceRecorder } from './trace.js';
 
@@ -14,6 +14,7 @@ export async function runCampaign({
   cycles = 3,
   seed = 777,
   emulateGni = false,
+  gniProvider = null,
   gniDirectives = [],
   savePath = null,
   clock = undefined,
@@ -21,6 +22,7 @@ export async function runCampaign({
 } = {}) {
   const runtime = createJungialRuntime({ seed, clock, catalog });
   const trace = new TraceRecorder({ clock: clock?.fork?.() ?? undefined });
+  const gniBridge = new GniBridge({ adapter: runtime.gni, provider: gniProvider });
   const symbolGrammar = new SymbolGrammar();
   const campaignCycles = [];
 
@@ -80,17 +82,37 @@ export async function runCampaign({
     });
     const architectUpdate = runtime.architect.update(bundle);
     const explicitDirective = gniDirectives[index] ?? null;
-    const emulatedDirective = !explicitDirective && emulateGni
-      ? new GniEmulator({ seed: `${seed}:${cycleNumber}` }).processSessionBundle(bundle)
-      : null;
-    const appliedDirective = explicitDirective || emulatedDirective
-      ? runtime.gni.parseDirective(explicitDirective ?? emulatedDirective)
-      : null;
+    const gniBridgeResult = await gniBridge.processSessionBundle({
+      sessionBundle: bundle,
+      providedDirective: explicitDirective,
+      emulate: emulateGni,
+      seed: `${seed}:${cycleNumber}`
+    });
+    trace.record('gni.request.created', {
+      cycle: cycleNumber,
+      provider: gniBridgeResult.request.provider,
+      endpoint: gniBridgeResult.request.endpoint,
+      contract: gniBridgeResult.request.contract,
+      sessionId: gniBridgeResult.request.payload.sessionId
+    });
+    const appliedDirective = gniBridgeResult.directive;
     const directiveUpdate = appliedDirective ? runtime.architect.applyDirective(appliedDirective) : null;
-    if (emulatedDirective) {
+    if (gniBridgeResult.source === 'emulator') {
       trace.record('gni.emulator.directive.created', {
         cycle: cycleNumber,
-        dreamWeightDeltas: emulatedDirective.dreamWeightDeltas
+        dreamWeightDeltas: gniBridgeResult.directive.dreamWeightDeltas
+      });
+    }
+    if (gniBridgeResult.source === 'provider' && gniBridgeResult.status === 'directive_ready') {
+      trace.record('gni.provider.directive.created', {
+        cycle: cycleNumber,
+        dreamWeightDeltas: gniBridgeResult.directive.dreamWeightDeltas
+      });
+    }
+    if (gniBridgeResult.status === 'provider_error') {
+      trace.record('gni.provider.error', {
+        cycle: cycleNumber,
+        errors: gniBridgeResult.errors
       });
     }
     if (appliedDirective) {
@@ -109,6 +131,7 @@ export async function runCampaign({
       journalEntry,
       sessionBundle: bundle,
       architectUpdate,
+      gniBridgeResult,
       appliedDirective,
       directiveUpdate,
       architectState: runtime.architect.snapshot()

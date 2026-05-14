@@ -127,6 +127,8 @@ export class GniAdapter {
     // GNI is intentionally isolated here. The game emits stable context; GNI can
     // process it and later return directive data without owning mutable state.
     return {
+      schema: 'GniProcessingRequestV1',
+      schemaVersion: 1,
       provider: 'GNI',
       endpoint: this.endpoint,
       model: this.model,

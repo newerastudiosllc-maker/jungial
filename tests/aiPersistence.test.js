@@ -43,6 +43,8 @@ test('GNI adapter packages session bundle without coupling game systems to provi
   });
 
   assert.equal(request.provider, 'GNI');
+  assert.equal(request.schema, 'GniProcessingRequestV1');
+  assert.equal(request.schemaVersion, 1);
   assert.equal(request.endpoint, 'local-gni-placeholder');
   assert.equal(request.contract.outputFormat, 'JungialDirectiveV1');
   assert.deepEqual(request.payload.recentSymbols, ['portal', 'light']);

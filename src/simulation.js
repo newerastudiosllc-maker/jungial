@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 
 import { createJungialRuntime } from './runtime.js';
 import { saveGameState } from './persistence.js';
-import { GniEmulator } from './gniEmulator.js';
+import { GniBridge } from './gniBridge.js';
 import { selectDreamJourney } from './dreamJourney.js';
 import { SymbolGrammar } from './symbolGrammar.js';
 import { createDeterministicClock } from './clock.js';
@@ -17,6 +17,7 @@ export async function runSimulation({
   seed = 777,
   savePath = join(root, 'saves', 'latest-session.json'),
   gniResponse = null,
+  gniProvider = null,
   emulateGni = false,
   catalog = undefined,
   clock = undefined,
@@ -118,7 +119,14 @@ export async function runSimulation({
     recentSymbols: bundle.recentSymbols
   });
   const architectUpdate = architect.update(bundle);
-  const gniRequest = gni.createProcessingRequest(bundle);
+  const gniBridge = new GniBridge({ adapter: gni, provider: gniProvider });
+  const gniBridgeResult = await gniBridge.processSessionBundle({
+    sessionBundle: bundle,
+    providedDirective: gniResponse,
+    emulate: emulateGni,
+    seed
+  });
+  const gniRequest = gniBridgeResult.request;
   transcript.push(`Architect updates ${Object.keys(architectUpdate.adjustedWeights).length} dream weight(s).`);
   transcript.push(`GNI request prepared as ${gniRequest.contract.inputFormat} -> ${gniRequest.contract.outputFormat}.`);
   traceRecorder.record('gni.request.created', {
@@ -128,16 +136,23 @@ export async function runSimulation({
     sessionId: gniRequest.payload.sessionId
   });
 
-  const emulatedGniResponse = !gniResponse && emulateGni
-    ? new GniEmulator({ seed }).processSessionBundle(bundle)
-    : null;
-  if (emulatedGniResponse) {
+  if (gniBridgeResult.source === 'emulator') {
     transcript.push('GNI emulator prepared a directive.');
     traceRecorder.record('gni.emulator.directive.created', {
-      directive: emulatedGniResponse
+      directive: gniBridgeResult.directive
     });
   }
-  const appliedGniDirective = gniResponse || emulatedGniResponse ? gni.parseDirective(gniResponse ?? emulatedGniResponse) : null;
+  if (gniBridgeResult.source === 'provider' && gniBridgeResult.status === 'directive_ready') {
+    transcript.push('GNI provider returned a directive.');
+    traceRecorder.record('gni.provider.directive.created', {
+      directive: gniBridgeResult.directive
+    });
+  }
+  if (gniBridgeResult.status === 'provider_error') {
+    traceRecorder.record('gni.provider.error', { errors: gniBridgeResult.errors });
+  }
+
+  const appliedGniDirective = gniBridgeResult.directive;
   const directiveUpdate = appliedGniDirective ? architect.applyDirective(appliedGniDirective) : null;
   if (appliedGniDirective) {
     transcript.push(`GNI directive applied: ${Object.keys(appliedGniDirective.dreamWeightDeltas).length} dream delta(s).`);
@@ -160,6 +175,7 @@ export async function runSimulation({
     trace: traceSnapshot,
     lastSessionBundle: bundle,
     pendingGniRequest: gniRequest,
+    gniBridgeResult,
     appliedGniDirective
   }, { clock });
   transcript.push(`Saved session JSON to ${savePath}.`);
@@ -176,6 +192,7 @@ export async function runSimulation({
     architectUpdate,
     directiveUpdate,
     gniRequest,
+    gniBridgeResult,
     appliedGniDirective,
     trace: traceSnapshot,
     savePath

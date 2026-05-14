@@ -36,6 +36,7 @@ test('simulation can apply a mocked GNI directive and persist the result', async
     assert.equal(saved.architectState.globalDreamWeights.mirror_hall, 1.5);
     assert.equal(saved.architectState.symbolFrequency.mirror, 1);
     assert.equal(saved.architectState.maskPressure.double, 0.25);
+    assert.equal(saved.gniBridgeResult.source, 'provided');
     assert.match(result.transcript.join('\n'), /GNI directive applied/);
   } finally {
     await rm(dir, { recursive: true, force: true });
@@ -76,6 +77,39 @@ test('simulation can use deterministic GNI emulator when no real directive is pr
     assert.equal(result.appliedGniDirective.schema, 'JungialDirectiveV1');
     assert.equal(result.appliedGniDirective.schemaVersion, 1);
     assert.match(result.transcript.join('\n'), /GNI emulator prepared a directive/);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('simulation can accept an injected GNI provider boundary', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-gni-provider-'));
+  const savePath = join(dir, 'latest.json');
+  const requests = [];
+
+  try {
+    const result = await runSimulation({
+      seed: 21,
+      savePath,
+      gniProvider: {
+        async processRequest(request) {
+          requests.push(request);
+          return {
+            dreamWeightDeltas: { garden: 0.4 },
+            symbolEchoes: ['garden'],
+            pacingDelta: { repetition: 0.2 }
+          };
+        }
+      }
+    });
+    const saved = await loadGameState(savePath);
+
+    assert.equal(requests.length, 1);
+    assert.equal(requests[0].contract.inputFormat, 'SessionBundleV1');
+    assert.equal(result.gniBridgeResult.source, 'provider');
+    assert.equal(result.appliedGniDirective.dreamWeightDeltas.garden, 0.4);
+    assert.equal(saved.gniBridgeResult.status, 'directive_ready');
+    assert.match(result.transcript.join('\n'), /GNI provider returned a directive/);
   } finally {
     await rm(dir, { recursive: true, force: true });
   }

@@ -88,7 +88,22 @@ That matters for the UE5 path: these JSON files can become DataAssets later, whi
 
 ## GNI Integration Boundary
 
-GNI is represented by `GniAdapter` in `src/ai.js`.
+GNI is represented by `GniAdapter` in `src/ai.js` and routed through `GniBridge` in `src/gniBridge.js`.
+
+`GniBridge` is the provider boundary for the real GNI side. It validates `SessionBundleV1`, builds a `GniProcessingRequestV1`, accepts one of three directive sources, then normalizes the result before the Architect can apply it:
+
+- `provided`: a fixture/mock directive, such as `--gni-response=data/mock_gni_directive.json`
+- `provider`: an injected object/function that receives the processing request
+- `emulator`: the deterministic local `GniEmulator`
+
+A future GNI provider can expose any one of these shapes:
+
+```js
+async function provider(request, sessionBundle) {}
+provider.processRequest = async (request) => {}
+provider.processSessionBundle = async (sessionBundle) => {}
+provider.complete = async (request) => {}
+```
 
 `GniEmulator` in `src/gniEmulator.js` lets the prototype test AI-shaped behavior before real GNI is ready. Use `--emulate-gni` to have the simulation produce and apply a deterministic directive from the current `SessionBundleV1`.
 
@@ -110,9 +125,16 @@ GNI should return `JungialDirectiveV1`:
 - mask pressure
 - pacing deltas
 
-Game systems do not call GNI directly. They pass through the adapter so the AI can process structured state without owning mutable runtime state.
+Game systems do not call GNI directly. They pass through the bridge/adapter so the AI can process structured state without owning mutable runtime state.
 
 `src/contracts.js` is the guardrail layer. It validates `SessionBundleV1` shape and normalizes `JungialDirectiveV1` before the Architect applies anything.
+
+The current contract schemas live in `data/schemas/`:
+
+- `session_bundle.schema.json`
+- `gni_processing_request.schema.json`
+- `gni_directive.schema.json`
+- `gni_bridge_result.schema.json`
 
 ## Versioning And Replay
 

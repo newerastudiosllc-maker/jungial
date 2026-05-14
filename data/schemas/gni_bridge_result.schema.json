@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/gni_bridge_result.schema.json",
+  "title": "GniBridgeResultV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "status",
+    "source",
+    "request",
+    "rawResponse",
+    "directive",
+    "errors"
+  ],
+  "properties": {
+    "schema": { "const": "GniBridgeResultV1" },
+    "status": {
+      "enum": [
+        "invalid_session",
+        "pending",
+        "provider_empty",
+        "provider_error",
+        "directive_ready"
+      ]
+    },
+    "source": {
+      "enum": ["none", "provided", "provider", "emulator"]
+    },
+    "request": {
+      "type": ["object", "null"]
+    },
+    "rawResponse": {
+      "type": ["object", "null"]
+    },
+    "directive": {
+      "type": ["object", "null"]
+    },
+    "errors": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}
