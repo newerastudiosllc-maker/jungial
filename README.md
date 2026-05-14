@@ -41,6 +41,7 @@ To process a saved pending GNI queue later:
 ```powershell
 npm run gni:process -- --save=saves/latest-session.json --gni-endpoint=https://example.local/gni --gni-token-env=GNI_API_KEY
 npm run gni:process -- --save=saves/latest-session.json --out=saves/processed-session.json --gni-endpoint=https://example.local/gni --json
+npm run gni:process -- --save=saves/latest-session.json --out=saves/mock-processed-session.json --gni-response=data/mock_gni_directive.json
 ```
 
 To run a deterministic replay script:

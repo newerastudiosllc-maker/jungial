@@ -1,4 +1,5 @@
 import { fileURLToPath } from 'node:url';
+import { readFile } from 'node:fs/promises';
 
 import { ArchitectState } from './ai.js';
 import { callGniProvider } from './gniBridge.js';
@@ -112,6 +113,8 @@ export function parseGniQueueProcessorArgs(args) {
       options.outputPath = arg.slice('--out='.length);
     } else if (arg.startsWith('--gni-endpoint=')) {
       options.gniEndpoint = arg.slice('--gni-endpoint='.length);
+    } else if (arg.startsWith('--gni-response=')) {
+      options.gniResponsePath = arg.slice('--gni-response='.length);
     } else if (arg.startsWith('--gni-token-env=')) {
       options.gniTokenEnv = arg.slice('--gni-token-env='.length);
     } else if (arg.startsWith('--gni-timeout-ms=')) {
@@ -139,6 +142,15 @@ export function createGniQueueProviderFromOptions(options = {}) {
   });
 }
 
+export async function loadGniQueueProviderFromOptions(options = {}) {
+  if (options.gniResponsePath) {
+    const directive = JSON.parse(await readFile(options.gniResponsePath, 'utf8'));
+    return async () => structuredClone(directive);
+  }
+
+  return createGniQueueProviderFromOptions(options);
+}
+
 function toArchitectState(input) {
   if (typeof input?.applyDirective === 'function' && typeof input?.snapshot === 'function') {
     return input;
@@ -153,14 +165,14 @@ function nowIso(clock) {
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const options = parseGniQueueProcessorArgs(process.argv.slice(2));
   if (!options.savePath) {
-    console.error('Usage: node src/gniQueueProcessor.js --save=<save.json> [--out=<save.json>] [--gni-endpoint=<url>] [--gni-token-env=GNI_API_KEY] [--limit=1] [--json]');
+    console.error('Usage: node src/gniQueueProcessor.js --save=<save.json> [--out=<save.json>] [--gni-response=<directive.json>] [--gni-endpoint=<url>] [--gni-token-env=GNI_API_KEY] [--limit=1] [--json]');
     process.exit(1);
   }
 
   const result = await processSavedGniQueue({
     savePath: options.savePath,
     outputPath: options.outputPath ?? options.savePath,
-    provider: createGniQueueProviderFromOptions(options),
+    provider: await loadGniQueueProviderFromOptions(options),
     limit: options.limit ?? Infinity
   });
 

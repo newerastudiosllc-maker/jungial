@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -8,6 +8,7 @@ import { ArchitectState } from '../src/ai.js';
 import { GniDirectiveQueue } from '../src/gniQueue.js';
 import {
   createGniQueueProviderFromOptions,
+  loadGniQueueProviderFromOptions,
   parseGniQueueProcessorArgs,
   processPendingGniQueue,
   processSavedGniQueue
@@ -165,5 +166,32 @@ test('GNI queue processor CLI args and provider factory support HTTP handoff opt
     } else {
       process.env.TEST_GNI_TOKEN = previous;
     }
+  }
+});
+
+test('GNI queue processor can load a local directive fixture as provider output', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-queue-fixture-provider-'));
+  const responsePath = join(dir, 'directive.json');
+
+  try {
+    await writeFile(responsePath, JSON.stringify({
+      dreamWeightDeltas: { garden: 0.25 },
+      symbolEchoes: ['mirror']
+    }), 'utf8');
+
+    const options = parseGniQueueProcessorArgs([
+      '--save=saves/latest-session.json',
+      `--gni-response=${responsePath}`
+    ]);
+    const provider = await loadGniQueueProviderFromOptions(options);
+    const response = await provider(REQUEST);
+
+    assert.equal(options.gniResponsePath, responsePath);
+    assert.deepEqual(response, {
+      dreamWeightDeltas: { garden: 0.25 },
+      symbolEchoes: ['mirror']
+    });
+  } finally {
+    await rm(dir, { recursive: true, force: true });
   }
 });
