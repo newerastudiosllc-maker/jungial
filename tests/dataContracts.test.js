@@ -135,6 +135,59 @@ test('GNI request and bridge result validation accept provider-ready contracts',
   assert.deepEqual(validateGniBridgeResult(bridgeResult), { valid: true, errors: [] });
 });
 
+test('GNI bridge result validation rejects impossible status envelopes', () => {
+  const request = validGniRequest();
+
+  assert.deepEqual(validateGniBridgeResult({
+    schema: 'GniBridgeResultV1',
+    status: 'directive_ready',
+    source: 'provider',
+    request,
+    rawResponse: null,
+    directive: null,
+    errors: []
+  }), {
+    valid: false,
+    errors: [
+      'directive is required when status is directive_ready',
+      'rawResponse is required when status is directive_ready'
+    ]
+  });
+
+  assert.deepEqual(validateGniBridgeResult({
+    schema: 'GniBridgeResultV1',
+    status: 'pending',
+    source: 'none',
+    request,
+    rawResponse: null,
+    directive: {
+      schema: 'JungialDirectiveV1',
+      schemaVersion: 1,
+      dreamWeightDeltas: {},
+      symbolEchoes: [],
+      maskPressure: {},
+      pacingDelta: {}
+    },
+    errors: []
+  }), {
+    valid: false,
+    errors: ['directive must be null unless status is directive_ready']
+  });
+
+  assert.deepEqual(validateGniBridgeResult({
+    schema: 'GniBridgeResultV1',
+    status: 'provider_error',
+    source: 'provider',
+    request,
+    rawResponse: null,
+    directive: null,
+    errors: []
+  }), {
+    valid: false,
+    errors: ['errors must include provider error details']
+  });
+});
+
 test('GNI directive queue validation accepts pending and resolved envelopes', () => {
   const request = {
     schema: 'GniProcessingRequestV1',
@@ -260,4 +313,32 @@ test('GNI queue process result validation rejects ready entries without directiv
 
 async function readJson(path) {
   return JSON.parse(await readFile(join(root, path), 'utf8'));
+}
+
+function validGniRequest() {
+  return {
+    schema: 'GniProcessingRequestV1',
+    schemaVersion: 1,
+    provider: 'GNI',
+    endpoint: 'gni://local-dev-placeholder',
+    model: 'gni-dream-director-dev',
+    contract: {
+      inputFormat: 'SessionBundleV1',
+      outputFormat: 'JungialDirectiveV1',
+      allowedDirectives: ['adjust_dream_weights']
+    },
+    payload: {
+      schema: 'SessionBundleV1',
+      schemaVersion: 1,
+      sessionId: 'session-one',
+      dominantArchetype: 'Seeker',
+      coherence: 0.6,
+      vibeState: 'calm_hopeful_boundless_bright_warm',
+      recentSymbols: ['portal'],
+      recentActions: ['open_portal'],
+      roomConfigSnapshot: { portalOpen: true },
+      selectedDream: { id: 'garden' },
+      archetypeVector: { Seeker: 1 }
+    }
+  };
 }

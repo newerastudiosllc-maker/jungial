@@ -146,7 +146,7 @@ GNI should return `JungialDirectiveV1`:
 
 Game systems do not call GNI directly. They pass through the bridge/adapter so the AI can process structured state without owning mutable runtime state.
 
-`src/contracts.js` is the guardrail layer. It validates `SessionBundleV1` shape and normalizes `JungialDirectiveV1` before the Architect applies anything.
+`src/contracts.js` is the guardrail layer. It validates `SessionBundleV1`, status-checks `GniBridgeResultV1`, and normalizes `JungialDirectiveV1` before the Architect applies anything.
 
 For an async provider, the safe flow is: save `GniDirectiveQueueV1`, let a background/service task resolve it, then write back the normalized queue and Architect snapshot. The in-world Witness still only observes; it does not wait for or narrate provider status.
 

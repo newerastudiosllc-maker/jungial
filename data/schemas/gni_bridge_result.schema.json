@@ -40,5 +40,45 @@
       "items": { "type": "string" }
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "required": ["status"],
+        "properties": { "status": { "const": "directive_ready" } }
+      },
+      "then": {
+        "properties": {
+          "rawResponse": { "type": "object" },
+          "directive": { "type": "object" }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["status"],
+        "properties": {
+          "status": {
+            "enum": ["invalid_session", "pending", "provider_empty", "provider_error"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "directive": { "type": "null" }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["status"],
+        "properties": { "status": { "const": "provider_error" } }
+      },
+      "then": {
+        "properties": {
+          "errors": { "minItems": 1 }
+        }
+      }
+    }
+  ],
   "additionalProperties": false
 }

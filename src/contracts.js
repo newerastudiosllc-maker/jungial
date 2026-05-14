@@ -169,6 +169,19 @@ export function validateGniBridgeResult(result) {
       }
     });
   }
+  if (result?.status === 'directive_ready') {
+    if (result?.directive == null) {
+      errors.push('directive is required when status is directive_ready');
+    }
+    if (result?.rawResponse == null) {
+      errors.push('rawResponse is required when status is directive_ready');
+    }
+  } else if (result?.directive !== null) {
+    errors.push('directive must be null unless status is directive_ready');
+  }
+  if (result?.status === 'provider_error' && Array.isArray(result?.errors) && result.errors.length === 0) {
+    errors.push('errors must include provider error details');
+  }
 
   return {
     valid: errors.length === 0,
