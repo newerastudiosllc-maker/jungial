@@ -9,6 +9,7 @@ import { selectDreamJourney } from './dreamJourney.js';
 import { SymbolGrammar } from './symbolGrammar.js';
 import { createDeterministicClock } from './clock.js';
 import { TraceRecorder, writeTrace } from './trace.js';
+import { applyPlayerInput } from './input.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -44,11 +45,11 @@ export async function runSimulation({
   transcript.push(`A small note waits: "${chamber.note}".`);
 
   traceRecorder.record('threshold.input', { kind: 'speech', text: 'the word' });
-  chamber.receiveInput({
-    kind: 'speech',
-    text: 'the word',
+  applyPlayerInput({ source: 'system', kind: 'speech', text: 'the word' }, {
     archetypes,
-    feeling
+    feeling,
+    chamber,
+    witness
   });
   transcript.push('The Heartlight opens. Tools become visible.');
   traceRecorder.record('threshold.awakened', {
@@ -57,8 +58,12 @@ export async function runSimulation({
     dominantArchetype: archetypes.dominantArchetype()
   });
 
-  witness.observeAction('open_portal', ['Seeker'], ['portal']);
-  chamber.openPortal('key_of_portals');
+  applyPlayerInput({ source: 'system', kind: 'action', name: 'open_portal' }, {
+    archetypes,
+    feeling,
+    chamber,
+    witness
+  });
   transcript.push('The Key of Portals turns without sound.');
   traceRecorder.record('portal.opened', { room: chamber.snapshot() });
 

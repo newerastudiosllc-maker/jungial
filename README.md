@@ -134,6 +134,7 @@ Game systems do not call GNI directly. They pass through the bridge/adapter so t
 
 The current contract schemas live in `data/schemas/`:
 
+- `input_intent.schema.json`
 - `session_bundle.schema.json`
 - `gni_processing_request.schema.json`
 - `gni_directive.schema.json`
@@ -146,6 +147,12 @@ Save files are wrapped as `JungialSaveGame` with version metadata. Legacy unvers
 Dreamflow can now produce a four-beat `DreamJourneyV1`: entry, pressure, mirror, return. Replay scripts exercise deterministic inputs, GNI directives, dream outcomes, journal text shape, and ArchitectState.
 
 For QA-style reproducibility, pass `--clock-start=<ISO time>` and optional `--clock-step-ms=<milliseconds>` to simulation runs. Programmatic callers can inject `createDeterministicClock()`.
+
+## Input Intents
+
+`src/input.js` normalizes speech, keyboard, controller, VR, and system input into `JungialInputIntentV1`. The chamber can awaken from a platform intent such as `speak_word` or `awaken_threshold`, so console/VR builds do not need microphone permission to trigger the same symbolic event.
+
+Replay, simulation, and campaign runs all pass through this router.
 
 ## Trace/Audit Output
 
@@ -190,6 +197,7 @@ npm run contracts
 
 - `ArchetypeState` -> `UArchetypeResonanceComponent`
 - `FeelingState` -> `UFeelingEngineComponent` controlling lights, fog, post-process, audio, and movement parameters
+- `normalizePlayerInput` / `applyPlayerInput` -> `UJungialInputRouter`
 - `ThresholdChamber` -> `AThresholdChamberActor`
 - `DreamflowGenerator` -> `UDreamflowComponent` plus Dream Module DataAssets
 - `WitnessState` -> local/session observer component

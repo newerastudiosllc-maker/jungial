@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/input_intent.schema.json",
+  "title": "JungialInputIntentV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "source",
+    "kind",
+    "intent",
+    "text",
+    "actionName",
+    "toolId",
+    "archetypes",
+    "symbols",
+    "requiresMicrophone"
+  ],
+  "properties": {
+    "schema": { "const": "JungialInputIntentV1" },
+    "source": {
+      "enum": ["system", "speech", "microphone", "keyboard", "controller", "vr"]
+    },
+    "kind": { "const": "intent" },
+    "intent": {
+      "enum": ["awaken_threshold", "open_portal", "use_tool", "observe"]
+    },
+    "text": { "type": "string" },
+    "actionName": { "type": ["string", "null"] },
+    "toolId": { "type": ["string", "null"] },
+    "archetypes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "symbols": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "requiresMicrophone": { "type": "boolean" }
+  },
+  "additionalProperties": false
+}

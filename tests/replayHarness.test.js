@@ -38,3 +38,20 @@ test('replay harness produces deterministic dream, journal, and architect outcom
     await rm(dir, { recursive: true, force: true });
   }
 });
+
+test('replay harness accepts platform-neutral input intents', async () => {
+  const script = {
+    seed: 44,
+    inputs: [
+      { source: 'controller', kind: 'action', name: 'speak_word' },
+      { source: 'controller', kind: 'tool', toolId: 'key_of_portals' }
+    ]
+  };
+
+  const result = await runReplay({ script });
+
+  assert.equal(result.sessionBundle.roomConfigSnapshot.portalOpen, true);
+  assert.equal(result.sessionBundle.roomConfigSnapshot.awakened, true);
+  assert.equal(result.transcript.includes('intent:awaken_threshold'), true);
+  assert.equal(result.transcript.includes('intent:open_portal'), true);
+});

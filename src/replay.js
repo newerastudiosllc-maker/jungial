@@ -5,6 +5,7 @@ import { createJungialRuntime } from './runtime.js';
 import { saveGameState } from './persistence.js';
 import { selectDreamJourney } from './dreamJourney.js';
 import { TraceRecorder } from './trace.js';
+import { applyPlayerInput } from './input.js';
 
 export async function runReplay({ script, savePath, clock = undefined, trace = undefined }) {
   const runtime = createJungialRuntime({ seed: script.seed ?? 1, clock });
@@ -14,23 +15,8 @@ export async function runReplay({ script, savePath, clock = undefined, trace = u
 
   for (const input of script.inputs ?? []) {
     traceRecorder.record('replay.input', input);
-    if (input.kind === 'speech') {
-      runtime.chamber.receiveInput({
-        kind: 'speech',
-        text: input.text,
-        archetypes: runtime.archetypes,
-        feeling: runtime.feeling
-      });
-      transcript.push(`speech:${input.text}`);
-    }
-
-    if (input.kind === 'action') {
-      runtime.witness.observeAction(input.name, input.archetypes ?? [], input.symbols ?? []);
-      if (input.name === 'open_portal') {
-        runtime.chamber.openPortal('key_of_portals');
-      }
-      transcript.push(`action:${input.name}`);
-    }
+    const application = applyPlayerInput(input, runtime);
+    transcript.push(`intent:${application.intent.intent}`);
   }
 
   const journey = selectDreamJourney({

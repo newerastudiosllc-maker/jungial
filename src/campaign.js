@@ -9,6 +9,7 @@ import { createDreamWeightOverrides } from './directorPolicy.js';
 import { GniBridge } from './gniBridge.js';
 import { SymbolGrammar } from './symbolGrammar.js';
 import { TraceRecorder } from './trace.js';
+import { applyPlayerInput } from './input.js';
 
 export async function runCampaign({
   cycles = 3,
@@ -40,14 +41,8 @@ export async function runCampaign({
     const cycleNumber = index + 1;
     trace.record('campaign.cycle.started', { cycle: cycleNumber });
 
-    runtime.chamber.receiveInput({
-      kind: 'speech',
-      text: 'the word',
-      archetypes: runtime.archetypes,
-      feeling: runtime.feeling
-    });
-    runtime.witness.observeAction('open_portal', ['Seeker'], ['portal']);
-    runtime.chamber.openPortal('key_of_portals');
+    applyPlayerInput({ source: 'system', kind: 'speech', text: 'the word' }, runtime);
+    applyPlayerInput({ source: 'system', kind: 'action', name: 'open_portal' }, runtime);
 
     const weightOverrides = createDreamWeightOverrides(runtime.architect.snapshot());
     const dreamJourney = selectDreamJourney({
