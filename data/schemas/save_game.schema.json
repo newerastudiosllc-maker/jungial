@@ -27,6 +27,8 @@
         "dreamerProfile": { "$ref": "dreamer_profile.schema.json" },
         "sessionCovenant": { "$ref": "session_covenant.schema.json" },
         "echoTrace": { "$ref": "echo_trace.schema.json" },
+        "dreamWeather": { "$ref": "dream_weather.schema.json" },
+        "weatherTrace": { "$ref": "weather_trace.schema.json" },
         "trace": { "$ref": "trace.schema.json" }
       }
     }

@@ -31,6 +31,26 @@
       "additionalProperties": { "type": "number" }
     },
     "dreamerMemoryContext": { "$ref": "dreamer_memory_context.schema.json" },
+    "dreamWeatherContext": {
+      "type": "object",
+      "required": [
+        "schema",
+        "schemaVersion",
+        "weatherTags",
+        "pressure",
+        "dreadBudget",
+        "suppressedTags"
+      ],
+      "properties": {
+        "schema": { "const": "DreamWeatherContextV1" },
+        "schemaVersion": { "const": 1 },
+        "weatherTags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "pressure": { "enum": ["low", "medium", "heavy", "storm"] },
+        "dreadBudget": { "$ref": "dread_budget.schema.json" },
+        "suppressedTags": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      },
+      "additionalProperties": false
+    },
     "sessionCovenant": { "$ref": "session_covenant.schema.json" },
     "passageContext": {
       "type": "object",

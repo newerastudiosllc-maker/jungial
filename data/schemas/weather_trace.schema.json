@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/weather_trace.schema.json",
+  "title": "WeatherTraceV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "schemaVersion",
+    "traceId",
+    "weatherId",
+    "mood",
+    "pressure",
+    "sourceTags",
+    "resultingTags",
+    "suppressedTags",
+    "strongestDreadAxis"
+  ],
+  "properties": {
+    "schema": { "const": "WeatherTraceV1" },
+    "schemaVersion": { "const": 1 },
+    "traceId": { "type": "string", "minLength": 1 },
+    "weatherId": { "type": ["string", "null"] },
+    "mood": { "enum": ["stillness", "hush", "gravity", "flicker", "bloom", "eclipse"] },
+    "pressure": { "enum": ["low", "medium", "heavy", "storm"] },
+    "sourceTags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "resultingTags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "suppressedTags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "strongestDreadAxis": {
+      "enum": [
+        "pursuit",
+        "bodyUnease",
+        "cosmicDread",
+        "disorientation",
+        "loss",
+        "watching",
+        "claustrophobia"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

@@ -10,6 +10,9 @@ import {
   validateEchoTrace,
   validateDreamerMemoryContext,
   validateDreamerProfile,
+  validateDreadBudget,
+  validateDreamWeather,
+  validateDreamWeatherContext,
   validateGniBridgeResult,
   validateGniContractCheckReport,
   validateGniDirectiveQueue,
@@ -18,11 +21,18 @@ import {
   validatePassage,
   validateSaveGame,
   validateSessionCovenant,
-  validateSessionBundle
+  validateSessionBundle,
+  validateWeatherTrace
 } from '../src/contracts.js';
 import { DreamerProfile } from '../src/dreamerProfile.js';
 import { loadBundledContentCatalog, validateContentCatalog } from '../src/contentCatalog.js';
 import { createSessionCovenant } from '../src/sessionCovenant.js';
+import {
+  createDreamWeather,
+  createWeatherTrace,
+  normalizeDreadBudget,
+  toGniWeatherContext
+} from '../src/dreamWeather.js';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 
@@ -101,6 +111,136 @@ test('session covenant validation rejects raw speech fields', () => {
 
   assert.equal(result.valid, false);
   assert.deepEqual(result.errors, ['covenant.rawSpeech is not allowed']);
+});
+
+test('validates DreamWeatherV1 contracts', () => {
+  const weather = createDreamWeather({
+    seed: 7,
+    weatherTags: ['garden', 'watching'],
+    dreadBudget: { watching: 0.4 }
+  });
+
+  assert.deepEqual(validateDreamWeather(weather), { valid: true, errors: [] });
+
+  const result = validateDreamWeather({
+    ...weather,
+    pressure: 'crushing',
+    dreadBudget: { ...weather.dreadBudget, watching: 2 },
+    atmosphere: { ...weather.atmosphere, fogDensity: -0.1 },
+    rawPrompt: 'do not store'
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'dreamWeather.rawPrompt is not allowed',
+    'pressure must be one of low, medium, heavy, storm',
+    'dreadBudget.watching must be between 0 and 1',
+    'atmosphere.fogDensity must be between 0 and 1'
+  ]);
+});
+
+test('validates WeatherTraceV1 contracts', () => {
+  const weather = createDreamWeather({ seed: 8, weatherTags: ['mist'] });
+  const trace = createWeatherTrace({
+    weather,
+    sourceTags: ['mist'],
+    suppressedTags: ['static'],
+    seed: 8
+  });
+
+  assert.deepEqual(validateWeatherTrace(trace), { valid: true, errors: [] });
+
+  const result = validateWeatherTrace({
+    ...trace,
+    weatherId: 123,
+    strongestDreadAxis: 'teeth',
+    sourceTags: ['mist', ''],
+    notes: 'not allowed'
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'weatherTrace.notes is not allowed',
+    'weatherId must be a string or null',
+    'sourceTags[1] must be a non-empty string',
+    'strongestDreadAxis must be one of pursuit, bodyUnease, cosmicDread, disorientation, loss, watching, claustrophobia'
+  ]);
+});
+
+test('validates DreadBudgetV1 contracts', () => {
+  const budget = normalizeDreadBudget({ pursuit: 0.2, watching: 0.4 }, 0.5);
+
+  assert.deepEqual(validateDreadBudget(budget), { valid: true, errors: [] });
+
+  const result = validateDreadBudget({
+    ...budget,
+    pursuit: 1.2,
+    teeth: 0.1
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'dreadBudget.teeth is not allowed',
+    'pursuit must be between 0 and 1'
+  ]);
+});
+
+test('session bundle validation accepts valid dreamWeatherContext from toGniWeatherContext', () => {
+  const dreamWeather = createDreamWeather({ seed: 9, weatherTags: ['gravity'] });
+  const weatherTrace = createWeatherTrace({ weather: dreamWeather, seed: 9 });
+  const result = validateSessionBundle({
+    ...validSessionBundle(),
+    dreamWeatherContext: toGniWeatherContext({ dreamWeather, weatherTrace })
+  });
+
+  assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('session bundle validation rejects malformed dreamWeatherContext pressure or extra field', () => {
+  const dreamWeather = createDreamWeather({ seed: 10 });
+  const result = validateSessionBundle({
+    ...validSessionBundle(),
+    dreamWeatherContext: {
+      ...toGniWeatherContext({ dreamWeather }),
+      pressure: 'thunder',
+      rawPrompt: 'not allowed'
+    }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'dreamWeatherContext.rawPrompt is not allowed',
+    'dreamWeatherContext.pressure must be one of low, medium, heavy, storm'
+  ]);
+});
+
+test('save game validation checks optional dreamWeather/weatherTrace payloads', () => {
+  const dreamWeather = createDreamWeather({ seed: 11, weatherTags: ['cold'] });
+  const weatherTrace = createWeatherTrace({ weather: dreamWeather, seed: 11 });
+
+  assert.deepEqual(validateSaveGame({
+    ...validSaveGame(),
+    payload: {
+      ...validSaveGame().payload,
+      dreamWeather,
+      weatherTrace
+    }
+  }), { valid: true, errors: [] });
+
+  const result = validateSaveGame({
+    ...validSaveGame(),
+    payload: {
+      ...validSaveGame().payload,
+      dreamWeather: { ...dreamWeather, weatherId: '' },
+      weatherTrace: { ...weatherTrace, resultingTags: ['cold', ''] }
+    }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'payload.dreamWeather.weatherId is required',
+    'payload.weatherTrace.resultingTags[1] must be a non-empty string'
+  ]);
 });
 
 test('Passage validation accepts dream-native content contracts', () => {
@@ -743,6 +883,37 @@ function validGniRequest() {
       roomConfigSnapshot: { portalOpen: true },
       selectedDream: { id: 'garden' },
       archetypeVector: { Seeker: 1 }
+    }
+  };
+}
+
+function validSessionBundle() {
+  return {
+    schema: 'SessionBundleV1',
+    schemaVersion: 1,
+    sessionId: 'session-one',
+    dominantArchetype: 'Seeker',
+    coherence: 0.6,
+    vibeState: 'calm_hopeful_boundless_bright_warm',
+    recentSymbols: ['portal'],
+    recentActions: ['open_portal'],
+    roomConfigSnapshot: { portalOpen: true },
+    archetypeVector: { Seeker: 1 }
+  };
+}
+
+function validSaveGame() {
+  return {
+    schema: 'JungialSaveGame',
+    version: 1,
+    savedAt: '2080-01-01T00:00:00.000Z',
+    migrations: [],
+    payload: {
+      room: {},
+      archetypeState: {},
+      feelingState: {},
+      journal: {},
+      architectState: {}
     }
   };
 }

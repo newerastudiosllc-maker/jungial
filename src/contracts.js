@@ -1,3 +1,8 @@
+import { DREAD_BUDGET_AXES } from './dreamWeather.js';
+
+const DREAM_WEATHER_MOODS = Object.freeze(['stillness', 'hush', 'gravity', 'flicker', 'bloom', 'eclipse']);
+const DREAM_WEATHER_PRESSURES = Object.freeze(['low', 'medium', 'heavy', 'storm']);
+
 export function validateSessionBundle(bundle) {
   const errors = [];
 
@@ -43,6 +48,12 @@ export function validateSessionBundle(bundle) {
       errors.push(...covenantValidation.errors.map((error) => `sessionCovenant.${error}`));
     }
   }
+  if (bundle?.dreamWeatherContext !== undefined) {
+    const weatherValidation = validateDreamWeatherContext(bundle.dreamWeatherContext);
+    if (!weatherValidation.valid) {
+      errors.push(...prefixNestedErrors(weatherValidation.errors, 'dreamWeatherContext', 'dreamWeatherContext'));
+    }
+  }
   if (bundle?.passageContext !== undefined) {
     if (!isObject(bundle.passageContext)) {
       errors.push('passageContext must be an object');
@@ -55,6 +66,156 @@ export function validateSessionBundle(bundle) {
       }
     }
   }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function validateDreadBudget(budget) {
+  const errors = [];
+
+  errors.push(...validateKnownKeys(budget, DREAD_BUDGET_AXES, 'dreadBudget'));
+  for (const axis of DREAD_BUDGET_AXES) {
+    errors.push(...validateNumberBetween(budget?.[axis], axis, 0, 1));
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function validateDreamWeather(weather) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'weatherId',
+    'mood',
+    'pressure',
+    'ceiling',
+    'dreadBudget',
+    'weatherTags',
+    'suppressedTags',
+    'atmosphere'
+  ];
+  const atmosphereKeys = ['lightIntensity', 'fogDensity', 'bloom', 'exposure', 'warmth', 'movementDrag'];
+
+  if (weather?.schema !== 'DreamWeatherV1') {
+    errors.push('schema must be DreamWeatherV1');
+  }
+  if (weather?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  errors.push(...validateKnownKeys(weather, allowedKeys, 'dreamWeather'));
+  if (!isNonEmptyString(weather?.weatherId)) {
+    errors.push('weatherId is required');
+  }
+  if (!DREAM_WEATHER_MOODS.includes(weather?.mood)) {
+    errors.push(`mood must be one of ${DREAM_WEATHER_MOODS.join(', ')}`);
+  }
+  if (!DREAM_WEATHER_PRESSURES.includes(weather?.pressure)) {
+    errors.push(`pressure must be one of ${DREAM_WEATHER_PRESSURES.join(', ')}`);
+  }
+  errors.push(...validateNumberBetween(weather?.ceiling, 'ceiling', 0, 1));
+
+  const dreadValidation = validateDreadBudget(weather?.dreadBudget);
+  if (!dreadValidation.valid) {
+    errors.push(...dreadValidation.errors.map((error) => `dreadBudget.${error}`));
+  }
+  errors.push(...validateStringList(weather?.weatherTags, 'weatherTags'));
+  errors.push(...validateStringList(weather?.suppressedTags, 'suppressedTags'));
+  if (!isObject(weather?.atmosphere)) {
+    errors.push('atmosphere must be an object');
+  } else {
+    errors.push(...validateKnownKeys(weather.atmosphere, atmosphereKeys, 'atmosphere'));
+    for (const key of atmosphereKeys) {
+      errors.push(...validateNumberBetween(weather.atmosphere[key], `atmosphere.${key}`, 0, 1));
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function validateWeatherTrace(trace) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'traceId',
+    'weatherId',
+    'mood',
+    'pressure',
+    'sourceTags',
+    'resultingTags',
+    'suppressedTags',
+    'strongestDreadAxis'
+  ];
+
+  if (trace?.schema !== 'WeatherTraceV1') {
+    errors.push('schema must be WeatherTraceV1');
+  }
+  if (trace?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  errors.push(...validateKnownKeys(trace, allowedKeys, 'weatherTrace'));
+  if (!isNonEmptyString(trace?.traceId)) {
+    errors.push('traceId is required');
+  }
+  if (!(trace?.weatherId === null || typeof trace?.weatherId === 'string')) {
+    errors.push('weatherId must be a string or null');
+  }
+  if (!DREAM_WEATHER_MOODS.includes(trace?.mood)) {
+    errors.push(`mood must be one of ${DREAM_WEATHER_MOODS.join(', ')}`);
+  }
+  if (!DREAM_WEATHER_PRESSURES.includes(trace?.pressure)) {
+    errors.push(`pressure must be one of ${DREAM_WEATHER_PRESSURES.join(', ')}`);
+  }
+  errors.push(...validateStringList(trace?.sourceTags, 'sourceTags'));
+  errors.push(...validateStringList(trace?.resultingTags, 'resultingTags'));
+  errors.push(...validateStringList(trace?.suppressedTags, 'suppressedTags'));
+  if (!DREAD_BUDGET_AXES.includes(trace?.strongestDreadAxis)) {
+    errors.push(`strongestDreadAxis must be one of ${DREAD_BUDGET_AXES.join(', ')}`);
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function validateDreamWeatherContext(context) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'weatherTags',
+    'pressure',
+    'dreadBudget',
+    'suppressedTags'
+  ];
+
+  if (context?.schema !== 'DreamWeatherContextV1') {
+    errors.push('schema must be DreamWeatherContextV1');
+  }
+  if (context?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  errors.push(...validateKnownKeys(context, allowedKeys, 'dreamWeatherContext'));
+  errors.push(...validateStringList(context?.weatherTags, 'weatherTags'));
+  if (!DREAM_WEATHER_PRESSURES.includes(context?.pressure)) {
+    errors.push(`pressure must be one of ${DREAM_WEATHER_PRESSURES.join(', ')}`);
+  }
+  const dreadValidation = validateDreadBudget(context?.dreadBudget);
+  if (!dreadValidation.valid) {
+    errors.push(...dreadValidation.errors.map((error) => `dreadBudget.${error}`));
+  }
+  errors.push(...validateStringList(context?.suppressedTags, 'suppressedTags'));
 
   return {
     valid: errors.length === 0,
@@ -763,6 +924,18 @@ export function validateSaveGame(saveGame) {
     'payload.echoTrace',
     validateEchoTrace
   ));
+  if (saveGame.payload.dreamWeather !== undefined && saveGame.payload.dreamWeather !== null) {
+    const weatherValidation = validateDreamWeather(saveGame.payload.dreamWeather);
+    if (!weatherValidation.valid) {
+      errors.push(...prefixNestedErrors(weatherValidation.errors, 'payload.dreamWeather', 'dreamWeather'));
+    }
+  }
+  if (saveGame.payload.weatherTrace !== undefined && saveGame.payload.weatherTrace !== null) {
+    const traceValidation = validateWeatherTrace(saveGame.payload.weatherTrace);
+    if (!traceValidation.valid) {
+      errors.push(...prefixNestedErrors(traceValidation.errors, 'payload.weatherTrace', 'weatherTrace'));
+    }
+  }
   errors.push(...validateOptionalNestedContract(
     saveGame.payload.trace,
     'payload.trace',
@@ -806,6 +979,15 @@ function validateOptionalNestedContract(value, label, validator) {
   }
   const validation = validator(value);
   return validation.valid ? [] : validation.errors.map((error) => `${label}.${error}`);
+}
+
+function prefixNestedErrors(errors, label, nestedLabel) {
+  return errors.map((error) => {
+    const prefix = `${nestedLabel}.`;
+    return error.startsWith(prefix)
+      ? `${label}.${error.slice(prefix.length)}`
+      : `${label}.${error}`;
+  });
 }
 
 function validateMemoryMap(map, label) {
@@ -968,6 +1150,13 @@ function validateOptionalNumberMap(input, label, { min, max, allowedKeys = null 
     }
   }
   return errors;
+}
+
+function validateNumberBetween(value, label, min, max) {
+  if (!Number.isFinite(value) || value < min || value > max) {
+    return [`${label} must be between ${min} and ${max}`];
+  }
+  return [];
 }
 
 function validateKnownKeys(input, allowedKeys, label) {

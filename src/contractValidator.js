@@ -5,6 +5,7 @@ import {
   validateDirective,
   validateDreamerMemoryContext,
   validateDreamerProfile,
+  validateDreamWeather,
   validateEchoTrace,
   validateGniBridgeResult,
   validateGniContractCheckReport,
@@ -15,7 +16,8 @@ import {
   validateSaveGame,
   validateSessionCovenant,
   validateSessionBundle,
-  validateTrace
+  validateTrace,
+  validateWeatherTrace
 } from './contracts.js';
 
 export function validateContractDocument(document) {
@@ -30,6 +32,10 @@ export function validateContractDocument(document) {
       return validateDreamerProfile(document);
     case 'DreamerMemoryContextV1':
       return validateDreamerMemoryContext(document);
+    case 'DreamWeatherV1':
+      return validateDreamWeather(document);
+    case 'WeatherTraceV1':
+      return validateWeatherTrace(document);
     case 'SessionCovenantV1':
       return validateSessionCovenant(document);
     case 'PassageV1':

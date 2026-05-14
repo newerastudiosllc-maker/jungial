@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
 import { validateContractDocument, validateContractFiles } from '../src/contractValidator.js';
+import { createDreamWeather, createWeatherTrace } from '../src/dreamWeather.js';
 
 test('contract validator routes known Jungial contract schemas', () => {
   const directiveResult = validateContractDocument({
@@ -153,6 +154,19 @@ test('contract validator validates save game payload and nested GNI state', () =
 
   assert.equal(result.valid, false);
   assert.deepEqual(result.errors, ['payload.gniQueue.pending must be an array']);
+});
+
+test('contract validator routes DreamWeatherV1 documents', () => {
+  const result = validateContractDocument(createDreamWeather({ seed: 21, weatherTags: ['mist'] }));
+
+  assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('contract validator routes WeatherTraceV1 documents', () => {
+  const weather = createDreamWeather({ seed: 22, weatherTags: ['garden'] });
+  const result = validateContractDocument(createWeatherTrace({ weather, seed: 22 }));
+
+  assert.deepEqual(result, { valid: true, errors: [] });
 });
 
 test('contract validator requires save game migration metadata', () => {

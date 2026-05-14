@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/dream_weather.schema.json",
+  "title": "DreamWeatherV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "schemaVersion",
+    "weatherId",
+    "mood",
+    "pressure",
+    "ceiling",
+    "dreadBudget",
+    "weatherTags",
+    "suppressedTags",
+    "atmosphere"
+  ],
+  "properties": {
+    "schema": { "const": "DreamWeatherV1" },
+    "schemaVersion": { "const": 1 },
+    "weatherId": { "type": "string", "minLength": 1 },
+    "mood": { "enum": ["stillness", "hush", "gravity", "flicker", "bloom", "eclipse"] },
+    "pressure": { "enum": ["low", "medium", "heavy", "storm"] },
+    "ceiling": { "type": "number", "minimum": 0, "maximum": 1 },
+    "dreadBudget": { "$ref": "dread_budget.schema.json" },
+    "weatherTags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "suppressedTags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "atmosphere": {
+      "type": "object",
+      "required": ["lightIntensity", "fogDensity", "bloom", "exposure", "warmth", "movementDrag"],
+      "properties": {
+        "lightIntensity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "fogDensity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "bloom": { "type": "number", "minimum": 0, "maximum": 1 },
+        "exposure": { "type": "number", "minimum": 0, "maximum": 1 },
+        "warmth": { "type": "number", "minimum": 0, "maximum": 1 },
+        "movementDrag": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

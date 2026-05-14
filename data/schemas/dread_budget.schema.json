@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/dread_budget.schema.json",
+  "title": "DreadBudgetV1",
+  "type": "object",
+  "required": [
+    "pursuit",
+    "bodyUnease",
+    "cosmicDread",
+    "disorientation",
+    "loss",
+    "watching",
+    "claustrophobia"
+  ],
+  "properties": {
+    "pursuit": { "type": "number", "minimum": 0, "maximum": 1 },
+    "bodyUnease": { "type": "number", "minimum": 0, "maximum": 1 },
+    "cosmicDread": { "type": "number", "minimum": 0, "maximum": 1 },
+    "disorientation": { "type": "number", "minimum": 0, "maximum": 1 },
+    "loss": { "type": "number", "minimum": 0, "maximum": 1 },
+    "watching": { "type": "number", "minimum": 0, "maximum": 1 },
+    "claustrophobia": { "type": "number", "minimum": 0, "maximum": 1 }
+  },
+  "additionalProperties": false
+}
