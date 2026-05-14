@@ -86,13 +86,16 @@ export function createWeatherTrace({ weather, sourceTags = [], suppressedTags = 
   const normalizedWeather = weather ?? createDreamWeather({ seed });
 
   return {
-    schema: 'DreamWeatherTraceV1',
+    schema: 'WeatherTraceV1',
     schemaVersion: 1,
+    traceId: `weather-trace-${String(seed)}`,
     weatherId: normalizedWeather.weatherId,
+    mood: normalizedWeather.mood,
+    pressure: normalizedWeather.pressure,
     sourceTags: normalizeTags(sourceTags),
-    weatherTags: [...normalizedWeather.weatherTags],
+    resultingTags: [...normalizedWeather.weatherTags],
     suppressedTags: uniqueTags([...normalizedWeather.suppressedTags, ...normalizeTags(suppressedTags)]),
-    seed: String(seed)
+    strongestDreadAxis: getStrongestDreadAxis(normalizedWeather.dreadBudget)
   };
 }
 
@@ -186,6 +189,12 @@ function selectPressure(ceiling, dreadBudget) {
     return 'medium';
   }
   return 'low';
+}
+
+function getStrongestDreadAxis(dreadBudget) {
+  return DREAD_BUDGET_AXES.reduce((strongest, axis) => (
+    dreadBudget[axis] > dreadBudget[strongest] ? axis : strongest
+  ), DREAD_BUDGET_AXES[0]);
 }
 
 function normalizeTags(tags = []) {

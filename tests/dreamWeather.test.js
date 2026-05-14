@@ -65,6 +65,48 @@ describe("dream weather", () => {
     assert.deepEqual(createDreamWeather(input), createDreamWeather(input));
   });
 
+  it("creates a WeatherTraceV1 with exact trace shape and strongest dread axis", () => {
+    const weather = createDreamWeather({
+      seed: 41,
+      weatherTags: ["mist", "mirror"],
+      dreadBudget: {
+        pursuit: 0.1,
+        cosmicDread: 0.34,
+        watching: 0.2
+      }
+    });
+
+    const trace = createWeatherTrace({
+      weather,
+      sourceTags: ["mirror", "mist"],
+      suppressedTags: ["pursuit"],
+      seed: 41
+    });
+
+    assert.deepEqual(Object.keys(trace), [
+      "schema",
+      "schemaVersion",
+      "traceId",
+      "weatherId",
+      "mood",
+      "pressure",
+      "sourceTags",
+      "resultingTags",
+      "suppressedTags",
+      "strongestDreadAxis"
+    ]);
+    assert.equal(trace.schema, "WeatherTraceV1");
+    assert.equal(trace.schemaVersion, 1);
+    assert.equal(trace.traceId, "weather-trace-41");
+    assert.equal(trace.weatherId, weather.weatherId);
+    assert.equal(trace.mood, weather.mood);
+    assert.equal(trace.pressure, weather.pressure);
+    assert.deepEqual(trace.sourceTags, ["mirror", "mist"]);
+    assert.deepEqual(trace.resultingTags, weather.weatherTags);
+    assert.deepEqual(trace.suppressedTags, ["pursuit"]);
+    assert.equal(trace.strongestDreadAxis, "cosmicDread");
+  });
+
   it("redacts raw and private input from GNI weather context", () => {
     const dreamWeather = createDreamWeather({
       seed: 31,
