@@ -8,6 +8,9 @@
     "test": "node --test tests/*.test.js",
     "simulate": "node src/simulation.js",
     "validate": "node src/contentValidator.js",
-    "replay": "node src/replay.js"
+    "replay": "node src/replay.js",
+    "scenarios": "node src/scenarioRunner.js data/scenarios/smoke_matrix.json saves/scenarios",
+    "fixtures": "node src/fixtureExporter.js fixtures",
+    "trace": "node src/traceInspector.js"
   }
 }

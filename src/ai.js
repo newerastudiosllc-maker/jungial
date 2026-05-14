@@ -141,6 +141,7 @@ export class GniAdapter {
         ]
       },
       payload: {
+        schema: sessionBundle.schema ?? 'SessionBundleV1',
         schemaVersion: sessionBundle.schemaVersion ?? 1,
         sessionId: sessionBundle.sessionId,
         dominantArchetype: sessionBundle.dominantArchetype,

@@ -22,6 +22,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - Runtime timestamps and session IDs must come from an injected clock/session service during replays and QA captures.
 - Replay scripts should produce stable dream journey, journal text shape, and ArchitectState.
 - QA and GNI debugging should use `JungialTraceV1` audit output rather than adding exposition to the world.
+- Scenario matrices should gate changes to procedural logic with stable hashes for selected dream, journey, trace summary, and journal shape.
 - GNI/GNI-emulator outputs must be normalized before touching gameplay state.
 - Content validation must run before packaged builds and before accepting AI-authored content.
 

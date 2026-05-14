@@ -14,6 +14,8 @@ UE5 was not available on PATH in this workspace, and no local C++ compiler was a
 npm test
 npm run simulate
 npm run validate
+npm run scenarios
+npm run fixtures
 ```
 
 `npm run simulate` writes `saves/latest-session.json`. That folder is ignored by git.
@@ -35,6 +37,14 @@ To run a deterministic replay script:
 ```powershell
 node src/replay.js data/replay_scripts/threshold_word.json saves/replay-threshold-word.json
 ```
+
+To run the smoke scenario matrix:
+
+```powershell
+npm run scenarios
+```
+
+This writes `saves/scenarios/scenario-report.json` with stable hashes for each scenario.
 
 ## Folder Structure
 
@@ -95,6 +105,20 @@ For QA-style reproducibility, pass `--clock-start=<ISO time>` and optional `--cl
 `TraceRecorder` writes `JungialTraceV1` developer traces. These are not in-world exposition; they are black-box records for QA and GNI debugging. A trace captures threshold input, room awakening, portal opening, dream journey selection, mask selection, journal grounding, Witness bundle creation, GNI requests/directives, and save output.
 
 Use `--trace=<path>` on simulation runs to write a standalone trace JSON file. Save files also include the trace snapshot.
+
+Inspect a trace summary:
+
+```powershell
+npm run trace -- saves/latest-trace.json
+```
+
+Export GNI contract fixtures:
+
+```powershell
+npm run fixtures
+```
+
+This writes `fixtures/session_bundle_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
 
 ## Current Playable Loop
 

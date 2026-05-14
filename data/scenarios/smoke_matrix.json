@@ -1,0 +1,33 @@
+{
+  "schema": "JungialScenarioMatrixV1",
+  "generatedAt": "deterministic",
+  "scenarios": [
+    {
+      "id": "sim-emulated-gni",
+      "kind": "simulation",
+      "seed": 777,
+      "emulateGni": true,
+      "clockStartIso": "2055-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "threshold-word-replay",
+      "kind": "replay",
+      "clockStartIso": "2055-01-02T00:00:00.000Z",
+      "script": {
+        "seed": 44,
+        "inputs": [
+          {
+            "kind": "speech",
+            "text": "the word"
+          },
+          {
+            "kind": "action",
+            "name": "open_portal",
+            "archetypes": ["Seeker"],
+            "symbols": ["portal"]
+          }
+        ]
+      }
+    }
+  ]
+}

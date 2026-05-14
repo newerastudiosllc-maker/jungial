@@ -1,4 +1,5 @@
 node_modules/
 saves/
+fixtures/
 coverage/
 .DS_Store

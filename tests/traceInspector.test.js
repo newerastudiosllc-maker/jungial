@@ -1,0 +1,40 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+
+import { inspectTrace } from '../src/traceInspector.js';
+
+test('trace inspector summarizes journey, GNI, and event counts', () => {
+  const summary = inspectTrace({
+    schema: 'JungialTraceV1',
+    runId: 'trace-one',
+    entries: [
+      { index: 1, at: 'x', type: 'simulation.started', payload: {} },
+      {
+        index: 2,
+        at: 'x',
+        type: 'dream.journey.selected',
+        payload: {
+          summary: 'entry:Garden -> pressure:Mirror Hall',
+          symbolTrail: ['growth', 'reflection']
+        }
+      },
+      { index: 3, at: 'x', type: 'gni.request.created', payload: { provider: 'GNI' } },
+      { index: 4, at: 'x', type: 'gni.directive.applied', payload: { directive: { dreamWeightDeltas: { garden: 0.2 } } } }
+    ]
+  });
+
+  assert.deepEqual(summary, {
+    schema: 'JungialTraceSummaryV1',
+    runId: 'trace-one',
+    eventCounts: {
+      'simulation.started': 1,
+      'dream.journey.selected': 1,
+      'gni.request.created': 1,
+      'gni.directive.applied': 1
+    },
+    journeySummary: 'entry:Garden -> pressure:Mirror Hall',
+    symbolTrail: ['growth', 'reflection'],
+    gniRequestCount: 1,
+    gniDirectiveCount: 1
+  });
+});
