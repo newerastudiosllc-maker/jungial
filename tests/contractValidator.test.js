@@ -43,6 +43,24 @@ test('contract validator validates save game payload and nested GNI state', () =
   assert.deepEqual(result.errors, ['payload.gniQueue.pending must be an array']);
 });
 
+test('contract validator requires save game migration metadata', () => {
+  const result = validateContractDocument({
+    schema: 'JungialSaveGame',
+    version: 1,
+    savedAt: '2080-01-01T00:00:00.000Z',
+    payload: {
+      room: {},
+      archetypeState: {},
+      feelingState: {},
+      journal: {},
+      architectState: {}
+    }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, ['migrations must be an array']);
+});
+
 test('contract validator reports unsupported schemas and file-level failures', async () => {
   const dir = await mkdtemp(join(tmpdir(), 'jungial-contracts-'));
   const validPath = join(dir, 'directive.json');

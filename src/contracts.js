@@ -256,16 +256,14 @@ export function validateSaveGame(saveGame) {
   if (!isNonEmptyString(saveGame?.savedAt)) {
     errors.push('savedAt is required');
   }
-  if (saveGame?.migrations !== undefined) {
-    if (!Array.isArray(saveGame.migrations)) {
-      errors.push('migrations must be an array');
-    } else {
-      saveGame.migrations.forEach((migration, index) => {
-        if (typeof migration !== 'string') {
-          errors.push(`migrations[${index}] must be a string`);
-        }
-      });
-    }
+  if (!Array.isArray(saveGame?.migrations)) {
+    errors.push('migrations must be an array');
+  } else {
+    saveGame.migrations.forEach((migration, index) => {
+      if (typeof migration !== 'string') {
+        errors.push(`migrations[${index}] must be a string`);
+      }
+    });
   }
   if (!isObject(saveGame?.payload)) {
     errors.push('payload must be an object');
