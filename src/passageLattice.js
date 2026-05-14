@@ -8,6 +8,20 @@ const BAND_CEILINGS = Object.freeze({
   abyssal: 0.92
 });
 
+const FALLBACK_PASSAGE = Object.freeze({
+  schema: 'PassageV1',
+  schemaVersion: 1,
+  id: 'threshold_silence',
+  motifs: ['threshold', 'silence'],
+  pressureTags: ['invitation'],
+  formTags: ['quiet_room'],
+  intensityBand: 'gentle',
+  allowedResponseKinds: ['approach', 'wait', 'speak'],
+  returnAnchorTags: ['note', 'threshold'],
+  variationFamily: 'threshold_default',
+  baseWeight: 1
+});
+
 export function fibonacciSchedule(length = 6) {
   const schedule = [];
   let previous = 1;
@@ -27,7 +41,7 @@ export function selectPassage({
   dreamerMemoryContext = null,
   architectState = null
 } = {}) {
-  const normalizedPassages = (passages ?? []).map(normalizePassageForSelection);
+  const normalizedPassages = (passages?.length ? passages : [FALLBACK_PASSAGE]).map(normalizePassageForSelection);
   const recentIds = new Set(recentEchoTraces.slice(-4).map((trace) => trace.passageId));
   const recentForms = new Set(recentEchoTraces.slice(-4).flatMap((trace) => trace.formTags ?? []));
   const hardBoundaries = new Set(covenant?.hardBoundaryTags ?? []);

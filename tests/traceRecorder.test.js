@@ -61,6 +61,8 @@ test('simulation trace explains dream journey and GNI handoff without in-world e
       'threshold.input',
       'threshold.awakened',
       'portal.opened',
+      'passage.gathered',
+      'echo.trace.created',
       'dream.journey.selected',
       'mask.selected',
       'journal.entry.written',

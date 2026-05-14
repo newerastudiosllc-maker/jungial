@@ -12,6 +12,9 @@ import { DreamerProfile } from './dreamerProfile.js';
 
 const FIXTURE_FILES = Object.freeze([
   'session_bundle_v1.json',
+  'session_covenant_v1.json',
+  'passage_v1.json',
+  'echo_trace_v1.json',
   'dreamer_profile_v1.json',
   'dreamer_memory_context_v1.json',
   'gni_request_v1.json',
@@ -44,6 +47,9 @@ export async function exportContractFixtures({
   });
 
   const sessionBundle = run.gniRequest.payload;
+  const sessionCovenant = run.sessionCovenant;
+  const passage = run.activePassage;
+  const echoTrace = run.echoTrace;
   const dreamer = new DreamerProfile({
     profileId: 'fixture-dreamer',
     rootSeed: 'fixture-root-seed',
@@ -96,6 +102,9 @@ export async function exportContractFixtures({
   const traceSummary = inspectTrace(run.trace);
   const payloads = {
     'session_bundle_v1.json': sessionBundle,
+    'session_covenant_v1.json': sessionCovenant,
+    'passage_v1.json': passage,
+    'echo_trace_v1.json': echoTrace,
     'dreamer_profile_v1.json': dreamerProfile,
     'dreamer_memory_context_v1.json': dreamerMemoryContext,
     'gni_request_v1.json': gniRequest,

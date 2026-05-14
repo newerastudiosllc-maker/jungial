@@ -197,6 +197,9 @@ The current contract schemas live in `data/schemas/`:
 - `input_intent.schema.json`
 - `threshold_presentation.schema.json`
 - `session_bundle.schema.json`
+- `session_covenant.schema.json`
+- `passage.schema.json`
+- `echo_trace.schema.json`
 - `dreamer_profile.schema.json`
 - `dreamer_memory_context.schema.json`
 - `gni_processing_request.schema.json`
@@ -236,6 +239,12 @@ Use `--trace=<path>` on simulation runs to write a standalone trace JSON file. S
 
 See `docs/dreamer-memory-and-safety.md` for the product/architecture guardrails: mystery in-world, transparent profile controls out-of-world, save/incarnation modes, and safety boundaries around therapeutic positioning.
 
+## Session Covenant And Passages
+
+`SessionCovenantV1` captures the current session's tone, intensity ceiling, boundaries, and return anchor. `PassageV1` is the dream-native adaptive fragment format, and `EchoTraceV1` records symbolic response patterns without raw speech.
+
+The system can become strange, dark, or horrific when the covenant allows it, while exact Passage repeats and boundary violations are filtered before GNI or Dreamflow can use them.
+
 Inspect a trace summary:
 
 ```powershell
@@ -248,7 +257,7 @@ Export GNI contract fixtures:
 npm run fixtures
 ```
 
-This writes `fixtures/session_bundle_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
+This writes `fixtures/session_bundle_v1.json`, `fixtures/session_covenant_v1.json`, `fixtures/passage_v1.json`, `fixtures/echo_trace_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
 
 Validate generated fixtures, SaveGame envelopes, and mock GNI directives against the strict contract gate:
 
