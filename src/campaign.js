@@ -7,7 +7,6 @@ import { loadGameState, saveGameState } from './persistence.js';
 import { selectDreamJourney } from './dreamJourney.js';
 import { createDreamWeightOverrides } from './directorPolicy.js';
 import { GniBridge } from './gniBridge.js';
-import { GniDirectiveQueue } from './gniQueue.js';
 import { SymbolGrammar } from './symbolGrammar.js';
 import { TraceRecorder } from './trace.js';
 import { applyPlayerInput } from './input.js';
@@ -33,7 +32,7 @@ export async function runCampaign({
   });
   const trace = new TraceRecorder({ clock: clock?.fork?.() ?? undefined });
   const gniBridge = new GniBridge({ adapter: runtime.gni, provider: gniProvider });
-  const gniQueue = new GniDirectiveQueue(resumeState?.gniQueue);
+  const gniQueue = runtime.gniQueue;
   const symbolGrammar = new SymbolGrammar();
   const campaignCycles = [];
 

@@ -2,7 +2,7 @@
 
 ## Current Direction
 
-Jungial now has a clean runtime composition boundary: `createJungialRuntime()` loads and validates content once, then injects normalized data into gameplay systems. In UE5, this maps to a subsystem or bootstrap actor that owns cooked DataAsset references and passes them into components.
+Jungial now has a clean runtime composition boundary: `createJungialRuntime()` loads and validates content once, then injects normalized data and hydrated SaveGame snapshots into gameplay systems. In UE5, this maps to a subsystem or bootstrap actor that owns cooked DataAsset references and passes them into components.
 
 ## Proposed UE5 Mapping
 

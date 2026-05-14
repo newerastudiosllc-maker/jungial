@@ -12,7 +12,6 @@ import { TraceRecorder, writeTrace } from './trace.js';
 import { applyPlayerInput } from './input.js';
 import { GniHttpProvider } from './gniHttpProvider.js';
 import { buildThresholdPresentation } from './presentation.js';
-import { GniDirectiveQueue } from './gniQueue.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -40,7 +39,8 @@ export async function runSimulation({
     dreamflow,
     journal,
     masks,
-    gni
+    gni,
+    gniQueue
   } = createJungialRuntime({ seed, catalog, clock });
 
   const transcript = [];
@@ -128,7 +128,6 @@ export async function runSimulation({
   });
   const architectUpdate = architect.update(bundle);
   const gniBridge = new GniBridge({ adapter: gni, provider: gniProvider });
-  const gniQueue = new GniDirectiveQueue();
   const gniBridgeResult = await gniBridge.processSessionBundle({
     sessionBundle: bundle,
     providedDirective: gniResponse,

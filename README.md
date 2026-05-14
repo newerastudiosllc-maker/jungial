@@ -58,7 +58,7 @@ npm run campaign
 
 The campaign keeps one Architect across cycles, applies optional GNI/emulated-GNI directives after each return, queues pending provider work in `GniDirectiveQueueV1`, and feeds Architect dream weights back into later Dreamflow selection.
 
-Programmatic callers can resume from a saved payload by passing `initialState` to `runCampaign()`, or from disk by setting `resumePath` in a campaign config. Resumed runs hydrate the room, archetype state, feeling state, journal, and Architect memory before the next cycle starts.
+Programmatic callers can resume from a saved payload by passing `initialState` to `runCampaign()`, or from disk by setting `resumePath` in a campaign config. Resumed runs hydrate the room, archetype state, feeling state, journal, GNI queue, and Architect memory before the next cycle starts.
 
 To run the smoke scenario matrix:
 
@@ -95,7 +95,7 @@ Dream modules, masks, tool-sigils, and the symbol lexicon are loaded through `sr
 
 That matters for the UE5 path: these JSON files can become DataAssets later, while the same validation rules can keep GNI-authored or designer-authored content inside known archetype and feeling-axis keys.
 
-`src/runtime.js` is the composition boundary. It is the only gameplay bootstrap path that loads the bundled catalog by default, validates it, and injects content into Threshold Chamber, Dreamflow, and Masks. Those systems now require explicit content, matching how UE5 components should receive cooked DataAssets instead of loading files from inside constructors.
+`src/runtime.js` is the composition boundary. It is the only gameplay bootstrap path that loads the bundled catalog by default, validates it, and injects content into Threshold Chamber, Dreamflow, Masks, and the SaveGame-backed GNI queue. Those systems now require explicit content/state, matching how UE5 components should receive cooked DataAssets and hydrated SaveGame snapshots instead of loading files from inside constructors.
 
 `npm run validate` checks duplicate IDs, missing symbolic tags, positive dream weights, known symbols, known archetypes, and known feeling-axis keys.
 

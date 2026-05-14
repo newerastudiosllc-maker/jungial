@@ -5,6 +5,7 @@ import { DreamflowGenerator } from './dreamflow.js';
 import { WitnessState, ArchitectState, GniAdapter } from './ai.js';
 import { JournalOfMirrors } from './library.js';
 import { MaskRegistry } from './masks.js';
+import { GniDirectiveQueue } from './gniQueue.js';
 import { loadBundledContentCatalog, validateContentCatalog } from './contentCatalog.js';
 import { createSystemClock } from './clock.js';
 import { loadGameState } from './persistence.js';
@@ -37,6 +38,7 @@ export function createJungialRuntime({
     journal: new JournalOfMirrors(snapshots.journal, { clock }),
     masks: new MaskRegistry({ seed, masks: catalog.masks }),
     gni: new GniAdapter({ endpoint: gniEndpoint }),
+    gniQueue: new GniDirectiveQueue(snapshots.gniQueue),
     clock
   };
 }
@@ -59,6 +61,7 @@ export function extractRuntimeSnapshots(state = {}) {
     feelingState: state.feelingState,
     room: state.room,
     architectState: state.architectState,
-    journal: state.journal
+    journal: state.journal,
+    gniQueue: state.gniQueue
   };
 }
