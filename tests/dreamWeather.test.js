@@ -54,6 +54,31 @@ describe("dream weather", () => {
     assert.ok(weather.suppressedTags.includes("pursuit"));
   });
 
+  it("preserves canonical camelCase dread axes for hard boundaries", () => {
+    const weather = createDreamWeather({
+      seed: "My Secret Name!",
+      covenant: {
+        hardBoundaries: ["cosmicDread"]
+      },
+      dreadBudget: {
+        cosmicDread: 0.3,
+        bodyUnease: 0.2
+      }
+    });
+    const trace = createWeatherTrace({ weather, seed: "My Secret Name!" });
+
+    assert.equal(weather.dreadBudget.cosmicDread, 0);
+    assert.ok(weather.suppressedTags.includes("cosmicDread"));
+    assert.equal(weather.suppressedTags.includes("cosmicdread"), false);
+    assert.equal(weather.suppressedTags.includes("cosmic_dread"), false);
+    assert.equal(weather.suppressedTags.includes("bodyunease"), false);
+    assert.equal(weather.suppressedTags.includes("body_unease"), false);
+    assert.equal(weather.weatherId.includes("My Secret Name!"), false);
+    assert.equal(weather.weatherId.includes("my_secret_name"), false);
+    assert.equal(trace.traceId.includes("My Secret Name!"), false);
+    assert.equal(trace.traceId.includes("my_secret_name"), false);
+  });
+
   it("is deterministic from the same input and seed", () => {
     const input = {
       seed: "same-night",

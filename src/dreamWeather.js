@@ -9,6 +9,9 @@ export const DREAD_BUDGET_AXES = Object.freeze([
   'watching',
   'claustrophobia'
 ]);
+const DREAD_AXIS_BY_COMPACT_TOKEN = Object.freeze(new Map(
+  DREAD_BUDGET_AXES.map((axis) => [compactToken(axis), axis])
+));
 
 export const WEATHER_TAGS = Object.freeze([
   'silence',
@@ -64,7 +67,6 @@ const SYMBOLIC_TAGS = Object.freeze([
 const ALLOWED_RETURNED_TAGS = Object.freeze(new Set([
   ...WEATHER_TAGS,
   ...DREAD_BUDGET_AXES,
-  ...DREAD_BUDGET_AXES.map(normalizeToken),
   ...SYMBOLIC_TAGS
 ]));
 
@@ -238,7 +240,9 @@ function safeSeedSuffix(seed) {
 }
 
 function normalizeAllowedTags(tags = []) {
-  return normalizeTags(tags).filter((tag) => ALLOWED_RETURNED_TAGS.has(tag));
+  return uniqueTags((Array.isArray(tags) ? tags : [])
+    .map(normalizeReturnedTag)
+    .filter((tag) => ALLOWED_RETURNED_TAGS.has(tag)));
 }
 
 function normalizeTags(tags = []) {
@@ -255,6 +259,15 @@ function normalizeToken(value) {
   return typeof value === 'string'
     ? value.trim().toLowerCase().replace(/[^a-z0-9_]+/g, '_').replace(/^_+|_+$/g, '')
     : '';
+}
+
+function normalizeReturnedTag(value) {
+  const token = normalizeToken(value);
+  return DREAD_AXIS_BY_COMPACT_TOKEN.get(compactToken(token)) ?? token;
+}
+
+function compactToken(value) {
+  return normalizeToken(value).replace(/_/g, '');
 }
 
 function clampNumber(value, min, max) {
