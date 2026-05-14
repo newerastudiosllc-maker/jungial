@@ -54,6 +54,21 @@ describe("dream weather", () => {
     assert.ok(weather.suppressedTags.includes("pursuit"));
   });
 
+  it("does not return default weather tags that cross hard boundaries", () => {
+    const weather = createDreamWeather({
+      seed: 24,
+      covenant: createSessionCovenant({
+        hardBoundaryTags: ["silence"]
+      })
+    });
+    const context = toGniWeatherContext({ dreamWeather: weather });
+
+    assert.equal(weather.weatherTags.includes("silence"), false);
+    assert.ok(weather.suppressedTags.includes("silence"));
+    assert.equal(context.weatherTags.includes("silence"), false);
+    assert.ok(context.suppressedTags.includes("silence"));
+  });
+
   it("preserves canonical camelCase dread axes for hard boundaries", () => {
     const weather = createDreamWeather({
       seed: "My Secret Name!",

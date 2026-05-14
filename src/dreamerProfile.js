@@ -61,8 +61,8 @@ export class DreamerProfile {
       motifs: cloneMap(snapshot.memory?.motifs),
       gestures: cloneMap(snapshot.memory?.gestures),
       echoThreads: cloneMap(snapshot.memory?.echoThreads),
-      weatherTags: cloneMap(snapshot.memory?.weatherTags),
-      dreadAxes: cloneMap(snapshot.memory?.dreadAxes),
+      weatherTags: cloneAllowedMap(snapshot.memory?.weatherTags, ALLOWED_WEATHER_TAGS),
+      dreadAxes: cloneAllowedMap(snapshot.memory?.dreadAxes, ALLOWED_DREAD_AXES),
       lastSessionDigest: snapshot.memory?.lastSessionDigest ?? null
     };
   }
@@ -264,6 +264,14 @@ function topKeys(map, limit, scoreKey = 'count') {
 function cloneMap(input = {}) {
   return Object.fromEntries(
     Object.entries(input ?? {}).map(([key, value]) => [key, { ...value }])
+  );
+}
+
+function cloneAllowedMap(input = {}, allowedKeys) {
+  return Object.fromEntries(
+    Object.entries(input ?? {})
+      .filter(([key]) => allowedKeys.has(key))
+      .map(([key, value]) => [key, { ...value }])
   );
 }
 

@@ -193,6 +193,32 @@ test('DreamerProfile hydrates old snapshots with empty weather memory maps', () 
   assert.deepEqual(profile.toGniMemoryContext({ slotId: 'slot-a' }).familiarDreadAxes, []);
 });
 
+test('DreamerProfile filters loaded weather memory before GNI context', () => {
+  const profile = new DreamerProfile({
+    profileId: 'loaded-dreamer',
+    rootSeed: 'loaded-root',
+    memory: {
+      weatherTags: {
+        mist: { count: 1, weight: 1, lastSeenAt: null },
+        raw_childhood_address: { count: 3, weight: 3, lastSeenAt: null }
+      },
+      dreadAxes: {
+        watching: { count: 1, weight: 0.4, lastSeenAt: null },
+        privateAxis: { count: 2, weight: 1.8, lastSeenAt: null }
+      }
+    }
+  });
+  const context = profile.toGniMemoryContext({ slotId: 'slot-a' });
+  const snapshotText = JSON.stringify(profile.snapshot());
+
+  assert.deepEqual(context.familiarWeatherTags, ['mist']);
+  assert.deepEqual(context.familiarDreadAxes, ['watching']);
+  assert.equal(snapshotText.includes('raw_childhood_address'), false);
+  assert.equal(snapshotText.includes('privateAxis'), false);
+  assert.equal(JSON.stringify(context).includes('raw_childhood_address'), false);
+  assert.equal(JSON.stringify(context).includes('privateAxis'), false);
+});
+
 test('DreamerProfile respects memory context limit for familiar dread axes', () => {
   const profile = new DreamerProfile({
     profileId: 'dreamer-one',

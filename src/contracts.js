@@ -337,7 +337,11 @@ export function validateDreamerMemoryContext(context) {
   }
   for (const key of ['familiarWeatherTags', 'familiarDreadAxes']) {
     if (context?.[key] !== undefined) {
-      errors.push(...validateStringList(context[key], key));
+      if (key === 'familiarWeatherTags') {
+        errors.push(...validateWeatherTagList(context[key], key));
+      } else {
+        errors.push(...validateDreadAxisList(context[key], key));
+      }
     }
   }
   if (!isNullableString(context?.lastSessionDigest)) {
@@ -1190,6 +1194,19 @@ function validateWeatherTagList(value, label) {
   value.forEach((item, index) => {
     if (isNonEmptyString(item) && !ALLOWED_WEATHER_TAGS.has(item)) {
       errors.push(`${label}[${index}] must be an allowed weather tag`);
+    }
+  });
+  return errors;
+}
+
+function validateDreadAxisList(value, label) {
+  const errors = validateStringList(value, label);
+  if (!Array.isArray(value)) {
+    return errors;
+  }
+  value.forEach((item, index) => {
+    if (isNonEmptyString(item) && !DREAD_BUDGET_AXES.includes(item)) {
+      errors.push(`${label}[${index}] must be a known dread axis`);
     }
   });
   return errors;

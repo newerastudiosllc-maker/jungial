@@ -147,6 +147,97 @@ test('Dream Weather nudges compatible passages without bypassing hard boundaries
   assert.equal(result.passage.selectionWeight, undefined);
 });
 
+test('selection excludes hard boundaries across motifs pressure and forms', () => {
+  const localPassages = [
+    {
+      schema: 'PassageV1',
+      schemaVersion: 1,
+      id: 'pursuit_in_motif',
+      motifs: ['pursuit', 'star'],
+      pressureTags: ['cosmic_mystery'],
+      formTags: ['black_star'],
+      intensityBand: 'horrific',
+      allowedResponseKinds: ['withdraw'],
+      returnAnchorTags: ['lamp'],
+      variationFamily: 'motif_boundary',
+      baseWeight: 10
+    },
+    {
+      schema: 'PassageV1',
+      schemaVersion: 1,
+      id: 'pursuit_in_form',
+      motifs: ['star'],
+      pressureTags: ['cosmic_mystery'],
+      formTags: ['pursuit'],
+      intensityBand: 'horrific',
+      allowedResponseKinds: ['withdraw'],
+      returnAnchorTags: ['lamp'],
+      variationFamily: 'form_boundary',
+      baseWeight: 10
+    },
+    {
+      schema: 'PassageV1',
+      schemaVersion: 1,
+      id: 'quiet_lamp',
+      motifs: ['lamp'],
+      pressureTags: ['invitation'],
+      formTags: ['quiet_room'],
+      intensityBand: 'gentle',
+      allowedResponseKinds: ['wait'],
+      returnAnchorTags: ['lamp'],
+      variationFamily: 'safe_boundary',
+      baseWeight: 0.1
+    }
+  ];
+  const covenant = createSessionCovenant({
+    intensityCeiling: 0.9,
+    hardBoundaryTags: ['pursuit']
+  });
+  const result = selectPassage({
+    passages: localPassages,
+    covenant,
+    seed: 12,
+    dreamWeather: createDreamWeather({
+      covenant,
+      seed: 12,
+      weatherTags: ['pursuit', 'star'],
+      dreadBudget: { pursuit: 0.7, cosmicDread: 0.7 }
+    })
+  });
+
+  assert.equal(result.passage.id, 'quiet_lamp');
+  assert.ok(result.candidates.every((candidate) => !candidate.motifs.includes('pursuit')));
+  assert.ok(result.candidates.every((candidate) => !candidate.formTags.includes('pursuit')));
+});
+
+test('selection uses a safe fallback when every supplied passage crosses a hard boundary', () => {
+  const covenant = createSessionCovenant({
+    intensityCeiling: 0.9,
+    hardBoundaryTags: ['pursuit']
+  });
+  const result = selectPassage({
+    passages: [{
+      schema: 'PassageV1',
+      schemaVersion: 1,
+      id: 'only_blocked',
+      motifs: ['pursuit'],
+      pressureTags: ['invitation'],
+      formTags: ['quiet_room'],
+      intensityBand: 'gentle',
+      allowedResponseKinds: ['wait'],
+      returnAnchorTags: ['lamp'],
+      variationFamily: 'blocked_only',
+      baseWeight: 1
+    }],
+    covenant,
+    seed: 8
+  });
+
+  assert.notEqual(result.passage.id, 'only_blocked');
+  assert.ok(!result.passage.motifs.includes('pursuit'));
+  assert.ok(result.candidates.every((candidate) => candidate.id !== 'only_blocked'));
+});
+
 test('EchoTrace captures symbolic response without raw speech', () => {
   const trace = createEchoTrace({
     passage: passages[0],

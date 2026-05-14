@@ -53,7 +53,7 @@ export function selectPassage({
   let candidates = normalizedPassages
     .filter((passage) => !recentIds.has(passage.id))
     .filter((passage) => passageAllowedByCeiling(passage, ceiling))
-    .filter((passage) => !passage.pressureTags.some((tag) => hardBoundaries.has(tag)))
+    .filter((passage) => !passageCrossesHardBoundary(passage, hardBoundaries))
     .map((passage) => ({
       ...passage,
       selectionWeight: scorePassage(passage, { covenant, softBoundaries, recentForms, dreamerMemoryContext, architectState, dreamWeather })
@@ -63,11 +63,15 @@ export function selectPassage({
   if (candidates.length === 0) {
     candidates = normalizedPassages
       .filter((passage) => passageAllowedByCeiling(passage, ceiling))
-      .filter((passage) => !passage.pressureTags.some((tag) => hardBoundaries.has(tag)))
+      .filter((passage) => !passageCrossesHardBoundary(passage, hardBoundaries))
       .map((passage) => ({ ...passage, selectionWeight: Math.max(0.05, passage.baseWeight) }));
   }
+  if (candidates.length === 0) {
+    const fallback = createBoundarySafeFallback(hardBoundaries);
+    candidates = [{ ...fallback, selectionWeight: Math.max(0.05, fallback.baseWeight) }];
+  }
 
-  const picked = rng.pickWeighted(candidates, (passage) => passage.selectionWeight).item ?? normalizedPassages[0];
+  const picked = rng.pickWeighted(candidates, (passage) => passage.selectionWeight).item ?? candidates[0];
   return {
     passage: stripSelectionWeight(picked),
     candidates: candidates.map(stripSelectionWeight)
@@ -161,6 +165,29 @@ function scoreWeatherAffinity(passage, dreamWeather) {
 
 function hasAnyTag(tagSet, tags) {
   return tags.some((tag) => tagSet.has(tag));
+}
+
+function passageCrossesHardBoundary(passage, hardBoundaries) {
+  if (hardBoundaries.size === 0) {
+    return false;
+  }
+  return [
+    ...passage.motifs,
+    ...passage.pressureTags,
+    ...passage.formTags,
+    ...passage.returnAnchorTags
+  ].some((tag) => hardBoundaries.has(tag));
+}
+
+function createBoundarySafeFallback(hardBoundaries) {
+  return normalizePassageForSelection({
+    ...FALLBACK_PASSAGE,
+    motifs: FALLBACK_PASSAGE.motifs.filter((tag) => !hardBoundaries.has(tag)),
+    pressureTags: FALLBACK_PASSAGE.pressureTags.filter((tag) => !hardBoundaries.has(tag)),
+    formTags: FALLBACK_PASSAGE.formTags.filter((tag) => !hardBoundaries.has(tag)),
+    returnAnchorTags: FALLBACK_PASSAGE.returnAnchorTags.filter((tag) => !hardBoundaries.has(tag)),
+    baseWeight: 0.05
+  });
 }
 
 function passageAllowedByCeiling(passage, ceiling) {

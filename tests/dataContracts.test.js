@@ -54,6 +54,18 @@ test('JSON catalogs match runtime constants used by the prototype', async () => 
   assert.deepEqual(validation, { valid: true, errors: [] });
 });
 
+test('Dreamer weather schemas encode weather tag and dread axis allowlists', async () => {
+  const profileSchema = await readJson('data/schemas/dreamer_profile.schema.json');
+  const memoryContextSchema = await readJson('data/schemas/dreamer_memory_context.schema.json');
+
+  assert.ok(profileSchema.$defs.weatherTagMemoryMap.propertyNames.enum.includes('mist'));
+  assert.ok(!profileSchema.$defs.weatherTagMemoryMap.propertyNames.enum.includes('raw_childhood_address'));
+  assert.ok(profileSchema.$defs.dreadAxisMemoryMap.propertyNames.enum.includes('cosmicDread'));
+  assert.ok(!profileSchema.$defs.dreadAxisMemoryMap.propertyNames.enum.includes('privateAxis'));
+  assert.ok(memoryContextSchema.$defs.weatherTagList.items.enum.includes('mist'));
+  assert.ok(memoryContextSchema.$defs.dreadAxisList.items.enum.includes('watching'));
+});
+
 test('session bundle validation reports missing GNI handoff fields', () => {
   const result = validateSessionBundle({
     schema: 'SessionBundleV1',
@@ -694,6 +706,36 @@ test('Dreamer memory context validation rejects unknown extra fields', () => {
 
   assert.equal(result.valid, false);
   assert.deepEqual(result.errors, ['dreamerMemoryContext.rawWeatherData is not allowed']);
+});
+
+test('Dreamer memory context validation rejects private weather and dread tokens', () => {
+  const result = validateDreamerMemoryContext({
+    schema: 'DreamerMemoryContextV1',
+    schemaVersion: 1,
+    profileId: null,
+    slotId: 'slot-a',
+    saveMode: 'continue',
+    sessionCount: 0,
+    strongSymbols: [],
+    recurringArchetypes: [],
+    familiarMasks: [],
+    familiarDreamModules: [],
+    familiarActions: [],
+    familiarPassages: [],
+    familiarMotifs: [],
+    familiarGestures: [],
+    echoThreadIds: [],
+    vibeEchoes: [],
+    familiarWeatherTags: ['mist', 'raw_childhood_address'],
+    familiarDreadAxes: ['watching', 'privateAxis'],
+    lastSessionDigest: null
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'familiarWeatherTags[1] must be an allowed weather tag',
+    'familiarDreadAxes[1] must be a known dread axis'
+  ]);
 });
 
 test('save game validation checks optional Dreamer profile payload', () => {

@@ -39,8 +39,8 @@
     "familiarGestures": { "$ref": "#/$defs/stringList" },
     "echoThreadIds": { "$ref": "#/$defs/stringList" },
     "vibeEchoes": { "$ref": "#/$defs/stringList" },
-    "familiarWeatherTags": { "$ref": "#/$defs/stringList" },
-    "familiarDreadAxes": { "$ref": "#/$defs/stringList" },
+    "familiarWeatherTags": { "$ref": "#/$defs/weatherTagList" },
+    "familiarDreadAxes": { "$ref": "#/$defs/dreadAxisList" },
     "lastSessionDigest": { "type": ["string", "null"] }
   },
   "additionalProperties": false,
@@ -48,6 +48,72 @@
     "stringList": {
       "type": "array",
       "items": { "type": "string", "minLength": 1 }
+    },
+    "weatherTagList": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "silence",
+          "threshold",
+          "soft_lamp",
+          "mirror",
+          "ash",
+          "mist",
+          "static",
+          "gravity",
+          "garden",
+          "warmth",
+          "cold",
+          "distant_voice",
+          "watching",
+          "boundless",
+          "contained",
+          "pursuit",
+          "bodyUnease",
+          "cosmicDread",
+          "disorientation",
+          "loss",
+          "claustrophobia",
+          "annihilation",
+          "rebirth",
+          "cosmic_mystery",
+          "reflection",
+          "shadow",
+          "self_observation",
+          "safety",
+          "memory",
+          "hearth",
+          "containment",
+          "growth",
+          "innocence",
+          "fertility",
+          "beauty",
+          "dissolution",
+          "void",
+          "star",
+          "unknown",
+          "invitation",
+          "door",
+          "breath",
+          "lamp"
+        ]
+      }
+    },
+    "dreadAxisList": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "pursuit",
+          "bodyUnease",
+          "cosmicDread",
+          "disorientation",
+          "loss",
+          "watching",
+          "claustrophobia"
+        ]
+      }
     }
   }
 }

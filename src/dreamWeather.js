@@ -76,17 +76,17 @@ export function createDreamWeather(input = {}) {
   const ceiling = resolveCovenantCeiling(input.covenant);
   const hardBoundaries = getHardBoundaries(input.covenant);
   const requestedTags = normalizeAllowedTags(input.weatherTags);
+  const defaultTags = ['silence', 'threshold'];
   const baseTags = requestedTags.length > 0
     ? requestedTags
-    : ['silence', 'threshold'];
+    : defaultTags;
+  const candidateTags = uniqueTags([...defaultTags, ...baseTags]);
   const suppressedTags = normalizeAllowedTags([
     ...(input.suppressedTags ?? []),
-    ...baseTags.filter((tag) => hardBoundaries.includes(tag))
+    ...candidateTags.filter((tag) => hardBoundaries.includes(tag))
   ]);
   const weatherTags = uniqueTags([
-    'silence',
-    'threshold',
-    ...baseTags.filter((tag) => ALLOWED_RETURNED_TAGS.has(tag) && !hardBoundaries.includes(tag))
+    ...candidateTags.filter((tag) => ALLOWED_RETURNED_TAGS.has(tag) && !hardBoundaries.includes(tag))
   ]);
   const dreadBudget = normalizeDreadBudget(input.dreadBudget ?? createDefaultDreadBudget(rng, ceiling), ceiling);
 

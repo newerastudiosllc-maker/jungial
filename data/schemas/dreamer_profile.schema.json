@@ -57,8 +57,8 @@
         "motifs": { "$ref": "#/$defs/memoryMap" },
         "gestures": { "$ref": "#/$defs/memoryMap" },
         "echoThreads": { "$ref": "#/$defs/memoryMap" },
-        "weatherTags": { "$ref": "#/$defs/memoryMap" },
-        "dreadAxes": { "$ref": "#/$defs/memoryMap" },
+        "weatherTags": { "$ref": "#/$defs/weatherTagMemoryMap" },
+        "dreadAxes": { "$ref": "#/$defs/dreadAxisMemoryMap" },
         "lastSessionDigest": { "type": ["string", "null"] }
       },
       "additionalProperties": false
@@ -68,16 +68,83 @@
   "$defs": {
     "memoryMap": {
       "type": "object",
-      "additionalProperties": {
-        "type": "object",
-        "required": ["count", "weight", "lastSeenAt"],
-        "properties": {
-          "count": { "type": "integer", "minimum": 1 },
-          "weight": { "type": "number" },
-          "lastSeenAt": { "type": ["string", "null"] }
-        },
-        "additionalProperties": false
-      }
+      "additionalProperties": { "$ref": "#/$defs/memoryEntry" }
+    },
+    "weatherTagMemoryMap": {
+      "type": "object",
+      "propertyNames": {
+        "enum": [
+          "silence",
+          "threshold",
+          "soft_lamp",
+          "mirror",
+          "ash",
+          "mist",
+          "static",
+          "gravity",
+          "garden",
+          "warmth",
+          "cold",
+          "distant_voice",
+          "watching",
+          "boundless",
+          "contained",
+          "pursuit",
+          "bodyUnease",
+          "cosmicDread",
+          "disorientation",
+          "loss",
+          "claustrophobia",
+          "annihilation",
+          "rebirth",
+          "cosmic_mystery",
+          "reflection",
+          "shadow",
+          "self_observation",
+          "safety",
+          "memory",
+          "hearth",
+          "containment",
+          "growth",
+          "innocence",
+          "fertility",
+          "beauty",
+          "dissolution",
+          "void",
+          "star",
+          "unknown",
+          "invitation",
+          "door",
+          "breath",
+          "lamp"
+        ]
+      },
+      "additionalProperties": { "$ref": "#/$defs/memoryEntry" }
+    },
+    "dreadAxisMemoryMap": {
+      "type": "object",
+      "propertyNames": {
+        "enum": [
+          "pursuit",
+          "bodyUnease",
+          "cosmicDread",
+          "disorientation",
+          "loss",
+          "watching",
+          "claustrophobia"
+        ]
+      },
+      "additionalProperties": { "$ref": "#/$defs/memoryEntry" }
+    },
+    "memoryEntry": {
+      "type": "object",
+      "required": ["count", "weight", "lastSeenAt"],
+      "properties": {
+        "count": { "type": "integer", "minimum": 1 },
+        "weight": { "type": "number" },
+        "lastSeenAt": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
     }
   }
 }
