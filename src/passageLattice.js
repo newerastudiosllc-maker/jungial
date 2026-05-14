@@ -39,7 +39,8 @@ export function selectPassage({
   seed,
   recentEchoTraces = [],
   dreamerMemoryContext = null,
-  architectState = null
+  architectState = null,
+  dreamWeather = null
 } = {}) {
   const normalizedPassages = (passages?.length ? passages : [FALLBACK_PASSAGE]).map(normalizePassageForSelection);
   const recentIds = new Set(recentEchoTraces.slice(-4).map((trace) => trace.passageId));
@@ -55,7 +56,7 @@ export function selectPassage({
     .filter((passage) => !passage.pressureTags.some((tag) => hardBoundaries.has(tag)))
     .map((passage) => ({
       ...passage,
-      selectionWeight: scorePassage(passage, { covenant, softBoundaries, recentForms, dreamerMemoryContext, architectState })
+      selectionWeight: scorePassage(passage, { covenant, softBoundaries, recentForms, dreamerMemoryContext, architectState, dreamWeather })
     }))
     .filter((passage) => passage.selectionWeight > 0);
 
@@ -100,7 +101,7 @@ export function toGniPassageContext({ activePassage = null, recentEchoTraces = [
   };
 }
 
-function scorePassage(passage, { covenant, softBoundaries, recentForms, dreamerMemoryContext, architectState }) {
+function scorePassage(passage, { covenant, softBoundaries, recentForms, dreamerMemoryContext, architectState, dreamWeather }) {
   let weight = passage.baseWeight;
   if (passage.pressureTags.some((tag) => softBoundaries.has(tag))) {
     weight *= 0.35;
@@ -124,7 +125,42 @@ function scorePassage(passage, { covenant, softBoundaries, recentForms, dreamerM
       weight += Math.min(0.3, value * 0.05);
     }
   }
+  weight += scoreWeatherAffinity(passage, dreamWeather);
   return Number(Math.max(0, weight).toFixed(3));
+}
+
+function scoreWeatherAffinity(passage, dreamWeather) {
+  if (!dreamWeather) {
+    return 0;
+  }
+
+  const passageTags = new Set([
+    ...passage.motifs,
+    ...passage.pressureTags,
+    ...passage.formTags
+  ]);
+  let affinity = 0;
+
+  for (const tag of dreamWeather.weatherTags ?? []) {
+    if (passageTags.has(tag)) {
+      affinity += 0.12;
+    }
+  }
+  if ((dreamWeather.dreadBudget?.cosmicDread ?? 0) > 0.4 && hasAnyTag(passageTags, ['void', 'star', 'cosmic_mystery'])) {
+    affinity += 0.35;
+  }
+  if ((dreamWeather.dreadBudget?.watching ?? 0) > 0.35 && hasAnyTag(passageTags, ['mirror', 'shadow'])) {
+    affinity += 0.2;
+  }
+  if ((dreamWeather.dreadBudget?.claustrophobia ?? 0) > 0.35 && passageTags.has('contained')) {
+    affinity -= 0.12;
+  }
+
+  return affinity;
+}
+
+function hasAnyTag(tagSet, tags) {
+  return tags.some((tag) => tagSet.has(tag));
 }
 
 function passageAllowedByCeiling(passage, ceiling) {
