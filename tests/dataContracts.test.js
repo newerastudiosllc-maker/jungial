@@ -514,6 +514,38 @@ test('Dreamer profile validation requires weather aggregate memory maps', () => 
   ]);
 });
 
+test('Dreamer profile validation rejects missing weather aggregate memory maps', () => {
+  const result = validateDreamerProfile({
+    schema: 'DreamerProfileV1',
+    schemaVersion: 1,
+    profileId: 'dreamer-one',
+    rootSeed: 'root-seed-one',
+    createdAt: '2060-01-01T00:00:00.000Z',
+    updatedAt: '2060-01-01T00:00:00.000Z',
+    consent: { profileMemory: true, crossSaveEchoes: false },
+    memory: {
+      sessionCount: 0,
+      symbols: {},
+      archetypes: {},
+      actions: {},
+      dreamModules: {},
+      masks: {},
+      vibeStates: {},
+      passages: {},
+      motifs: {},
+      gestures: {},
+      echoThreads: {},
+      lastSessionDigest: null
+    }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'memory.weatherTags must be an object',
+    'memory.dreadAxes must be an object'
+  ]);
+});
+
 test('GNI request validation checks optional Dreamer memory context', () => {
   const result = validateGniProcessingRequest({
     schema: 'GniProcessingRequestV1',
