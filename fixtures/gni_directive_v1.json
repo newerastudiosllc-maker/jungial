@@ -1,0 +1,18 @@
+{
+  "schema": "JungialDirectiveV1",
+  "schemaVersion": 1,
+  "dreamWeightDeltas": {
+    "white_void": 0.361
+  },
+  "symbolEchoes": [
+    "light"
+  ],
+  "maskPressure": {
+    "double": 0.294
+  },
+  "pacingDelta": {
+    "intensity": 0.108,
+    "repetition": 0,
+    "silence": 0.02
+  }
+}

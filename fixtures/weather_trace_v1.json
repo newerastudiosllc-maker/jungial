@@ -1,0 +1,19 @@
+{
+  "schema": "WeatherTraceV1",
+  "schemaVersion": 1,
+  "traceId": "weather-trace-777",
+  "weatherId": "weather-777",
+  "mood": "stillness",
+  "pressure": "low",
+  "sourceTags": [
+    "threshold",
+    "memory"
+  ],
+  "resultingTags": [
+    "silence",
+    "threshold",
+    "memory"
+  ],
+  "suppressedTags": [],
+  "strongestDreadAxis": "cosmicDread"
+}

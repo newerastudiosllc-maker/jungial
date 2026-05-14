@@ -1,0 +1,173 @@
+{
+  "schema": "DreamerProfileV1",
+  "schemaVersion": 1,
+  "profileId": "fixture-dreamer",
+  "rootSeed": "fixture-root-seed",
+  "createdAt": "2060-01-01T00:00:00.000Z",
+  "updatedAt": "2060-01-01T00:00:01.000Z",
+  "consent": {
+    "profileMemory": true,
+    "crossSaveEchoes": false
+  },
+  "memory": {
+    "sessionCount": 1,
+    "symbols": {
+      "light": {
+        "count": 1,
+        "weight": 1,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "threshold": {
+        "count": 1,
+        "weight": 1,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "silence": {
+        "count": 2,
+        "weight": 2,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "awakening": {
+        "count": 1,
+        "weight": 1,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "portal": {
+        "count": 1,
+        "weight": 1,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "boundlessness": {
+        "count": 1,
+        "weight": 1,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "dissolution": {
+        "count": 1,
+        "weight": 1,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "annihilation": {
+        "count": 1,
+        "weight": 1,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "rebirth": {
+        "count": 1,
+        "weight": 1,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "cosmic mystery": {
+        "count": 1,
+        "weight": 1,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      }
+    },
+    "archetypes": {
+      "Hero": {
+        "count": 1,
+        "weight": 0.15,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "Shadow": {
+        "count": 1,
+        "weight": 0,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "Anima": {
+        "count": 1,
+        "weight": 0.1,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "Animus": {
+        "count": 1,
+        "weight": 0,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "Sage": {
+        "count": 1,
+        "weight": 0.25,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "Trickster": {
+        "count": 1,
+        "weight": 0,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "Creator": {
+        "count": 1,
+        "weight": 2.15,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "Destroyer": {
+        "count": 1,
+        "weight": 0,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "Child": {
+        "count": 1,
+        "weight": 0.15,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "Mother": {
+        "count": 1,
+        "weight": 0,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "Father": {
+        "count": 1,
+        "weight": 0,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "Lover": {
+        "count": 1,
+        "weight": 0,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "Seeker": {
+        "count": 1,
+        "weight": 2.75,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      }
+    },
+    "actions": {
+      "awaken_heartlight": {
+        "count": 1,
+        "weight": 1,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "open_portal": {
+        "count": 1,
+        "weight": 1,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      }
+    },
+    "dreamModules": {
+      "white_void": {
+        "count": 1,
+        "weight": 1,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      },
+      "space_black_hole": {
+        "count": 1,
+        "weight": 1,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      }
+    },
+    "masks": {},
+    "vibeStates": {
+      "calm_hopeful_boundless_bright_warm": {
+        "count": 1,
+        "weight": 1,
+        "lastSeenAt": "2060-01-01T00:00:01.000Z"
+      }
+    },
+    "passages": {},
+    "motifs": {},
+    "gestures": {},
+    "echoThreads": {},
+    "weatherTags": {},
+    "dreadAxes": {},
+    "lastSessionDigest": "b106fb2190dfad0dce6284c035cfc2c2536c04173e862545d074c421f641b925"
+  }
+}

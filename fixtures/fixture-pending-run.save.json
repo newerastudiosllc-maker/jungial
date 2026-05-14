@@ -1,0 +1,1550 @@
+{
+  "schema": "JungialSaveGame",
+  "version": 1,
+  "savedAt": "2060-01-01T00:00:04.000Z",
+  "migrations": [],
+  "payload": {
+    "room": {
+      "note": "the word",
+      "awakened": true,
+      "boundaryState": "boundless",
+      "portalOpen": true,
+      "heartlight": {
+        "awake": true,
+        "intensity": 1,
+        "color": "pearl-gold placeholder"
+      },
+      "visibleToolSigils": [
+        {
+          "id": "key_of_portals",
+          "name": "Key of Portals",
+          "effect": "opens_dream_transition"
+        },
+        {
+          "id": "glyph_quill",
+          "name": "Glyph Quill",
+          "effect": "writes_journal_placeholder"
+        },
+        {
+          "id": "mirror_lens",
+          "name": "Mirror Lens",
+          "effect": "changes_visual_mood"
+        },
+        {
+          "id": "lamp_of_forms",
+          "name": "Lamp of Forms",
+          "effect": "spawns_forms_lights_mirrors"
+        }
+      ],
+      "spawnedForms": []
+    },
+    "archetypeState": {
+      "archetype_vector": {
+        "Hero": 0.15,
+        "Shadow": 0,
+        "Anima": 0.1,
+        "Animus": 0,
+        "Sage": 0.25,
+        "Trickster": 0,
+        "Creator": 2.15,
+        "Destroyer": 0,
+        "Child": 0.15,
+        "Mother": 0,
+        "Father": 0,
+        "Lover": 0,
+        "Seeker": 2.7499999999999996
+      },
+      "coherence": 0.578,
+      "vibe_state": "silent",
+      "symbol_hits": {
+        "threshold": 1,
+        "silence": 1,
+        "light": 2,
+        "awakening": 1,
+        "portal": 1
+      },
+      "speech_events": [
+        {
+          "text": "the word",
+          "symbols": [
+            "threshold",
+            "silence",
+            "light"
+          ],
+          "timestamp": "2060-01-01T00:00:00.000Z"
+        }
+      ],
+      "action_events": [
+        {
+          "name": "awaken_heartlight",
+          "archetypes": [
+            "Creator",
+            "Seeker"
+          ],
+          "symbols": [
+            "awakening",
+            "light"
+          ],
+          "timestamp": "2060-01-01T00:00:01.000Z"
+        },
+        {
+          "name": "open_portal",
+          "archetypes": [
+            "Seeker"
+          ],
+          "symbols": [
+            "portal"
+          ],
+          "timestamp": "2060-01-01T00:00:02.000Z"
+        }
+      ],
+      "room_config_snapshot": {
+        "note": "the word",
+        "awakened": true,
+        "boundaryState": "boundless",
+        "portalOpen": false,
+        "heartlight": {
+          "awake": true,
+          "intensity": 1,
+          "color": "pearl-gold placeholder"
+        },
+        "visibleToolSigils": [
+          {
+            "id": "key_of_portals",
+            "name": "Key of Portals",
+            "effect": "opens_dream_transition"
+          },
+          {
+            "id": "glyph_quill",
+            "name": "Glyph Quill",
+            "effect": "writes_journal_placeholder"
+          },
+          {
+            "id": "mirror_lens",
+            "name": "Mirror Lens",
+            "effect": "changes_visual_mood"
+          },
+          {
+            "id": "lamp_of_forms",
+            "name": "Lamp of Forms",
+            "effect": "spawns_forms_lights_mirrors"
+          }
+        ],
+        "spawnedForms": []
+      }
+    },
+    "feelingState": {
+      "axes": {
+        "calm_tense": -0.2,
+        "hopeful_melancholic": 0.25,
+        "expansive_confined": 0.7,
+        "bright_dark": 0.55,
+        "warm_cold": -0.25
+      },
+      "vibe_state": "calm_hopeful_boundless_bright_warm"
+    },
+    "journal": {
+      "entries": [
+        {
+          "id": "journal_001",
+          "title": "Mirror 1",
+          "symbols": [
+            "boundlessness",
+            "dissolution",
+            "silence",
+            "annihilation",
+            "rebirth",
+            "cosmic mystery"
+          ],
+          "actions": [
+            "awaken_heartlight",
+            "open_portal"
+          ],
+          "dominantArchetype": "Seeker",
+          "vibeState": "calm_hopeful_boundless_bright_warm",
+          "text": "I returned with boundlessness, dissolution, silence, annihilation. The Seeker current moved beneath awaken_heartlight, open_portal. The room remembered me as calm_hopeful_boundless_bright_warm. entry, pressure, mirror, return folded into one path.",
+          "createdAt": "2060-01-01T00:00:03.000Z"
+        }
+      ],
+      "lexiconOfSymbols": {
+        "boundlessness": {
+          "symbol": "boundlessness",
+          "sightings": 1,
+          "note": "Meaning waits for repetition."
+        },
+        "dissolution": {
+          "symbol": "dissolution",
+          "sightings": 1,
+          "note": "Meaning waits for repetition."
+        },
+        "silence": {
+          "symbol": "silence",
+          "sightings": 1,
+          "note": "Meaning waits for repetition."
+        },
+        "annihilation": {
+          "symbol": "annihilation",
+          "sightings": 1,
+          "note": "Meaning waits for repetition."
+        },
+        "rebirth": {
+          "symbol": "rebirth",
+          "sightings": 1,
+          "note": "Meaning waits for repetition."
+        },
+        "cosmic mystery": {
+          "symbol": "cosmic mystery",
+          "sightings": 1,
+          "note": "Meaning waits for repetition."
+        }
+      },
+      "playerNotes": [],
+      "unlockedBooks": []
+    },
+    "architectState": {
+      "globalDreamWeights": {
+        "white_void": 1.2
+      },
+      "symbolFrequency": {
+        "light": 1,
+        "threshold": 1,
+        "silence": 1,
+        "awakening": 1,
+        "portal": 1
+      },
+      "pacingProfile": {
+        "intensity": 0.25,
+        "repetition": 0.12,
+        "silence": 0.59
+      },
+      "futureDreamModuleWeights": {
+        "symbol:boundlessness": 1.1,
+        "symbol:dissolution": 1.1,
+        "symbol:silence": 1.1
+      },
+      "maskPressure": {}
+    },
+    "dreamJourney": {
+      "schema": "DreamJourneyV1",
+      "beats": [
+        {
+          "role": "entry",
+          "moduleId": "white_void",
+          "moduleName": "Boundless White Void",
+          "symbolicTags": [
+            "boundlessness",
+            "dissolution",
+            "silence"
+          ],
+          "weightBreakdown": {
+            "base": 1,
+            "archetype": 2.69,
+            "vibe": 1.005,
+            "room": 0.25,
+            "portal": 0.35,
+            "directorMultiplier": 1,
+            "total": 5.295,
+            "roll": 8.64349
+          }
+        },
+        {
+          "role": "pressure",
+          "moduleId": "space_black_hole",
+          "moduleName": "Space / Black Hole",
+          "symbolicTags": [
+            "annihilation",
+            "rebirth",
+            "cosmic mystery"
+          ],
+          "weightBreakdown": {
+            "base": 1,
+            "archetype": 2.325,
+            "vibe": -0.038,
+            "room": 0.25,
+            "portal": 0.35,
+            "directorMultiplier": 1,
+            "total": 3.887,
+            "roll": 12.15426
+          }
+        },
+        {
+          "role": "mirror",
+          "moduleId": "space_black_hole",
+          "moduleName": "Space / Black Hole",
+          "symbolicTags": [
+            "annihilation",
+            "rebirth",
+            "cosmic mystery"
+          ],
+          "weightBreakdown": {
+            "base": 1,
+            "archetype": 2.325,
+            "vibe": -0.038,
+            "room": 0.25,
+            "portal": 0.35,
+            "directorMultiplier": 1,
+            "total": 3.887,
+            "roll": 13.48119
+          }
+        },
+        {
+          "role": "return",
+          "moduleId": "white_void",
+          "moduleName": "Boundless White Void",
+          "symbolicTags": [
+            "boundlessness",
+            "dissolution",
+            "silence"
+          ],
+          "weightBreakdown": {
+            "base": 1,
+            "archetype": 2.69,
+            "vibe": 1.005,
+            "room": 0.25,
+            "portal": 0.35,
+            "directorMultiplier": 1,
+            "total": 5.295,
+            "roll": 6.91199
+          }
+        }
+      ],
+      "symbolTrail": [
+        "boundlessness",
+        "dissolution",
+        "silence",
+        "annihilation",
+        "rebirth",
+        "cosmic mystery"
+      ],
+      "summary": "entry:Boundless White Void -> pressure:Space / Black Hole -> mirror:Space / Black Hole -> return:Boundless White Void"
+    },
+    "symbolGrammar": {
+      "recurrence": {
+        "boundlessness": 1,
+        "dissolution": 1,
+        "silence": 1,
+        "annihilation": 1,
+        "rebirth": 1,
+        "cosmic mystery": 1
+      },
+      "symbolicTension": 0,
+      "contradictions": [],
+      "echoes": []
+    },
+    "thresholdPresentation": {
+      "schema": "ThresholdPresentationV1",
+      "room": {
+        "awakened": true,
+        "boundaryState": "boundless",
+        "atmosphereState": "calm_hopeful_boundless_bright_warm"
+      },
+      "note": {
+        "text": "the word",
+        "visible": true,
+        "material": "ink_warmed_by_heartlight"
+      },
+      "heartlight": {
+        "awake": true,
+        "intensity": 1,
+        "color": "pearl-gold placeholder",
+        "bloom": 0.815
+      },
+      "portal": {
+        "open": true,
+        "material": "threshold_rim_light"
+      },
+      "toolSigils": {
+        "visible": [
+          {
+            "id": "key_of_portals",
+            "name": "Key of Portals",
+            "effect": "opens_dream_transition",
+            "material": "key_of_portals_sigil_placeholder"
+          },
+          {
+            "id": "glyph_quill",
+            "name": "Glyph Quill",
+            "effect": "writes_journal_placeholder",
+            "material": "glyph_quill_sigil_placeholder"
+          },
+          {
+            "id": "mirror_lens",
+            "name": "Mirror Lens",
+            "effect": "changes_visual_mood",
+            "material": "mirror_lens_sigil_placeholder"
+          },
+          {
+            "id": "lamp_of_forms",
+            "name": "Lamp of Forms",
+            "effect": "spawns_forms_lights_mirrors",
+            "material": "lamp_of_forms_sigil_placeholder"
+          }
+        ]
+      },
+      "forms": [],
+      "atmosphere": {
+        "lighting": {
+          "intensity": 1.357,
+          "colorTemperature": 5950,
+          "placeholder": "UE LightComponent intensity/color"
+        },
+        "fog": {
+          "density": 0.21,
+          "placeholder": "UE ExponentialHeightFog density"
+        },
+        "postProcess": {
+          "bloom": 0.815,
+          "exposure": 1.12,
+          "placeholder": "UE PostProcessVolume bloom/exposure"
+        },
+        "audio": {
+          "parameterMood": "calm_hopeful_boundless_bright_warm",
+          "placeholder": "ambient_calm_hopeful_boundless_bright_warm"
+        },
+        "movement": {
+          "feel": "drifting, slow acceleration placeholder",
+          "gravityScale": 0.825
+        },
+        "thermalHint": "warm"
+      }
+    },
+    "trace": {
+      "schema": "JungialTraceV1",
+      "runId": "trace_0001",
+      "entries": [
+        {
+          "index": 1,
+          "at": "2060-01-01T00:00:00.000Z",
+          "type": "simulation.started",
+          "payload": {
+            "seed": 777,
+            "emulateGni": false,
+            "hasGniResponse": false
+          }
+        },
+        {
+          "index": 2,
+          "at": "2060-01-01T00:00:01.000Z",
+          "type": "threshold.input",
+          "payload": {
+            "kind": "speech",
+            "text": "the word"
+          }
+        },
+        {
+          "index": 3,
+          "at": "2060-01-01T00:00:02.000Z",
+          "type": "threshold.awakened",
+          "payload": {
+            "room": {
+              "note": "the word",
+              "awakened": true,
+              "boundaryState": "boundless",
+              "portalOpen": false,
+              "heartlight": {
+                "awake": true,
+                "intensity": 1,
+                "color": "pearl-gold placeholder"
+              },
+              "visibleToolSigils": [
+                {
+                  "id": "key_of_portals",
+                  "name": "Key of Portals",
+                  "effect": "opens_dream_transition"
+                },
+                {
+                  "id": "glyph_quill",
+                  "name": "Glyph Quill",
+                  "effect": "writes_journal_placeholder"
+                },
+                {
+                  "id": "mirror_lens",
+                  "name": "Mirror Lens",
+                  "effect": "changes_visual_mood"
+                },
+                {
+                  "id": "lamp_of_forms",
+                  "name": "Lamp of Forms",
+                  "effect": "spawns_forms_lights_mirrors"
+                }
+              ],
+              "spawnedForms": []
+            },
+            "vibeState": "calm_hopeful_boundless_bright_warm",
+            "dominantArchetype": "Creator"
+          }
+        },
+        {
+          "index": 4,
+          "at": "2060-01-01T00:00:03.000Z",
+          "type": "portal.opened",
+          "payload": {
+            "room": {
+              "note": "the word",
+              "awakened": true,
+              "boundaryState": "boundless",
+              "portalOpen": true,
+              "heartlight": {
+                "awake": true,
+                "intensity": 1,
+                "color": "pearl-gold placeholder"
+              },
+              "visibleToolSigils": [
+                {
+                  "id": "key_of_portals",
+                  "name": "Key of Portals",
+                  "effect": "opens_dream_transition"
+                },
+                {
+                  "id": "glyph_quill",
+                  "name": "Glyph Quill",
+                  "effect": "writes_journal_placeholder"
+                },
+                {
+                  "id": "mirror_lens",
+                  "name": "Mirror Lens",
+                  "effect": "changes_visual_mood"
+                },
+                {
+                  "id": "lamp_of_forms",
+                  "name": "Lamp of Forms",
+                  "effect": "spawns_forms_lights_mirrors"
+                }
+              ],
+              "spawnedForms": []
+            }
+          }
+        },
+        {
+          "index": 5,
+          "at": "2060-01-01T00:00:04.000Z",
+          "type": "passage.gathered",
+          "payload": {
+            "passageId": "candle_refuses_dark",
+            "motifs": [
+              "light",
+              "threshold",
+              "memory"
+            ],
+            "intensityBand": "gentle"
+          }
+        },
+        {
+          "index": 6,
+          "at": "2060-01-01T00:00:05.000Z",
+          "type": "echo.trace.created",
+          "payload": {
+            "schema": "EchoTraceV1",
+            "schemaVersion": 1,
+            "passageId": "candle_refuses_dark",
+            "motifsTouched": [
+              "light",
+              "threshold",
+              "memory"
+            ],
+            "gestureTags": [
+              "approached",
+              "approach"
+            ],
+            "tempo": "unhurried",
+            "pressureAccepted": 0.4,
+            "returnAnchorUsed": false,
+            "boundarySignals": [],
+            "dreamflowDeltas": {}
+          }
+        },
+        {
+          "index": 7,
+          "at": "2060-01-01T00:00:06.000Z",
+          "type": "dream.journey.selected",
+          "payload": {
+            "summary": "entry:Boundless White Void -> pressure:Space / Black Hole -> mirror:Space / Black Hole -> return:Boundless White Void",
+            "symbolTrail": [
+              "boundlessness",
+              "dissolution",
+              "silence",
+              "annihilation",
+              "rebirth",
+              "cosmic mystery"
+            ],
+            "beats": [
+              {
+                "role": "entry",
+                "moduleId": "white_void",
+                "moduleName": "Boundless White Void",
+                "symbolicTags": [
+                  "boundlessness",
+                  "dissolution",
+                  "silence"
+                ],
+                "weightBreakdown": {
+                  "base": 1,
+                  "archetype": 2.69,
+                  "vibe": 1.005,
+                  "room": 0.25,
+                  "portal": 0.35,
+                  "directorMultiplier": 1,
+                  "total": 5.295,
+                  "roll": 8.64349
+                }
+              },
+              {
+                "role": "pressure",
+                "moduleId": "space_black_hole",
+                "moduleName": "Space / Black Hole",
+                "symbolicTags": [
+                  "annihilation",
+                  "rebirth",
+                  "cosmic mystery"
+                ],
+                "weightBreakdown": {
+                  "base": 1,
+                  "archetype": 2.325,
+                  "vibe": -0.038,
+                  "room": 0.25,
+                  "portal": 0.35,
+                  "directorMultiplier": 1,
+                  "total": 3.887,
+                  "roll": 12.15426
+                }
+              },
+              {
+                "role": "mirror",
+                "moduleId": "space_black_hole",
+                "moduleName": "Space / Black Hole",
+                "symbolicTags": [
+                  "annihilation",
+                  "rebirth",
+                  "cosmic mystery"
+                ],
+                "weightBreakdown": {
+                  "base": 1,
+                  "archetype": 2.325,
+                  "vibe": -0.038,
+                  "room": 0.25,
+                  "portal": 0.35,
+                  "directorMultiplier": 1,
+                  "total": 3.887,
+                  "roll": 13.48119
+                }
+              },
+              {
+                "role": "return",
+                "moduleId": "white_void",
+                "moduleName": "Boundless White Void",
+                "symbolicTags": [
+                  "boundlessness",
+                  "dissolution",
+                  "silence"
+                ],
+                "weightBreakdown": {
+                  "base": 1,
+                  "archetype": 2.69,
+                  "vibe": 1.005,
+                  "room": 0.25,
+                  "portal": 0.35,
+                  "directorMultiplier": 1,
+                  "total": 5.295,
+                  "roll": 6.91199
+                }
+              }
+            ]
+          }
+        },
+        {
+          "index": 8,
+          "at": "2060-01-01T00:00:07.000Z",
+          "type": "dream.weather.created",
+          "payload": {
+            "weatherId": "weather-777",
+            "traceId": "weather-trace-777",
+            "mood": "stillness",
+            "pressure": "low",
+            "weatherTags": [
+              "silence",
+              "threshold",
+              "dissolution",
+              "memory"
+            ],
+            "sourceTags": [
+              "dissolution",
+              "silence",
+              "threshold",
+              "memory"
+            ],
+            "suppressedTags": []
+          }
+        },
+        {
+          "index": 9,
+          "at": "2060-01-01T00:00:08.000Z",
+          "type": "mask.selected",
+          "payload": {
+            "maskId": "double",
+            "maskName": "Double",
+            "spawnTrigger": {
+              "coherence": 0.578,
+              "matchedArchetypes": [
+                "Seeker",
+                "Hero"
+              ]
+            }
+          }
+        },
+        {
+          "index": 10,
+          "at": "2060-01-01T00:00:09.000Z",
+          "type": "journal.entry.written",
+          "payload": {
+            "entryId": "journal_001",
+            "symbols": [
+              "boundlessness",
+              "dissolution",
+              "silence",
+              "annihilation",
+              "rebirth",
+              "cosmic mystery"
+            ],
+            "dominantArchetype": "Seeker",
+            "vibeState": "calm_hopeful_boundless_bright_warm"
+          }
+        },
+        {
+          "index": 11,
+          "at": "2060-01-01T00:00:10.000Z",
+          "type": "witness.bundle.created",
+          "payload": {
+            "sessionId": "session_0001",
+            "dominantArchetype": "Seeker",
+            "coherence": 0.578,
+            "recentSymbols": [
+              "light",
+              "threshold",
+              "silence",
+              "awakening",
+              "portal"
+            ]
+          }
+        },
+        {
+          "index": 12,
+          "at": "2060-01-01T00:00:11.000Z",
+          "type": "gni.request.created",
+          "payload": {
+            "provider": "GNI",
+            "endpoint": "gni://local-dev-placeholder",
+            "contract": {
+              "inputFormat": "SessionBundleV1",
+              "outputFormat": "JungialDirectiveV1",
+              "allowedDirectives": [
+                "adjust_dream_weights",
+                "suggest_symbol_echo",
+                "suggest_mask_pressure",
+                "nudge_pacing"
+              ]
+            },
+            "sessionId": "session_0001"
+          }
+        },
+        {
+          "index": 13,
+          "at": "2060-01-01T00:00:12.000Z",
+          "type": "gni.request.queued",
+          "payload": {
+            "id": "gni_pending_session_0001",
+            "reason": "pending",
+            "sessionId": "session_0001"
+          }
+        },
+        {
+          "index": 14,
+          "at": "2060-01-01T00:00:13.000Z",
+          "type": "simulation.saved",
+          "payload": {
+            "savePath": "fixtures\\fixture-pending-run.save.json",
+            "tracePath": null
+          }
+        }
+      ]
+    },
+    "lastSessionBundle": {
+      "schema": "SessionBundleV1",
+      "schemaVersion": 1,
+      "sessionId": "session_0001",
+      "dominantArchetype": "Seeker",
+      "coherence": 0.578,
+      "vibeState": "calm_hopeful_boundless_bright_warm",
+      "recentSymbols": [
+        "light",
+        "threshold",
+        "silence",
+        "awakening",
+        "portal"
+      ],
+      "recentActions": [
+        "awaken_heartlight",
+        "open_portal"
+      ],
+      "roomConfigSnapshot": {
+        "note": "the word",
+        "awakened": true,
+        "boundaryState": "boundless",
+        "portalOpen": true,
+        "heartlight": {
+          "awake": true,
+          "intensity": 1,
+          "color": "pearl-gold placeholder"
+        },
+        "visibleToolSigils": [
+          {
+            "id": "key_of_portals",
+            "name": "Key of Portals",
+            "effect": "opens_dream_transition"
+          },
+          {
+            "id": "glyph_quill",
+            "name": "Glyph Quill",
+            "effect": "writes_journal_placeholder"
+          },
+          {
+            "id": "mirror_lens",
+            "name": "Mirror Lens",
+            "effect": "changes_visual_mood"
+          },
+          {
+            "id": "lamp_of_forms",
+            "name": "Lamp of Forms",
+            "effect": "spawns_forms_lights_mirrors"
+          }
+        ],
+        "spawnedForms": []
+      },
+      "selectedDream": {
+        "id": "white_void",
+        "name": "Boundless White Void",
+        "symbolicTags": [
+          "boundlessness",
+          "dissolution",
+          "silence"
+        ],
+        "weightBreakdown": {
+          "base": 1,
+          "archetype": 2.69,
+          "vibe": 1.005,
+          "room": 0.25,
+          "portal": 0.35,
+          "directorMultiplier": 1,
+          "total": 5.295,
+          "roll": 8.64349
+        }
+      },
+      "archetypeVector": {
+        "Hero": 0.15,
+        "Shadow": 0,
+        "Anima": 0.1,
+        "Animus": 0,
+        "Sage": 0.25,
+        "Trickster": 0,
+        "Creator": 2.15,
+        "Destroyer": 0,
+        "Child": 0.15,
+        "Mother": 0,
+        "Father": 0,
+        "Lover": 0,
+        "Seeker": 2.7499999999999996
+      },
+      "sessionCovenant": {
+        "schema": "SessionCovenantV1",
+        "schemaVersion": 1,
+        "mode": "tonight_shape",
+        "toneTags": [
+          "gentle",
+          "strange"
+        ],
+        "intensityCeiling": 0.35,
+        "hardBoundaryTags": [
+          "real_world_self_harm"
+        ],
+        "softBoundaryTags": [],
+        "allowedPressureTags": [],
+        "returnAnchor": {
+          "kind": "image",
+          "value": "the note in the Threshold Chamber"
+        },
+        "groundingPreference": "quiet_room",
+        "memoryScope": "session_only"
+      },
+      "passageContext": {
+        "schema": "PassageContextV1",
+        "schemaVersion": 1,
+        "activePassageId": "candle_refuses_dark",
+        "recentMotifs": [
+          "light",
+          "threshold",
+          "memory"
+        ],
+        "recentGestureTags": [
+          "approached",
+          "approach"
+        ],
+        "echoThreadIds": []
+      },
+      "dreamWeatherContext": {
+        "schema": "DreamWeatherContextV1",
+        "schemaVersion": 1,
+        "weatherTags": [
+          "silence",
+          "threshold",
+          "dissolution",
+          "memory"
+        ],
+        "pressure": "low",
+        "dreadBudget": {
+          "pursuit": 0.103,
+          "bodyUnease": 0.145,
+          "cosmicDread": 0.161,
+          "disorientation": 0.083,
+          "loss": 0.044,
+          "watching": 0.114,
+          "claustrophobia": 0.05
+        },
+        "suppressedTags": []
+      }
+    },
+    "pendingGniRequest": {
+      "schema": "GniProcessingRequestV1",
+      "schemaVersion": 1,
+      "provider": "GNI",
+      "endpoint": "gni://local-dev-placeholder",
+      "model": "gni-dream-director-dev",
+      "contract": {
+        "inputFormat": "SessionBundleV1",
+        "outputFormat": "JungialDirectiveV1",
+        "allowedDirectives": [
+          "adjust_dream_weights",
+          "suggest_symbol_echo",
+          "suggest_mask_pressure",
+          "nudge_pacing"
+        ]
+      },
+      "payload": {
+        "schema": "SessionBundleV1",
+        "schemaVersion": 1,
+        "sessionId": "session_0001",
+        "dominantArchetype": "Seeker",
+        "vibeState": "calm_hopeful_boundless_bright_warm",
+        "coherence": 0.578,
+        "recentSymbols": [
+          "light",
+          "threshold",
+          "silence",
+          "awakening",
+          "portal"
+        ],
+        "recentActions": [
+          "awaken_heartlight",
+          "open_portal"
+        ],
+        "roomConfigSnapshot": {
+          "note": "the word",
+          "awakened": true,
+          "boundaryState": "boundless",
+          "portalOpen": true,
+          "heartlight": {
+            "awake": true,
+            "intensity": 1,
+            "color": "pearl-gold placeholder"
+          },
+          "visibleToolSigils": [
+            {
+              "id": "key_of_portals",
+              "name": "Key of Portals",
+              "effect": "opens_dream_transition"
+            },
+            {
+              "id": "glyph_quill",
+              "name": "Glyph Quill",
+              "effect": "writes_journal_placeholder"
+            },
+            {
+              "id": "mirror_lens",
+              "name": "Mirror Lens",
+              "effect": "changes_visual_mood"
+            },
+            {
+              "id": "lamp_of_forms",
+              "name": "Lamp of Forms",
+              "effect": "spawns_forms_lights_mirrors"
+            }
+          ],
+          "spawnedForms": []
+        },
+        "selectedDream": {
+          "id": "white_void",
+          "name": "Boundless White Void",
+          "symbolicTags": [
+            "boundlessness",
+            "dissolution",
+            "silence"
+          ],
+          "weightBreakdown": {
+            "base": 1,
+            "archetype": 2.69,
+            "vibe": 1.005,
+            "room": 0.25,
+            "portal": 0.35,
+            "directorMultiplier": 1,
+            "total": 5.295,
+            "roll": 8.64349
+          }
+        },
+        "archetypeVector": {
+          "Hero": 0.15,
+          "Shadow": 0,
+          "Anima": 0.1,
+          "Animus": 0,
+          "Sage": 0.25,
+          "Trickster": 0,
+          "Creator": 2.15,
+          "Destroyer": 0,
+          "Child": 0.15,
+          "Mother": 0,
+          "Father": 0,
+          "Lover": 0,
+          "Seeker": 2.7499999999999996
+        },
+        "sessionCovenant": {
+          "schema": "SessionCovenantV1",
+          "schemaVersion": 1,
+          "mode": "tonight_shape",
+          "toneTags": [
+            "gentle",
+            "strange"
+          ],
+          "intensityCeiling": 0.35,
+          "hardBoundaryTags": [
+            "real_world_self_harm"
+          ],
+          "softBoundaryTags": [],
+          "allowedPressureTags": [],
+          "returnAnchor": {
+            "kind": "image",
+            "value": "redacted_anchor"
+          },
+          "groundingPreference": "quiet_room",
+          "memoryScope": "session_only"
+        },
+        "passageContext": {
+          "schema": "PassageContextV1",
+          "schemaVersion": 1,
+          "activePassageId": "candle_refuses_dark",
+          "recentMotifs": [
+            "light",
+            "threshold",
+            "memory"
+          ],
+          "recentGestureTags": [
+            "approached",
+            "approach"
+          ],
+          "echoThreadIds": []
+        },
+        "dreamWeatherContext": {
+          "schema": "DreamWeatherContextV1",
+          "schemaVersion": 1,
+          "weatherTags": [
+            "silence",
+            "threshold",
+            "dissolution",
+            "memory"
+          ],
+          "pressure": "low",
+          "dreadBudget": {
+            "pursuit": 0.103,
+            "bodyUnease": 0.145,
+            "cosmicDread": 0.161,
+            "disorientation": 0.083,
+            "loss": 0.044,
+            "watching": 0.114,
+            "claustrophobia": 0.05
+          },
+          "suppressedTags": []
+        }
+      }
+    },
+    "gniQueue": {
+      "schema": "GniDirectiveQueueV1",
+      "pending": [
+        {
+          "id": "gni_pending_session_0001",
+          "status": "pending",
+          "reason": "pending",
+          "attempts": 1,
+          "createdAt": null,
+          "updatedAt": null,
+          "providerJob": null,
+          "request": {
+            "schema": "GniProcessingRequestV1",
+            "schemaVersion": 1,
+            "provider": "GNI",
+            "endpoint": "gni://local-dev-placeholder",
+            "model": "gni-dream-director-dev",
+            "contract": {
+              "inputFormat": "SessionBundleV1",
+              "outputFormat": "JungialDirectiveV1",
+              "allowedDirectives": [
+                "adjust_dream_weights",
+                "suggest_symbol_echo",
+                "suggest_mask_pressure",
+                "nudge_pacing"
+              ]
+            },
+            "payload": {
+              "schema": "SessionBundleV1",
+              "schemaVersion": 1,
+              "sessionId": "session_0001",
+              "dominantArchetype": "Seeker",
+              "vibeState": "calm_hopeful_boundless_bright_warm",
+              "coherence": 0.578,
+              "recentSymbols": [
+                "light",
+                "threshold",
+                "silence",
+                "awakening",
+                "portal"
+              ],
+              "recentActions": [
+                "awaken_heartlight",
+                "open_portal"
+              ],
+              "roomConfigSnapshot": {
+                "note": "the word",
+                "awakened": true,
+                "boundaryState": "boundless",
+                "portalOpen": true,
+                "heartlight": {
+                  "awake": true,
+                  "intensity": 1,
+                  "color": "pearl-gold placeholder"
+                },
+                "visibleToolSigils": [
+                  {
+                    "id": "key_of_portals",
+                    "name": "Key of Portals",
+                    "effect": "opens_dream_transition"
+                  },
+                  {
+                    "id": "glyph_quill",
+                    "name": "Glyph Quill",
+                    "effect": "writes_journal_placeholder"
+                  },
+                  {
+                    "id": "mirror_lens",
+                    "name": "Mirror Lens",
+                    "effect": "changes_visual_mood"
+                  },
+                  {
+                    "id": "lamp_of_forms",
+                    "name": "Lamp of Forms",
+                    "effect": "spawns_forms_lights_mirrors"
+                  }
+                ],
+                "spawnedForms": []
+              },
+              "selectedDream": {
+                "id": "white_void",
+                "name": "Boundless White Void",
+                "symbolicTags": [
+                  "boundlessness",
+                  "dissolution",
+                  "silence"
+                ],
+                "weightBreakdown": {
+                  "base": 1,
+                  "archetype": 2.69,
+                  "vibe": 1.005,
+                  "room": 0.25,
+                  "portal": 0.35,
+                  "directorMultiplier": 1,
+                  "total": 5.295,
+                  "roll": 8.64349
+                }
+              },
+              "archetypeVector": {
+                "Hero": 0.15,
+                "Shadow": 0,
+                "Anima": 0.1,
+                "Animus": 0,
+                "Sage": 0.25,
+                "Trickster": 0,
+                "Creator": 2.15,
+                "Destroyer": 0,
+                "Child": 0.15,
+                "Mother": 0,
+                "Father": 0,
+                "Lover": 0,
+                "Seeker": 2.7499999999999996
+              },
+              "sessionCovenant": {
+                "schema": "SessionCovenantV1",
+                "schemaVersion": 1,
+                "mode": "tonight_shape",
+                "toneTags": [
+                  "gentle",
+                  "strange"
+                ],
+                "intensityCeiling": 0.35,
+                "hardBoundaryTags": [
+                  "real_world_self_harm"
+                ],
+                "softBoundaryTags": [],
+                "allowedPressureTags": [],
+                "returnAnchor": {
+                  "kind": "image",
+                  "value": "redacted_anchor"
+                },
+                "groundingPreference": "quiet_room",
+                "memoryScope": "session_only"
+              },
+              "passageContext": {
+                "schema": "PassageContextV1",
+                "schemaVersion": 1,
+                "activePassageId": "candle_refuses_dark",
+                "recentMotifs": [
+                  "light",
+                  "threshold",
+                  "memory"
+                ],
+                "recentGestureTags": [
+                  "approached",
+                  "approach"
+                ],
+                "echoThreadIds": []
+              },
+              "dreamWeatherContext": {
+                "schema": "DreamWeatherContextV1",
+                "schemaVersion": 1,
+                "weatherTags": [
+                  "silence",
+                  "threshold",
+                  "dissolution",
+                  "memory"
+                ],
+                "pressure": "low",
+                "dreadBudget": {
+                  "pursuit": 0.103,
+                  "bodyUnease": 0.145,
+                  "cosmicDread": 0.161,
+                  "disorientation": 0.083,
+                  "loss": 0.044,
+                  "watching": 0.114,
+                  "claustrophobia": 0.05
+                },
+                "suppressedTags": []
+              }
+            }
+          }
+        }
+      ],
+      "resolved": []
+    },
+    "gniBridgeResult": {
+      "schema": "GniBridgeResultV1",
+      "status": "pending",
+      "source": "none",
+      "request": {
+        "schema": "GniProcessingRequestV1",
+        "schemaVersion": 1,
+        "provider": "GNI",
+        "endpoint": "gni://local-dev-placeholder",
+        "model": "gni-dream-director-dev",
+        "contract": {
+          "inputFormat": "SessionBundleV1",
+          "outputFormat": "JungialDirectiveV1",
+          "allowedDirectives": [
+            "adjust_dream_weights",
+            "suggest_symbol_echo",
+            "suggest_mask_pressure",
+            "nudge_pacing"
+          ]
+        },
+        "payload": {
+          "schema": "SessionBundleV1",
+          "schemaVersion": 1,
+          "sessionId": "session_0001",
+          "dominantArchetype": "Seeker",
+          "vibeState": "calm_hopeful_boundless_bright_warm",
+          "coherence": 0.578,
+          "recentSymbols": [
+            "light",
+            "threshold",
+            "silence",
+            "awakening",
+            "portal"
+          ],
+          "recentActions": [
+            "awaken_heartlight",
+            "open_portal"
+          ],
+          "roomConfigSnapshot": {
+            "note": "the word",
+            "awakened": true,
+            "boundaryState": "boundless",
+            "portalOpen": true,
+            "heartlight": {
+              "awake": true,
+              "intensity": 1,
+              "color": "pearl-gold placeholder"
+            },
+            "visibleToolSigils": [
+              {
+                "id": "key_of_portals",
+                "name": "Key of Portals",
+                "effect": "opens_dream_transition"
+              },
+              {
+                "id": "glyph_quill",
+                "name": "Glyph Quill",
+                "effect": "writes_journal_placeholder"
+              },
+              {
+                "id": "mirror_lens",
+                "name": "Mirror Lens",
+                "effect": "changes_visual_mood"
+              },
+              {
+                "id": "lamp_of_forms",
+                "name": "Lamp of Forms",
+                "effect": "spawns_forms_lights_mirrors"
+              }
+            ],
+            "spawnedForms": []
+          },
+          "selectedDream": {
+            "id": "white_void",
+            "name": "Boundless White Void",
+            "symbolicTags": [
+              "boundlessness",
+              "dissolution",
+              "silence"
+            ],
+            "weightBreakdown": {
+              "base": 1,
+              "archetype": 2.69,
+              "vibe": 1.005,
+              "room": 0.25,
+              "portal": 0.35,
+              "directorMultiplier": 1,
+              "total": 5.295,
+              "roll": 8.64349
+            }
+          },
+          "archetypeVector": {
+            "Hero": 0.15,
+            "Shadow": 0,
+            "Anima": 0.1,
+            "Animus": 0,
+            "Sage": 0.25,
+            "Trickster": 0,
+            "Creator": 2.15,
+            "Destroyer": 0,
+            "Child": 0.15,
+            "Mother": 0,
+            "Father": 0,
+            "Lover": 0,
+            "Seeker": 2.7499999999999996
+          },
+          "sessionCovenant": {
+            "schema": "SessionCovenantV1",
+            "schemaVersion": 1,
+            "mode": "tonight_shape",
+            "toneTags": [
+              "gentle",
+              "strange"
+            ],
+            "intensityCeiling": 0.35,
+            "hardBoundaryTags": [
+              "real_world_self_harm"
+            ],
+            "softBoundaryTags": [],
+            "allowedPressureTags": [],
+            "returnAnchor": {
+              "kind": "image",
+              "value": "redacted_anchor"
+            },
+            "groundingPreference": "quiet_room",
+            "memoryScope": "session_only"
+          },
+          "passageContext": {
+            "schema": "PassageContextV1",
+            "schemaVersion": 1,
+            "activePassageId": "candle_refuses_dark",
+            "recentMotifs": [
+              "light",
+              "threshold",
+              "memory"
+            ],
+            "recentGestureTags": [
+              "approached",
+              "approach"
+            ],
+            "echoThreadIds": []
+          },
+          "dreamWeatherContext": {
+            "schema": "DreamWeatherContextV1",
+            "schemaVersion": 1,
+            "weatherTags": [
+              "silence",
+              "threshold",
+              "dissolution",
+              "memory"
+            ],
+            "pressure": "low",
+            "dreadBudget": {
+              "pursuit": 0.103,
+              "bodyUnease": 0.145,
+              "cosmicDread": 0.161,
+              "disorientation": 0.083,
+              "loss": 0.044,
+              "watching": 0.114,
+              "claustrophobia": 0.05
+            },
+            "suppressedTags": []
+          }
+        }
+      },
+      "rawResponse": null,
+      "directive": null,
+      "providerJob": null,
+      "errors": []
+    },
+    "appliedGniDirective": null,
+    "sessionCovenant": {
+      "schema": "SessionCovenantV1",
+      "schemaVersion": 1,
+      "mode": "tonight_shape",
+      "toneTags": [
+        "gentle",
+        "strange"
+      ],
+      "intensityCeiling": 0.35,
+      "hardBoundaryTags": [
+        "real_world_self_harm"
+      ],
+      "softBoundaryTags": [],
+      "allowedPressureTags": [],
+      "returnAnchor": {
+        "kind": "image",
+        "value": "the note in the Threshold Chamber"
+      },
+      "groundingPreference": "quiet_room",
+      "memoryScope": "session_only"
+    },
+    "echoTrace": {
+      "schema": "EchoTraceV1",
+      "schemaVersion": 1,
+      "passageId": "candle_refuses_dark",
+      "motifsTouched": [
+        "light",
+        "threshold",
+        "memory"
+      ],
+      "gestureTags": [
+        "approached",
+        "approach"
+      ],
+      "tempo": "unhurried",
+      "pressureAccepted": 0.4,
+      "returnAnchorUsed": false,
+      "boundarySignals": [],
+      "dreamflowDeltas": {}
+    },
+    "activePassage": {
+      "schema": "PassageV1",
+      "schemaVersion": 1,
+      "id": "candle_refuses_dark",
+      "motifs": [
+        "light",
+        "threshold",
+        "memory"
+      ],
+      "pressureTags": [
+        "hope",
+        "refusal"
+      ],
+      "formTags": [
+        "candle",
+        "dim_room",
+        "held_flame"
+      ],
+      "intensityBand": "gentle",
+      "allowedResponseKinds": [
+        "protect",
+        "speak",
+        "wait",
+        "alter_object"
+      ],
+      "returnAnchorTags": [
+        "lamp",
+        "note",
+        "hearth"
+      ],
+      "variationFamily": "unspent_lights",
+      "baseWeight": 1
+    },
+    "dreamWeather": {
+      "schema": "DreamWeatherV1",
+      "schemaVersion": 1,
+      "weatherId": "weather-777",
+      "mood": "stillness",
+      "pressure": "low",
+      "ceiling": 0.35,
+      "dreadBudget": {
+        "pursuit": 0.103,
+        "bodyUnease": 0.145,
+        "cosmicDread": 0.161,
+        "disorientation": 0.083,
+        "loss": 0.044,
+        "watching": 0.114,
+        "claustrophobia": 0.05
+      },
+      "weatherTags": [
+        "silence",
+        "threshold",
+        "dissolution",
+        "memory"
+      ],
+      "suppressedTags": [],
+      "atmosphere": {
+        "lightIntensity": 0.74,
+        "fogDensity": 0.337,
+        "bloom": 0.246,
+        "exposure": 0.48,
+        "warmth": 0.527,
+        "movementDrag": 0.277
+      }
+    },
+    "weatherTrace": {
+      "schema": "WeatherTraceV1",
+      "schemaVersion": 1,
+      "traceId": "weather-trace-777",
+      "weatherId": "weather-777",
+      "mood": "stillness",
+      "pressure": "low",
+      "sourceTags": [
+        "dissolution",
+        "silence",
+        "threshold",
+        "memory"
+      ],
+      "resultingTags": [
+        "silence",
+        "threshold",
+        "dissolution",
+        "memory"
+      ],
+      "suppressedTags": [],
+      "strongestDreadAxis": "cosmicDread"
+    }
+  }
+}

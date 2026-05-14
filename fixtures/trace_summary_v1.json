@@ -1,0 +1,33 @@
+{
+  "schema": "JungialTraceSummaryV1",
+  "runId": "trace_0001",
+  "eventCounts": {
+    "simulation.started": 1,
+    "threshold.input": 1,
+    "threshold.awakened": 1,
+    "portal.opened": 1,
+    "passage.gathered": 1,
+    "echo.trace.created": 1,
+    "dream.journey.selected": 1,
+    "dream.weather.created": 1,
+    "mask.selected": 1,
+    "journal.entry.written": 1,
+    "witness.bundle.created": 1,
+    "gni.request.created": 1,
+    "gni.emulator.directive.created": 1,
+    "gni.directive.applied": 1,
+    "simulation.saved": 1
+  },
+  "journeySummary": "entry:Boundless White Void -> pressure:Space / Black Hole -> mirror:Space / Black Hole -> return:Boundless White Void",
+  "symbolTrail": [
+    "boundlessness",
+    "dissolution",
+    "silence",
+    "annihilation",
+    "rebirth",
+    "cosmic mystery"
+  ],
+  "gniRequestCount": 1,
+  "gniQueuedRequestCount": 0,
+  "gniDirectiveCount": 1
+}

@@ -1,0 +1,47 @@
+{
+  "schema": "DreamerMemoryContextV1",
+  "schemaVersion": 1,
+  "profileId": null,
+  "slotId": "fixture-slot",
+  "saveMode": "continue",
+  "sessionCount": 1,
+  "strongSymbols": [
+    "silence",
+    "annihilation",
+    "awakening",
+    "boundlessness",
+    "cosmic mystery",
+    "dissolution",
+    "light",
+    "portal"
+  ],
+  "recurringArchetypes": [
+    "Seeker",
+    "Creator",
+    "Sage",
+    "Child",
+    "Hero",
+    "Anima",
+    "Animus",
+    "Destroyer"
+  ],
+  "familiarMasks": [],
+  "familiarDreamModules": [
+    "space_black_hole",
+    "white_void"
+  ],
+  "familiarActions": [
+    "awaken_heartlight",
+    "open_portal"
+  ],
+  "familiarPassages": [],
+  "familiarMotifs": [],
+  "familiarGestures": [],
+  "echoThreadIds": [],
+  "vibeEchoes": [
+    "calm_hopeful_boundless_bright_warm"
+  ],
+  "familiarWeatherTags": [],
+  "familiarDreadAxes": [],
+  "lastSessionDigest": "b106fb2190dfad0dce6284c035cfc2c2536c04173e862545d074c421f641b925"
+}

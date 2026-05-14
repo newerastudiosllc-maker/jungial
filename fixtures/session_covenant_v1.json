@@ -1,0 +1,21 @@
+{
+  "schema": "SessionCovenantV1",
+  "schemaVersion": 1,
+  "mode": "tonight_shape",
+  "toneTags": [
+    "gentle",
+    "strange"
+  ],
+  "intensityCeiling": 0.35,
+  "hardBoundaryTags": [
+    "real_world_self_harm"
+  ],
+  "softBoundaryTags": [],
+  "allowedPressureTags": [],
+  "returnAnchor": {
+    "kind": "image",
+    "value": "the note in the Threshold Chamber"
+  },
+  "groundingPreference": "quiet_room",
+  "memoryScope": "session_only"
+}

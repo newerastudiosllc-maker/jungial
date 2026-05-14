@@ -200,6 +200,9 @@ The current contract schemas live in `data/schemas/`:
 - `session_covenant.schema.json`
 - `passage.schema.json`
 - `echo_trace.schema.json`
+- `dread_budget.schema.json`
+- `dream_weather.schema.json`
+- `weather_trace.schema.json`
 - `dreamer_profile.schema.json`
 - `dreamer_memory_context.schema.json`
 - `gni_processing_request.schema.json`
@@ -245,6 +248,8 @@ See `docs/dreamer-memory-and-safety.md` for the product/architecture guardrails:
 
 The system can become strange, dark, or horrific when the covenant allows it, while exact Passage repeats and boundary violations are filtered before GNI or Dreamflow can use them.
 
+Dream Weather is the hidden atmospheric layer for each session. `DreamWeatherV1` carries weather tags, pressure, atmosphere, and the embedded `DreadBudgetV1`; `WeatherTraceV1` records how those tags resolved. When sent toward GNI, it is redacted into `DreamWeatherContextV1` so the provider sees structured pressure context without owning the underlying weather machinery.
+
 Inspect a trace summary:
 
 ```powershell
@@ -257,7 +262,7 @@ Export GNI contract fixtures:
 npm run fixtures
 ```
 
-This writes `fixtures/session_bundle_v1.json`, `fixtures/session_covenant_v1.json`, `fixtures/passage_v1.json`, `fixtures/echo_trace_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
+This writes `fixtures/session_bundle_v1.json`, `fixtures/session_covenant_v1.json`, `fixtures/passage_v1.json`, `fixtures/echo_trace_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/dream_weather_v1.json`, `fixtures/weather_trace_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
 
 Validate generated fixtures, SaveGame envelopes, and mock GNI directives against the strict contract gate:
 

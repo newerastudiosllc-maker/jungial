@@ -1,0 +1,31 @@
+{
+  "schema": "DreamWeatherV1",
+  "schemaVersion": 1,
+  "weatherId": "weather-777",
+  "mood": "stillness",
+  "pressure": "low",
+  "ceiling": 0.35,
+  "dreadBudget": {
+    "pursuit": 0.103,
+    "bodyUnease": 0.145,
+    "cosmicDread": 0.161,
+    "disorientation": 0.083,
+    "loss": 0.044,
+    "watching": 0.114,
+    "claustrophobia": 0.05
+  },
+  "weatherTags": [
+    "silence",
+    "threshold",
+    "memory"
+  ],
+  "suppressedTags": [],
+  "atmosphere": {
+    "lightIntensity": 0.74,
+    "fogDensity": 0.337,
+    "bloom": 0.246,
+    "exposure": 0.48,
+    "warmth": 0.527,
+    "movementDrag": 0.277
+  }
+}

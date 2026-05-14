@@ -9,6 +9,7 @@ import { inspectTrace } from './traceInspector.js';
 import { processPendingGniQueue } from './gniQueueProcessor.js';
 import { checkGniContract } from './gniContractCheck.js';
 import { DreamerProfile } from './dreamerProfile.js';
+import { createDreamWeather, createWeatherTrace } from './dreamWeather.js';
 
 const FIXTURE_FILES = Object.freeze([
   'session_bundle_v1.json',
@@ -17,6 +18,8 @@ const FIXTURE_FILES = Object.freeze([
   'echo_trace_v1.json',
   'dreamer_profile_v1.json',
   'dreamer_memory_context_v1.json',
+  'dream_weather_v1.json',
+  'weather_trace_v1.json',
   'gni_request_v1.json',
   'gni_directive_v1.json',
   'gni_bridge_result_v1.json',
@@ -68,6 +71,16 @@ export async function exportContractFixtures({
     slotId: 'fixture-slot',
     mode: 'continue'
   });
+  const dreamWeather = createDreamWeather({
+    seed,
+    covenant: sessionCovenant,
+    weatherTags: echoTrace.motifsTouched
+  });
+  const weatherTrace = createWeatherTrace({
+    weather: dreamWeather,
+    sourceTags: echoTrace.motifsTouched,
+    seed
+  });
   const gniRequest = run.gniRequest;
   const gniDirective = run.appliedGniDirective;
   const gniBridgeResult = run.gniBridgeResult;
@@ -107,6 +120,8 @@ export async function exportContractFixtures({
     'echo_trace_v1.json': echoTrace,
     'dreamer_profile_v1.json': dreamerProfile,
     'dreamer_memory_context_v1.json': dreamerMemoryContext,
+    'dream_weather_v1.json': dreamWeather,
+    'weather_trace_v1.json': weatherTrace,
     'gni_request_v1.json': gniRequest,
     'gni_directive_v1.json': gniDirective,
     'gni_bridge_result_v1.json': gniBridgeResult,

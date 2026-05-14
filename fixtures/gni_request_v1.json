@@ -1,0 +1,161 @@
+{
+  "schema": "GniProcessingRequestV1",
+  "schemaVersion": 1,
+  "provider": "GNI",
+  "endpoint": "gni://local-dev-placeholder",
+  "model": "gni-dream-director-dev",
+  "contract": {
+    "inputFormat": "SessionBundleV1",
+    "outputFormat": "JungialDirectiveV1",
+    "allowedDirectives": [
+      "adjust_dream_weights",
+      "suggest_symbol_echo",
+      "suggest_mask_pressure",
+      "nudge_pacing"
+    ]
+  },
+  "payload": {
+    "schema": "SessionBundleV1",
+    "schemaVersion": 1,
+    "sessionId": "session_0001",
+    "dominantArchetype": "Seeker",
+    "vibeState": "calm_hopeful_boundless_bright_warm",
+    "coherence": 0.578,
+    "recentSymbols": [
+      "light",
+      "threshold",
+      "silence",
+      "awakening",
+      "portal"
+    ],
+    "recentActions": [
+      "awaken_heartlight",
+      "open_portal"
+    ],
+    "roomConfigSnapshot": {
+      "note": "the word",
+      "awakened": true,
+      "boundaryState": "boundless",
+      "portalOpen": true,
+      "heartlight": {
+        "awake": true,
+        "intensity": 1,
+        "color": "pearl-gold placeholder"
+      },
+      "visibleToolSigils": [
+        {
+          "id": "key_of_portals",
+          "name": "Key of Portals",
+          "effect": "opens_dream_transition"
+        },
+        {
+          "id": "glyph_quill",
+          "name": "Glyph Quill",
+          "effect": "writes_journal_placeholder"
+        },
+        {
+          "id": "mirror_lens",
+          "name": "Mirror Lens",
+          "effect": "changes_visual_mood"
+        },
+        {
+          "id": "lamp_of_forms",
+          "name": "Lamp of Forms",
+          "effect": "spawns_forms_lights_mirrors"
+        }
+      ],
+      "spawnedForms": []
+    },
+    "selectedDream": {
+      "id": "white_void",
+      "name": "Boundless White Void",
+      "symbolicTags": [
+        "boundlessness",
+        "dissolution",
+        "silence"
+      ],
+      "weightBreakdown": {
+        "base": 1,
+        "archetype": 2.69,
+        "vibe": 1.005,
+        "room": 0.25,
+        "portal": 0.35,
+        "directorMultiplier": 1,
+        "total": 5.295,
+        "roll": 8.64349
+      }
+    },
+    "archetypeVector": {
+      "Hero": 0.15,
+      "Shadow": 0,
+      "Anima": 0.1,
+      "Animus": 0,
+      "Sage": 0.25,
+      "Trickster": 0,
+      "Creator": 2.15,
+      "Destroyer": 0,
+      "Child": 0.15,
+      "Mother": 0,
+      "Father": 0,
+      "Lover": 0,
+      "Seeker": 2.7499999999999996
+    },
+    "sessionCovenant": {
+      "schema": "SessionCovenantV1",
+      "schemaVersion": 1,
+      "mode": "tonight_shape",
+      "toneTags": [
+        "gentle",
+        "strange"
+      ],
+      "intensityCeiling": 0.35,
+      "hardBoundaryTags": [
+        "real_world_self_harm"
+      ],
+      "softBoundaryTags": [],
+      "allowedPressureTags": [],
+      "returnAnchor": {
+        "kind": "image",
+        "value": "redacted_anchor"
+      },
+      "groundingPreference": "quiet_room",
+      "memoryScope": "session_only"
+    },
+    "passageContext": {
+      "schema": "PassageContextV1",
+      "schemaVersion": 1,
+      "activePassageId": "candle_refuses_dark",
+      "recentMotifs": [
+        "light",
+        "threshold",
+        "memory"
+      ],
+      "recentGestureTags": [
+        "approached",
+        "approach"
+      ],
+      "echoThreadIds": []
+    },
+    "dreamWeatherContext": {
+      "schema": "DreamWeatherContextV1",
+      "schemaVersion": 1,
+      "weatherTags": [
+        "silence",
+        "threshold",
+        "dissolution",
+        "memory"
+      ],
+      "pressure": "low",
+      "dreadBudget": {
+        "pursuit": 0.103,
+        "bodyUnease": 0.145,
+        "cosmicDread": 0.161,
+        "disorientation": 0.083,
+        "loss": 0.044,
+        "watching": 0.114,
+        "claustrophobia": 0.05
+      },
+      "suppressedTags": []
+    }
+  }
+}

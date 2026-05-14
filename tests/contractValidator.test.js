@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 
 import { validateContractDocument, validateContractFiles } from '../src/contractValidator.js';
 import { createDreamWeather, createWeatherTrace } from '../src/dreamWeather.js';
+import { exportContractFixtures } from '../src/fixtureExporter.js';
 
 test('contract validator routes known Jungial contract schemas', () => {
   const directiveResult = validateContractDocument({
@@ -169,6 +170,32 @@ test('contract validator routes WeatherTraceV1 documents', () => {
   const result = validateContractDocument(createWeatherTrace({ weather, seed: 22 }));
 
   assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('contract validator validates generated Dream Weather fixture files', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-weather-contracts-'));
+
+  try {
+    await exportContractFixtures({
+      outDir: dir,
+      seed: 777,
+      clockStartIso: '2060-01-01T00:00:00.000Z'
+    });
+
+    const report = await validateContractFiles([
+      join(dir, 'dream_weather_v1.json'),
+      join(dir, 'weather_trace_v1.json')
+    ]);
+
+    assert.equal(report.ok, true);
+    assert.deepEqual(report.files.map((file) => file.schema), [
+      'DreamWeatherV1',
+      'WeatherTraceV1'
+    ]);
+    assert.deepEqual(report.files.map((file) => file.valid), [true, true]);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
 });
 
 test('contract validator requires save game migration metadata', () => {

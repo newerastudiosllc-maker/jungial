@@ -1,0 +1,25 @@
+{
+  "schema": "JungialContractFixtureManifestV1",
+  "seed": 777,
+  "clockStartIso": "2060-01-01T00:00:00.000Z",
+  "files": [
+    "session_bundle_v1.json",
+    "session_covenant_v1.json",
+    "passage_v1.json",
+    "echo_trace_v1.json",
+    "dreamer_profile_v1.json",
+    "dreamer_memory_context_v1.json",
+    "dream_weather_v1.json",
+    "weather_trace_v1.json",
+    "gni_request_v1.json",
+    "gni_directive_v1.json",
+    "gni_bridge_result_v1.json",
+    "gni_contract_check_report_v1.json",
+    "gni_directive_queue_v1.json",
+    "gni_queue_process_result_v1.json",
+    "fixture-run.save.json",
+    "fixture-pending-run.save.json",
+    "trace_summary_v1.json"
+  ],
+  "hash": "a6a630aa2527405773c1c8bcb75b4fa8f0c67860becd73ebe6e75dbf964c9aba"
+}

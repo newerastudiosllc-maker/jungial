@@ -1,0 +1,33 @@
+{
+  "schema": "PassageV1",
+  "schemaVersion": 1,
+  "id": "candle_refuses_dark",
+  "motifs": [
+    "light",
+    "threshold",
+    "memory"
+  ],
+  "pressureTags": [
+    "hope",
+    "refusal"
+  ],
+  "formTags": [
+    "candle",
+    "dim_room",
+    "held_flame"
+  ],
+  "intensityBand": "gentle",
+  "allowedResponseKinds": [
+    "protect",
+    "speak",
+    "wait",
+    "alter_object"
+  ],
+  "returnAnchorTags": [
+    "lamp",
+    "note",
+    "hearth"
+  ],
+  "variationFamily": "unspent_lights",
+  "baseWeight": 1
+}

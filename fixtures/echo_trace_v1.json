@@ -1,0 +1,19 @@
+{
+  "schema": "EchoTraceV1",
+  "schemaVersion": 1,
+  "passageId": "candle_refuses_dark",
+  "motifsTouched": [
+    "light",
+    "threshold",
+    "memory"
+  ],
+  "gestureTags": [
+    "approached",
+    "approach"
+  ],
+  "tempo": "unhurried",
+  "pressureAccepted": 0.4,
+  "returnAnchorUsed": false,
+  "boundarySignals": [],
+  "dreamflowDeltas": {}
+}
