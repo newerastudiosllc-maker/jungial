@@ -152,7 +152,8 @@ export class GniAdapter {
         recentSymbols: [...(sessionBundle.recentSymbols ?? [])],
         recentActions: [...(sessionBundle.recentActions ?? [])],
         roomConfigSnapshot: sessionBundle.roomConfigSnapshot ?? null,
-        selectedDream: sessionBundle.selectedDream ?? null
+        selectedDream: sessionBundle.selectedDream ?? null,
+        archetypeVector: { ...(sessionBundle.archetypeVector ?? {}) }
       }
     };
   }

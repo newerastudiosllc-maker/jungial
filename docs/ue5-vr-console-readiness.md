@@ -29,6 +29,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - Baseline updates should be intentional and reviewed because they represent accepted changes to Jungial's procedural behavior.
 - GNI provider calls should stay behind the bridge so failed/empty responses cannot mutate gameplay state.
 - GNI/GNI-emulator outputs must be normalized before touching gameplay state.
+- GNI contract fixtures should pass strict validation before provider changes are accepted.
 - Content validation must run before packaged builds and before accepting AI-authored content.
 
 ## VR/Console Constraints

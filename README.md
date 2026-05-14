@@ -18,6 +18,7 @@ npm run campaign
 npm run scenarios
 npm run scenario:check
 npm run fixtures
+npm run contracts
 ```
 
 `npm run simulate` writes `saves/latest-session.json`. That folder is ignored by git.
@@ -163,6 +164,12 @@ npm run fixtures
 ```
 
 This writes `fixtures/session_bundle_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
+
+Validate generated fixtures and mock GNI directives against the strict contract gate:
+
+```powershell
+npm run contracts
+```
 
 ## Current Playable Loop
 

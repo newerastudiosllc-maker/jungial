@@ -43,7 +43,8 @@
         "recentSymbols",
         "recentActions",
         "roomConfigSnapshot",
-        "selectedDream"
+        "selectedDream",
+        "archetypeVector"
       ],
       "properties": {
         "schema": { "const": "SessionBundleV1" },
@@ -55,7 +56,11 @@
         "recentSymbols": { "type": "array", "items": { "type": "string" } },
         "recentActions": { "type": "array", "items": { "type": "string" } },
         "roomConfigSnapshot": { "type": ["object", "null"] },
-        "selectedDream": { "type": ["object", "null"] }
+        "selectedDream": { "type": ["object", "null"] },
+        "archetypeVector": {
+          "type": "object",
+          "additionalProperties": { "type": "number" }
+        }
       },
       "additionalProperties": false
     }

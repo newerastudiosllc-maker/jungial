@@ -5,7 +5,12 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { ARCHETYPES } from '../src/constants.js';
-import { validateSessionBundle } from '../src/contracts.js';
+import {
+  validateDirective,
+  validateGniBridgeResult,
+  validateGniProcessingRequest,
+  validateSessionBundle
+} from '../src/contracts.js';
 import { loadBundledContentCatalog, validateContentCatalog } from '../src/contentCatalog.js';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -60,6 +65,70 @@ test('session bundle validation accepts compact Witness handoff data', () => {
   });
 
   assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('GNI directive validation catches unsafe provider output before normalization', () => {
+  const result = validateDirective({
+    schema: 'JungialDirectiveV1',
+    schemaVersion: 1,
+    dreamWeightDeltas: { garden: 9 },
+    symbolEchoes: ['mirror', ''],
+    pacingDelta: { noise: 1 }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'dreamWeightDeltas.garden must be between -0.95 and 2',
+    'pacingDelta.noise is not allowed',
+    'symbolEchoes[1] must be a non-empty string'
+  ]);
+});
+
+test('GNI request and bridge result validation accept provider-ready contracts', () => {
+  const request = {
+    schema: 'GniProcessingRequestV1',
+    schemaVersion: 1,
+    provider: 'GNI',
+    endpoint: 'gni://local-dev-placeholder',
+    model: 'gni-dream-director-dev',
+    contract: {
+      inputFormat: 'SessionBundleV1',
+      outputFormat: 'JungialDirectiveV1',
+      allowedDirectives: ['adjust_dream_weights']
+    },
+    payload: {
+      schema: 'SessionBundleV1',
+      schemaVersion: 1,
+      sessionId: 'session-one',
+      dominantArchetype: 'Seeker',
+      coherence: 0.6,
+      vibeState: 'calm_hopeful_boundless_bright_warm',
+      recentSymbols: ['portal'],
+      recentActions: ['open_portal'],
+      roomConfigSnapshot: { portalOpen: true },
+      selectedDream: { id: 'garden' },
+      archetypeVector: { Seeker: 1 }
+    }
+  };
+  const bridgeResult = {
+    schema: 'GniBridgeResultV1',
+    status: 'directive_ready',
+    source: 'provider',
+    request,
+    rawResponse: { dreamWeightDeltas: { garden: 0.2 } },
+    directive: {
+      schema: 'JungialDirectiveV1',
+      schemaVersion: 1,
+      dreamWeightDeltas: { garden: 0.2 },
+      symbolEchoes: [],
+      maskPressure: {},
+      pacingDelta: {}
+    },
+    errors: []
+  };
+
+  assert.deepEqual(validateGniProcessingRequest(request), { valid: true, errors: [] });
+  assert.deepEqual(validateGniBridgeResult(bridgeResult), { valid: true, errors: [] });
 });
 
 async function readJson(path) {

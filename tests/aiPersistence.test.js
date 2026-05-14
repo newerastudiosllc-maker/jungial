@@ -48,6 +48,7 @@ test('GNI adapter packages session bundle without coupling game systems to provi
   assert.equal(request.endpoint, 'local-gni-placeholder');
   assert.equal(request.contract.outputFormat, 'JungialDirectiveV1');
   assert.deepEqual(request.payload.recentSymbols, ['portal', 'light']);
+  assert.deepEqual(request.payload.archetypeVector, {});
 });
 
 test('persistence saves and loads room, archetypes, journal, and architect state as JSON', async () => {
