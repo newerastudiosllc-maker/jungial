@@ -65,6 +65,50 @@ describe("dream weather", () => {
     assert.deepEqual(createDreamWeather(input), createDreamWeather(input));
   });
 
+  it("derives deterministic safe ids for private string seeds", () => {
+    const first = createDreamWeather({ seed: "my exact street address" });
+    const second = createDreamWeather({ seed: "my exact street address" });
+    const trace = createWeatherTrace({ weather: first, seed: "my exact street address" });
+
+    assert.equal(first.weatherId, second.weatherId);
+    assert.equal(first.weatherId.includes("my exact street address"), false);
+    assert.equal(trace.traceId.includes("my exact street address"), false);
+    assert.match(first.weatherId, /^weather-[a-z0-9]+$/);
+    assert.match(trace.traceId, /^weather-trace-[a-z0-9]+$/);
+  });
+
+  it("uses SessionCovenantV1 intensityCeiling before intensity band fallback", () => {
+    const covenant = createSessionCovenant({ intensityCeiling: 0.6 });
+
+    const weather = createDreamWeather({ seed: 42, covenant });
+
+    assert.equal(weather.ceiling, 0.6);
+  });
+
+  it("allowlists returned weather, trace, and GNI context tags", () => {
+    const weather = createDreamWeather({
+      seed: 43,
+      weatherTags: ["mist", "my exact street address", "rebirth"],
+      suppressedTags: ["pursuit", "my secret name"]
+    });
+    const trace = createWeatherTrace({
+      weather,
+      sourceTags: ["door", "my exact street address"],
+      suppressedTags: ["watching", "my secret name"],
+      seed: 610
+    });
+    const context = toGniWeatherContext({ dreamWeather: weather, weatherTrace: trace });
+
+    assert.deepEqual(weather.weatherTags, ["silence", "threshold", "mist", "rebirth"]);
+    assert.deepEqual(weather.suppressedTags, ["pursuit"]);
+    assert.equal(trace.traceId, "weather-trace-610");
+    assert.deepEqual(trace.sourceTags, ["door"]);
+    assert.deepEqual(trace.resultingTags, ["silence", "threshold", "mist", "rebirth"]);
+    assert.deepEqual(trace.suppressedTags, ["pursuit", "watching"]);
+    assert.deepEqual(context.weatherTags, ["silence", "threshold", "mist", "rebirth"]);
+    assert.deepEqual(context.suppressedTags, ["pursuit", "watching"]);
+  });
+
   it("creates a WeatherTraceV1 with exact trace shape and strongest dread axis", () => {
     const weather = createDreamWeather({
       seed: 41,

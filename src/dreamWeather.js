@@ -37,24 +37,54 @@ const COVENANT_CEILINGS = Object.freeze({
   deep: 0.68,
   dark: 0.82
 });
+const SYMBOLIC_TAGS = Object.freeze([
+  'annihilation',
+  'rebirth',
+  'cosmic_mystery',
+  'reflection',
+  'shadow',
+  'self_observation',
+  'safety',
+  'memory',
+  'hearth',
+  'containment',
+  'growth',
+  'innocence',
+  'fertility',
+  'beauty',
+  'dissolution',
+  'void',
+  'star',
+  'unknown',
+  'invitation',
+  'door',
+  'breath',
+  'lamp'
+]);
+const ALLOWED_RETURNED_TAGS = Object.freeze(new Set([
+  ...WEATHER_TAGS,
+  ...DREAD_BUDGET_AXES,
+  ...DREAD_BUDGET_AXES.map(normalizeToken),
+  ...SYMBOLIC_TAGS
+]));
 
 export function createDreamWeather(input = {}) {
   const seed = input.seed ?? 0;
   const rng = new SeededRandom(seed);
   const ceiling = resolveCovenantCeiling(input.covenant);
   const hardBoundaries = getHardBoundaries(input.covenant);
-  const requestedTags = normalizeTags(input.weatherTags);
+  const requestedTags = normalizeAllowedTags(input.weatherTags);
   const baseTags = requestedTags.length > 0
     ? requestedTags
     : ['silence', 'threshold'];
-  const suppressedTags = normalizeTags([
+  const suppressedTags = normalizeAllowedTags([
     ...(input.suppressedTags ?? []),
     ...baseTags.filter((tag) => hardBoundaries.includes(tag))
   ]);
   const weatherTags = uniqueTags([
     'silence',
     'threshold',
-    ...baseTags.filter((tag) => WEATHER_TAGS.includes(tag) && !hardBoundaries.includes(tag))
+    ...baseTags.filter((tag) => ALLOWED_RETURNED_TAGS.has(tag) && !hardBoundaries.includes(tag))
   ]);
   const dreadBudget = normalizeDreadBudget(input.dreadBudget ?? createDefaultDreadBudget(rng, ceiling), ceiling);
 
@@ -71,7 +101,7 @@ export function createDreamWeather(input = {}) {
   return {
     schema: 'DreamWeatherV1',
     schemaVersion: 1,
-    weatherId: `weather-${String(seed)}`,
+    weatherId: `weather-${safeSeedSuffix(seed)}`,
     mood: selectMood(weatherTags),
     pressure,
     ceiling,
@@ -88,13 +118,13 @@ export function createWeatherTrace({ weather, sourceTags = [], suppressedTags = 
   return {
     schema: 'WeatherTraceV1',
     schemaVersion: 1,
-    traceId: `weather-trace-${String(seed)}`,
+    traceId: `weather-trace-${safeSeedSuffix(seed)}`,
     weatherId: normalizedWeather.weatherId,
     mood: normalizedWeather.mood,
     pressure: normalizedWeather.pressure,
-    sourceTags: normalizeTags(sourceTags),
-    resultingTags: [...normalizedWeather.weatherTags],
-    suppressedTags: uniqueTags([...normalizedWeather.suppressedTags, ...normalizeTags(suppressedTags)]),
+    sourceTags: normalizeAllowedTags(sourceTags),
+    resultingTags: normalizeAllowedTags(normalizedWeather.weatherTags),
+    suppressedTags: uniqueTags([...normalizeAllowedTags(normalizedWeather.suppressedTags), ...normalizeAllowedTags(suppressedTags)]),
     strongestDreadAxis: getStrongestDreadAxis(normalizedWeather.dreadBudget)
   };
 }
@@ -106,10 +136,10 @@ export function toGniWeatherContext({ dreamWeather, weatherTrace } = {}) {
   return {
     schema: 'DreamWeatherContextV1',
     schemaVersion: 1,
-    weatherTags: [...weather.weatherTags],
+    weatherTags: normalizeAllowedTags(weather.weatherTags),
     pressure: weather.pressure,
     dreadBudget: { ...weather.dreadBudget },
-    suppressedTags: uniqueTags([...weather.suppressedTags, ...normalizeTags(traceSuppressedTags)])
+    suppressedTags: uniqueTags([...normalizeAllowedTags(weather.suppressedTags), ...normalizeAllowedTags(traceSuppressedTags)])
   };
 }
 
@@ -144,12 +174,15 @@ function createAtmosphere({ rng, pressure, ceiling }) {
 }
 
 function resolveCovenantCeiling(covenant = {}) {
+  if (Number.isFinite(Number(covenant?.intensityCeiling))) {
+    return clamp01(covenant.intensityCeiling);
+  }
   const band = normalizeToken(covenant?.intensityBand ?? covenant?.intensity?.band);
   return COVENANT_CEILINGS[band] ?? COVENANT_CEILINGS.gentle;
 }
 
 function getHardBoundaries(covenant = {}) {
-  return normalizeTags([
+  return normalizeAllowedTags([
     ...(covenant?.hardBoundaries ?? []),
     ...(covenant?.sessionLimits?.hardBoundaries ?? []),
     ...(covenant?.hardBoundaryTags ?? [])
@@ -195,6 +228,17 @@ function getStrongestDreadAxis(dreadBudget) {
   return DREAD_BUDGET_AXES.reduce((strongest, axis) => (
     dreadBudget[axis] > dreadBudget[strongest] ? axis : strongest
   ), DREAD_BUDGET_AXES[0]);
+}
+
+function safeSeedSuffix(seed) {
+  if (typeof seed === 'number' && Number.isFinite(seed)) {
+    return String(seed);
+  }
+  return SeededRandom.normalizeSeed(seed).toString(36);
+}
+
+function normalizeAllowedTags(tags = []) {
+  return normalizeTags(tags).filter((tag) => ALLOWED_RETURNED_TAGS.has(tag));
 }
 
 function normalizeTags(tags = []) {
