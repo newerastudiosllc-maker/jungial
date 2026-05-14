@@ -16,6 +16,7 @@ export function inspectTrace(trace) {
     journeySummary: journey?.payload?.summary ?? null,
     symbolTrail: journey?.payload?.symbolTrail ?? [],
     gniRequestCount: eventCounts['gni.request.created'] ?? 0,
+    gniQueuedRequestCount: eventCounts['gni.request.queued'] ?? 0,
     gniDirectiveCount: eventCounts['gni.directive.applied'] ?? 0
   };
 }

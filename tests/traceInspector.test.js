@@ -19,7 +19,8 @@ test('trace inspector summarizes journey, GNI, and event counts', () => {
         }
       },
       { index: 3, at: 'x', type: 'gni.request.created', payload: { provider: 'GNI' } },
-      { index: 4, at: 'x', type: 'gni.directive.applied', payload: { directive: { dreamWeightDeltas: { garden: 0.2 } } } }
+      { index: 4, at: 'x', type: 'gni.request.queued', payload: { id: 'gni_pending_session-one' } },
+      { index: 5, at: 'x', type: 'gni.directive.applied', payload: { directive: { dreamWeightDeltas: { garden: 0.2 } } } }
     ]
   });
 
@@ -30,11 +31,13 @@ test('trace inspector summarizes journey, GNI, and event counts', () => {
       'simulation.started': 1,
       'dream.journey.selected': 1,
       'gni.request.created': 1,
+      'gni.request.queued': 1,
       'gni.directive.applied': 1
     },
     journeySummary: 'entry:Garden -> pressure:Mirror Hall',
     symbolTrail: ['growth', 'reflection'],
     gniRequestCount: 1,
+    gniQueuedRequestCount: 1,
     gniDirectiveCount: 1
   });
 });
@@ -71,5 +74,6 @@ test('trace inspector summarizes the latest campaign journey', () => {
 
   assert.equal(summary.journeySummary, 'entry:Mirror Hall -> return:Boundless White Void');
   assert.deepEqual(summary.symbolTrail, ['reflection', 'silence']);
+  assert.equal(summary.gniQueuedRequestCount, 0);
   assert.equal(summary.gniDirectiveCount, 1);
 });
