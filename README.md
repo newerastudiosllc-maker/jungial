@@ -20,6 +20,7 @@ npm run scenarios
 npm run scenario:check
 npm run fixtures
 npm run contracts
+npm run gni:contract -- --endpoint=http://127.0.0.1:8787/gni
 npm run gni:smoke:async
 ```
 
@@ -51,6 +52,7 @@ To run a local mock GNI HTTP target while the real provider is being built:
 ```powershell
 npm run mock:gni -- --port=8787 --mode=directive --directive=data/mock_gni_directive.json
 node src/simulation.js --gni-endpoint=http://127.0.0.1:8787/gni
+npm run gni:contract -- --endpoint=http://127.0.0.1:8787/gni
 ```
 
 Use `--mode=async` to make the mock server return HTTP `202` with a `jobId`, `statusUrl`, and `pollAfterMs` instead of an immediate directive. Add `--ready-after-polls=2` or higher to rehearse jobs that stay pending before they resolve.
@@ -64,6 +66,15 @@ npm run gni:smoke:async -- --ready-after-polls=2 --max-queue-process-attempts=2
 ```
 
 This starts the local mock server in async mode, runs the Threshold-to-dream simulation against it, saves the pending queue, polls the mock job status URL, applies the returned directive, and writes the resolved queue back into the same save. The delayed-poll options rehearse jobs that stay pending across multiple background queue passes.
+
+To check a real or mock GNI endpoint without running gameplay:
+
+```powershell
+npm run gni:contract -- --endpoint=https://example.local/gni --token-env=GNI_API_KEY --max-polls=2
+npm run gni:contract -- --endpoint=https://example.local/gni --request=fixtures/gni_request_v1.json --json
+```
+
+The contract check posts a `GniProcessingRequestV1`, accepts an immediate `JungialDirectiveV1` or an async provider job, optionally polls that job, and reports whether the request, directive, or job status matched Jungial's current integration contract.
 
 To run a deterministic replay script:
 

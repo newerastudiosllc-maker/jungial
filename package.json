@@ -16,6 +16,7 @@
     "scenario:baseline": "npm run scenarios && node src/scenarioBaseline.js write saves/scenarios/scenario-report.json data/scenarios/smoke_baseline.json",
     "fixtures": "node src/fixtureExporter.js fixtures",
     "contracts": "npm run fixtures && node src/contractValidator.js fixtures/session_bundle_v1.json fixtures/gni_request_v1.json fixtures/gni_directive_v1.json fixtures/gni_bridge_result_v1.json fixtures/gni_directive_queue_v1.json fixtures/gni_queue_process_result_v1.json fixtures/fixture-run.save.json fixtures/fixture-pending-run.save.json data/mock_gni_directive.json",
+    "gni:contract": "node src/gniContractCheck.js",
     "gni:process": "node src/gniQueueProcessor.js",
     "gni:smoke:async": "node src/asyncGniSmoke.js",
     "mock:gni": "node src/mockGniServer.js",
