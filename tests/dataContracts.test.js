@@ -19,6 +19,7 @@ test('JSON catalogs match runtime constants used by the prototype', async () => 
   const archetypes = await readJson('data/archetypes.json');
   const dreamModules = await readJson('data/dream_modules.json');
   const masks = await readJson('data/masks.json');
+  const symbols = await readJson('data/symbols.json');
   const tools = await readJson('data/tool_sigils.json');
 
   assert.deepEqual(archetypes.archetypes, ARCHETYPES);
@@ -27,6 +28,7 @@ test('JSON catalogs match runtime constants used by the prototype', async () => 
 
   assert.deepEqual(dreamModules.modules.map((module) => module.id), catalog.dreamModules.map((module) => module.id));
   assert.deepEqual(masks.masks.map((mask) => mask.id), catalog.masks.map((mask) => mask.id));
+  assert.deepEqual(symbols.symbols.map((symbol) => symbol.id), catalog.symbolLexicon.map((symbol) => symbol.id));
   assert.deepEqual(tools.tool_sigils.map((tool) => tool.id), catalog.toolSigils.map((tool) => tool.id));
   assert.deepEqual(validation, { valid: true, errors: [] });
 });

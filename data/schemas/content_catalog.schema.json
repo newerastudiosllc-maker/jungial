@@ -8,6 +8,18 @@
       "type": "array",
       "items": { "type": "string" }
     },
+    "symbols": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "domain", "note"],
+        "properties": {
+          "id": { "type": "string" },
+          "domain": { "type": "string" },
+          "note": { "type": "string" }
+        }
+      }
+    },
     "tool_sigils": {
       "type": "array",
       "items": {

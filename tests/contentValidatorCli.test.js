@@ -6,6 +6,10 @@ import { validateProjectContent } from '../src/contentValidator.js';
 test('content validator reports duplicate IDs and missing symbolic tags', () => {
   const result = validateProjectContent({
     archetypes: ['Seeker'],
+    symbolLexicon: [
+      { id: 'mirror', domain: 'reflection', note: 'Mirror.' },
+      { id: 'mirror', domain: 'duplicate', note: 'Duplicate.' }
+    ],
     toolSigils: [{ id: 'key', name: 'Key', effect: 'open' }],
     dreamModules: [
       {
@@ -29,6 +33,7 @@ test('content validator reports duplicate IDs and missing symbolic tags', () => 
   });
 
   assert.equal(result.valid, false);
+  assert.equal(result.errors.includes('symbols.mirror is duplicated'), true);
   assert.equal(result.errors.includes('dreamModules.repeat is duplicated'), true);
   assert.equal(result.errors.includes('dreamModules.repeat must define at least one symbolic tag'), true);
 });

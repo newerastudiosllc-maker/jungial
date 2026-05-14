@@ -2,6 +2,7 @@ import { loadBundledContentCatalog, validateContentCatalog } from './contentCata
 
 export function validateProjectContent(catalog = loadBundledContentCatalog()) {
   const errors = [...validateContentCatalog(catalog).errors];
+  collectDuplicateIds('symbols', catalog.symbolLexicon, errors);
   collectDuplicateIds('toolSigils', catalog.toolSigils, errors);
   collectDuplicateIds('dreamModules', catalog.dreamModules, errors);
   collectDuplicateIds('masks', catalog.masks, errors);

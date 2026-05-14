@@ -9,13 +9,19 @@ export function loadBundledContentCatalog() {
     archetypes: require('../data/archetypes.json').archetypes,
     toolSigils: require('../data/tool_sigils.json').tool_sigils,
     dreamModules: require('../data/dream_modules.json').modules,
-    masks: require('../data/masks.json').masks
+    masks: require('../data/masks.json').masks,
+    symbolLexicon: require('../data/symbols.json').symbols
   });
 }
 
 export function normalizeContentCatalog(raw) {
   return {
     archetypes: [...(raw.archetypes ?? [])],
+    symbolLexicon: (raw.symbolLexicon ?? raw.symbols ?? []).map((symbol) => ({
+      id: symbol.id,
+      domain: symbol.domain ?? 'uncategorized',
+      note: symbol.note ?? ''
+    })),
     toolSigils: (raw.toolSigils ?? []).map((tool) => ({
       id: tool.id,
       name: tool.name,
@@ -44,9 +50,18 @@ export function validateContentCatalog(catalog) {
   const normalized = normalizeContentCatalog(catalog);
   const knownArchetypes = new Set(normalized.archetypes.length > 0 ? normalized.archetypes : ARCHETYPES);
   const knownAxes = new Set(FEELING_AXES);
+  const knownSymbols = new Set(normalized.symbolLexicon.map((symbol) => symbol.id));
   const errors = [];
 
   for (const module of normalized.dreamModules) {
+    if (knownSymbols.size > 0) {
+      for (const symbol of module.symbolicTags) {
+        if (!knownSymbols.has(symbol)) {
+          errors.push(`dreamModules.${module.id} has unknown symbolic tag ${symbol}`);
+        }
+      }
+    }
+
     for (const archetype of Object.keys(module.archetypeAffinities)) {
       if (!knownArchetypes.has(archetype)) {
         errors.push(`dreamModules.${module.id} has unknown archetype affinity ${archetype}`);

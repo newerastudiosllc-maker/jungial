@@ -20,6 +20,7 @@ test('bundled JSON content loads into runtime-ready catalog objects', () => {
   assert.equal(catalog.dreamModules.find((module) => module.id === 'mirror_hall').archetypeAffinities.Shadow, 1);
   assert.equal(catalog.dreamModules.find((module) => module.id === 'white_void').vibeAffinities.expansive_confined, 0.8);
   assert.equal(catalog.masks.find((mask) => mask.id === 'double').minCoherence, 0.25);
+  assert.ok(catalog.symbolLexicon.some((symbol) => symbol.id === 'threshold'));
 });
 
 test('content catalog validation rejects unknown archetype and feeling affinity keys', () => {
@@ -51,6 +52,30 @@ test('content catalog validation rejects unknown archetype and feeling affinity 
     'dreamModules.bad_dream has unknown archetype affinity NotReal',
     'dreamModules.bad_dream has unknown vibe affinity not_an_axis',
     'masks.bad_mask has unknown archetype tag AlsoNotReal'
+  ]);
+});
+
+test('content catalog validation rejects dream symbols outside the lexicon', () => {
+  const result = validateContentCatalog({
+    archetypes: ['Seeker'],
+    symbolLexicon: [{ id: 'known_symbol', domain: 'test', note: 'Known.' }],
+    toolSigils: [],
+    dreamModules: [
+      {
+        id: 'bad_symbol_dream',
+        name: 'Bad Symbol Dream',
+        symbolicTags: ['unknown_symbol'],
+        baseWeight: 1,
+        archetypeAffinities: {},
+        vibeAffinities: {}
+      }
+    ],
+    masks: []
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'dreamModules.bad_symbol_dream has unknown symbolic tag unknown_symbol'
   ]);
 });
 

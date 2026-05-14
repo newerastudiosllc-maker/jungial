@@ -13,6 +13,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - `UDreamflowComponent`: selects dream modules and four-beat `DreamJourneyV1` paths.
 - `UJungialCampaignRunner`: executes repeated Threshold-to-dream cycles while preserving Architect state.
 - `UJungialSymbolGrammar`: tracks recurrence, contradiction, tension, and symbol echoes.
+- `UJungialSymbolLexicon`: central DataAsset/registry for valid symbolic tags.
 - `UJungialWitnessComponent`: builds `SessionBundleV1`.
 - `UJungialArchitectSubsystem`: applies safe `JungialDirectiveV1` data and persists long-range state.
 - `UGniBridgeSubsystem`: validates bundles, creates `GniProcessingRequestV1`, selects provider/emulator/fixture source, and returns normalized directives.
@@ -32,6 +33,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - GNI/GNI-emulator outputs must be normalized before touching gameplay state.
 - GNI contract fixtures should pass strict validation before provider changes are accepted.
 - Content validation must run before packaged builds and before accepting AI-authored content.
+- Dream modules should reference known lexicon symbols rather than ad hoc strings.
 
 ## VR/Console Constraints
 
