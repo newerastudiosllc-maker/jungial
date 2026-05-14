@@ -442,8 +442,15 @@ test('Dreamer profile and memory context validation accept redacted hidden memor
     }
   });
 
-  assert.deepEqual(validateDreamerProfile(profile.snapshot()), { valid: true, errors: [] });
-  assert.deepEqual(validateDreamerMemoryContext(profile.toGniMemoryContext({ slotId: 'slot-a' })), { valid: true, errors: [] });
+  const snapshot = profile.snapshot();
+  const context = profile.toGniMemoryContext({ slotId: 'slot-a' });
+
+  assert.deepEqual(snapshot.memory.weatherTags, {});
+  assert.deepEqual(snapshot.memory.dreadAxes, {});
+  assert.deepEqual(context.familiarWeatherTags, []);
+  assert.deepEqual(context.familiarDreadAxes, []);
+  assert.deepEqual(validateDreamerProfile(snapshot), { valid: true, errors: [] });
+  assert.deepEqual(validateDreamerMemoryContext(context), { valid: true, errors: [] });
 });
 
 test('Dreamer profile validation rejects raw private memory shapes', () => {
@@ -481,7 +488,7 @@ test('Dreamer profile validation rejects raw private memory shapes', () => {
   ]);
 });
 
-test('Dreamer profile validation requires weather aggregate memory maps', () => {
+test('Dreamer profile validation rejects malformed present weather aggregate memory maps', () => {
   const result = validateDreamerProfile({
     schema: 'DreamerProfileV1',
     schemaVersion: 1,
@@ -502,6 +509,7 @@ test('Dreamer profile validation requires weather aggregate memory maps', () => 
       motifs: {},
       gestures: {},
       echoThreads: {},
+      weatherTags: [],
       dreadAxes: { watching: { count: 1, weight: Number.NaN, lastSeenAt: null } },
       lastSessionDigest: null
     }
@@ -514,7 +522,7 @@ test('Dreamer profile validation requires weather aggregate memory maps', () => 
   ]);
 });
 
-test('Dreamer profile validation rejects missing weather aggregate memory maps', () => {
+test('Dreamer profile validation accepts old V1 profiles missing weather aggregate memory maps', () => {
   const result = validateDreamerProfile({
     schema: 'DreamerProfileV1',
     schemaVersion: 1,
@@ -539,11 +547,7 @@ test('Dreamer profile validation rejects missing weather aggregate memory maps',
     }
   });
 
-  assert.equal(result.valid, false);
-  assert.deepEqual(result.errors, [
-    'memory.weatherTags must be an object',
-    'memory.dreadAxes must be an object'
-  ]);
+  assert.deepEqual(result, { valid: true, errors: [] });
 });
 
 test('GNI request validation checks optional Dreamer memory context', () => {
@@ -598,6 +602,30 @@ test('GNI request validation checks optional Dreamer memory context', () => {
     'payload.dreamerMemoryContext.slotId is required',
     'payload.dreamerMemoryContext.familiarDreadAxes[0] must be a non-empty string'
   ]);
+});
+
+test('Dreamer memory context validation accepts old V1 contexts missing weather lists', () => {
+  const result = validateDreamerMemoryContext({
+    schema: 'DreamerMemoryContextV1',
+    schemaVersion: 1,
+    profileId: null,
+    slotId: 'slot-a',
+    saveMode: 'continue',
+    sessionCount: 0,
+    strongSymbols: [],
+    recurringArchetypes: [],
+    familiarMasks: [],
+    familiarDreamModules: [],
+    familiarActions: [],
+    familiarPassages: [],
+    familiarMotifs: [],
+    familiarGestures: [],
+    echoThreadIds: [],
+    vibeEchoes: [],
+    lastSessionDigest: null
+  });
+
+  assert.deepEqual(result, { valid: true, errors: [] });
 });
 
 test('save game validation checks optional Dreamer profile payload', () => {

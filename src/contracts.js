@@ -289,9 +289,7 @@ export function validateDreamerMemoryContext(context) {
     'familiarMotifs',
     'familiarGestures',
     'echoThreadIds',
-    'vibeEchoes',
-    'familiarWeatherTags',
-    'familiarDreadAxes'
+    'vibeEchoes'
   ];
 
   if (context?.schema !== 'DreamerMemoryContextV1') {
@@ -314,6 +312,11 @@ export function validateDreamerMemoryContext(context) {
   }
   for (const key of requiredLists) {
     errors.push(...validateStringList(context?.[key], key));
+  }
+  for (const key of ['familiarWeatherTags', 'familiarDreadAxes']) {
+    if (context?.[key] !== undefined) {
+      errors.push(...validateStringList(context[key], key));
+    }
   }
   if (!isNullableString(context?.lastSessionDigest)) {
     errors.push('lastSessionDigest must be a string or null');
@@ -391,8 +394,12 @@ export function validateDreamerProfile(profile) {
     errors.push(...validateMemoryMap(profile.memory.motifs, 'memory.motifs'));
     errors.push(...validateMemoryMap(profile.memory.gestures, 'memory.gestures'));
     errors.push(...validateMemoryMap(profile.memory.echoThreads, 'memory.echoThreads'));
-    errors.push(...validateMemoryMap(profile.memory.weatherTags, 'memory.weatherTags'));
-    errors.push(...validateMemoryMap(profile.memory.dreadAxes, 'memory.dreadAxes'));
+    if (profile.memory.weatherTags !== undefined) {
+      errors.push(...validateMemoryMap(profile.memory.weatherTags, 'memory.weatherTags'));
+    }
+    if (profile.memory.dreadAxes !== undefined) {
+      errors.push(...validateMemoryMap(profile.memory.dreadAxes, 'memory.dreadAxes'));
+    }
     if (!isNullableString(profile.memory.lastSessionDigest)) {
       errors.push('memory.lastSessionDigest must be a string or null');
     }

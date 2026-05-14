@@ -125,6 +125,54 @@ test('DreamerProfile records familiar dream weather without storing raw player i
   assert.equal(snapshotText.includes('privateNote'), false);
 });
 
+test('DreamerProfile hydrates old snapshots with empty weather memory maps', () => {
+  const profile = new DreamerProfile({
+    profileId: 'legacy-dreamer',
+    rootSeed: 'legacy-root',
+    createdAt: '2050-01-01T00:00:00.000Z',
+    updatedAt: '2050-01-01T00:00:00.000Z',
+    consent: {
+      profileMemory: true,
+      crossSaveEchoes: false
+    },
+    memory: {
+      sessionCount: 0,
+      symbols: {},
+      archetypes: {},
+      actions: {},
+      dreamModules: {},
+      masks: {},
+      vibeStates: {},
+      passages: {},
+      motifs: {},
+      gestures: {},
+      echoThreads: {},
+      lastSessionDigest: null
+    }
+  });
+
+  assert.deepEqual(profile.snapshot().memory.weatherTags, {});
+  assert.deepEqual(profile.snapshot().memory.dreadAxes, {});
+  assert.deepEqual(profile.toGniMemoryContext({ slotId: 'slot-a' }).familiarWeatherTags, []);
+  assert.deepEqual(profile.toGniMemoryContext({ slotId: 'slot-a' }).familiarDreadAxes, []);
+});
+
+test('DreamerProfile respects memory context limit for familiar dread axes', () => {
+  const profile = new DreamerProfile({
+    profileId: 'dreamer-one',
+    rootSeed: 'root-one',
+    memory: {
+      dreadAxes: {
+        watching: { count: 1, weight: 0.9, lastSeenAt: null },
+        pursuit: { count: 1, weight: 0.8, lastSeenAt: null },
+        loss: { count: 1, weight: 0.7, lastSeenAt: null }
+      }
+    }
+  });
+
+  assert.deepEqual(profile.toGniMemoryContext({ slotId: 'slot-a', limit: 2 }).familiarDreadAxes, ['watching', 'pursuit']);
+});
+
 test('DreamerProfile derives divergent seeds for fresh saves and incarnations', () => {
   const profile = new DreamerProfile({
     profileId: 'dreamer-one',

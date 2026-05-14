@@ -43,8 +43,6 @@
         "motifs",
         "gestures",
         "echoThreads",
-        "weatherTags",
-        "dreadAxes",
         "lastSessionDigest"
       ],
       "properties": {

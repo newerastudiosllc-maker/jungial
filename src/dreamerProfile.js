@@ -131,7 +131,7 @@ export class DreamerProfile {
       echoThreadIds: topKeys(this.memory.echoThreads, limit),
       vibeEchoes: topKeys(this.memory.vibeStates, limit),
       familiarWeatherTags: topKeys(this.memory.weatherTags, limit),
-      familiarDreadAxes: topKeys(this.memory.dreadAxes, 5, 'weight'),
+      familiarDreadAxes: topKeys(this.memory.dreadAxes, limit, 'weight'),
       lastSessionDigest: this.memory.lastSessionDigest
     };
   }
