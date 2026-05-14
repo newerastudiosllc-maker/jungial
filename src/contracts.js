@@ -244,6 +244,81 @@ export function validateGniQueueProcessResult(result) {
   };
 }
 
+export function validateSaveGame(saveGame) {
+  const errors = [];
+
+  if (saveGame?.schema !== 'JungialSaveGame') {
+    errors.push('schema must be JungialSaveGame');
+  }
+  if (saveGame?.version !== 1) {
+    errors.push('version must be 1');
+  }
+  if (!isNonEmptyString(saveGame?.savedAt)) {
+    errors.push('savedAt is required');
+  }
+  if (saveGame?.migrations !== undefined) {
+    if (!Array.isArray(saveGame.migrations)) {
+      errors.push('migrations must be an array');
+    } else {
+      saveGame.migrations.forEach((migration, index) => {
+        if (typeof migration !== 'string') {
+          errors.push(`migrations[${index}] must be a string`);
+        }
+      });
+    }
+  }
+  if (!isObject(saveGame?.payload)) {
+    errors.push('payload must be an object');
+    return {
+      valid: errors.length === 0,
+      errors
+    };
+  }
+
+  const requiredPayloadObjects = ['room', 'archetypeState', 'feelingState', 'journal', 'architectState'];
+  for (const key of requiredPayloadObjects) {
+    if (!isObject(saveGame.payload[key])) {
+      errors.push(`payload.${key} must be an object`);
+    }
+  }
+
+  errors.push(...validateOptionalNestedContract(
+    saveGame.payload.gniQueue,
+    'payload.gniQueue',
+    validateGniDirectiveQueue
+  ));
+  errors.push(...validateOptionalNestedContract(
+    saveGame.payload.lastSessionBundle,
+    'payload.lastSessionBundle',
+    validateSessionBundle
+  ));
+  errors.push(...validateOptionalNestedContract(
+    saveGame.payload.pendingGniRequest,
+    'payload.pendingGniRequest',
+    validateGniProcessingRequest
+  ));
+  errors.push(...validateOptionalNestedContract(
+    saveGame.payload.gniBridgeResult,
+    'payload.gniBridgeResult',
+    validateGniBridgeResult
+  ));
+  errors.push(...validateOptionalNestedContract(
+    saveGame.payload.appliedGniDirective,
+    'payload.appliedGniDirective',
+    validateDirective
+  ));
+  errors.push(...validateOptionalNestedContract(
+    saveGame.payload.lastGniQueueProcessResult,
+    'payload.lastGniQueueProcessResult',
+    validateGniQueueProcessResult
+  ));
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
 export function normalizeDirective(response) {
   return {
     schema: 'JungialDirectiveV1',
@@ -267,6 +342,14 @@ export function normalizeDirective(response) {
 
 export function clampNumber(value, min, max) {
   return Math.max(min, Math.min(max, value));
+}
+
+function validateOptionalNestedContract(value, label, validator) {
+  if (value === undefined || value === null) {
+    return [];
+  }
+  const validation = validator(value);
+  return validation.valid ? [] : validation.errors.map((error) => `${label}.${error}`);
 }
 
 function validateQueueProcessEntry(entry, label) {

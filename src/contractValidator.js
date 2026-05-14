@@ -7,6 +7,7 @@ import {
   validateGniDirectiveQueue,
   validateGniQueueProcessResult,
   validateGniProcessingRequest,
+  validateSaveGame,
   validateSessionBundle
 } from './contracts.js';
 
@@ -24,6 +25,8 @@ export function validateContractDocument(document) {
       return validateGniDirectiveQueue(document);
     case 'GniDirectiveQueueProcessResultV1':
       return validateGniQueueProcessResult(document);
+    case 'JungialSaveGame':
+      return validateSaveGame(document);
     default:
       return {
         valid: false,
