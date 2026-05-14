@@ -230,6 +230,12 @@ Replay, simulation, and campaign runs all pass through this router.
 
 Use `--trace=<path>` on simulation runs to write a standalone trace JSON file. Save files also include the trace snapshot, and `processSavedGniQueue()` appends a `gni.queue.processed` event when background AI work is resolved later.
 
+## Dreamer Memory And Safety
+
+`DreamerProfileV1` is the hidden long-term memory layer for gradual personalization across sessions. It stores redacted symbolic aggregates, not raw speech or private transcripts, and can provide `DreamerMemoryContextV1` to GNI without exposing the mechanics to the player.
+
+See `docs/dreamer-memory-and-safety.md` for the product/architecture guardrails: mystery in-world, transparent profile controls out-of-world, save/incarnation modes, and safety boundaries around therapeutic positioning.
+
 Inspect a trace summary:
 
 ```powershell
@@ -242,7 +248,7 @@ Export GNI contract fixtures:
 npm run fixtures
 ```
 
-This writes `fixtures/session_bundle_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
+This writes `fixtures/session_bundle_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
 
 Validate generated fixtures, SaveGame envelopes, and mock GNI directives against the strict contract gate:
 
