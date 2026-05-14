@@ -25,11 +25,14 @@ export async function runAsyncGniSmoke({
   seed = 777,
   savePath = join(root, 'saves', 'async-gni-smoke-session.json'),
   directive = defaultDirective,
+  readyAfterPolls = 1,
+  maxQueueProcessAttempts = 3,
   clock = createDeterministicClock({ startIso: '2060-03-01T00:00:00.000Z', stepMs: 1000 })
 } = {}) {
   const mock = createMockGniServer({
     mode: 'async',
-    directive
+    directive,
+    readyAfterPolls
   });
 
   try {
@@ -46,12 +49,22 @@ export async function runAsyncGniSmoke({
       clock
     });
     const initialSave = await loadGameState(savePath);
-    const queueProcess = await processSavedGniQueue({
-      savePath,
-      provider,
-      clock
-    });
-    const finalSave = await loadGameState(savePath);
+    const queueProcessAttempts = [];
+    let queueProcess = null;
+    let finalSave = initialSave;
+
+    for (let attempt = 0; attempt < maxQueueProcessAttempts; attempt += 1) {
+      queueProcess = await processSavedGniQueue({
+        savePath,
+        provider,
+        clock
+      });
+      queueProcessAttempts.push(queueProcess);
+      finalSave = await loadGameState(savePath);
+      if (finalSave.gniQueue.pending.length === 0) {
+        break;
+      }
+    }
 
     return {
       schema: 'AsyncGniSmokeResultV1',
@@ -60,6 +73,7 @@ export async function runAsyncGniSmoke({
       simulation,
       initialSave,
       queueProcess,
+      queueProcessAttempts,
       finalSave
     };
   } finally {
@@ -79,6 +93,10 @@ export function parseAsyncGniSmokeArgs(args) {
       options.clockStartIso = arg.slice('--clock-start='.length);
     } else if (arg.startsWith('--clock-step-ms=')) {
       options.clockStepMs = Number(arg.slice('--clock-step-ms='.length));
+    } else if (arg.startsWith('--ready-after-polls=')) {
+      options.readyAfterPolls = Number(arg.slice('--ready-after-polls='.length));
+    } else if (arg.startsWith('--max-queue-process-attempts=')) {
+      options.maxQueueProcessAttempts = Number(arg.slice('--max-queue-process-attempts='.length));
     } else if (arg === '--json') {
       options.json = true;
     }
@@ -98,6 +116,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const result = await runAsyncGniSmoke({
     seed: options.seed,
     savePath: options.savePath,
+    readyAfterPolls: options.readyAfterPolls,
+    maxQueueProcessAttempts: options.maxQueueProcessAttempts,
     clock
   });
 
@@ -110,6 +130,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     }, {});
     console.log(`Mock async GNI endpoint: ${result.mockEndpoint}`);
     console.log(`Initial queue pending: ${result.initialSave.gniQueue.pending.length}`);
+    console.log(`Queue process attempts: ${result.queueProcessAttempts.length}`);
     console.log(`Queue process status counts: ${JSON.stringify(processed)}`);
     console.log(`Final queue pending: ${result.finalSave.gniQueue.pending.length}`);
     console.log(`Final queue resolved: ${result.finalSave.gniQueue.resolved.length}`);

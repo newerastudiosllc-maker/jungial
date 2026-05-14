@@ -228,6 +228,55 @@ test('pending GNI queue processor polls provider job status URLs before resubmit
   }
 });
 
+test('pending GNI queue processor leaves not-ready provider jobs queued', async () => {
+  const mock = createMockGniServer({
+    mode: 'async',
+    readyAfterPolls: 2,
+    directive: {
+      dreamWeightDeltas: { garden: 0.35 },
+      symbolEchoes: ['threshold']
+    }
+  });
+  const queue = new GniDirectiveQueue();
+
+  try {
+    await mock.start();
+    const acceptedResponse = await fetch(`${mock.url}/gni`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(REQUEST)
+    });
+    const accepted = await acceptedResponse.json();
+    queue.enqueue({
+      request: REQUEST,
+      reason: 'provider_empty',
+      providerJob: {
+        id: accepted.jobId,
+        statusUrl: accepted.statusUrl,
+        pollAfterMs: accepted.pollAfterMs
+      }
+    });
+
+    const firstResult = await processPendingGniQueue({
+      queueSnapshot: queue.snapshot(),
+      architectState: new ArchitectState({ globalDreamWeights: { garden: 1 } })
+    });
+    const secondResult = await processPendingGniQueue({
+      queueSnapshot: firstResult.queue,
+      architectState: firstResult.architectState
+    });
+
+    assert.equal(firstResult.processed[0].status, 'provider_empty');
+    assert.equal(firstResult.queue.pending.length, 1);
+    assert.equal(firstResult.queue.pending[0].attempts, 2);
+    assert.equal(secondResult.processed[0].status, 'directive_ready');
+    assert.equal(secondResult.queue.pending.length, 0);
+    assert.equal(secondResult.architectState.globalDreamWeights.garden, 1.35);
+  } finally {
+    await mock.stop();
+  }
+});
+
 test('GNI queue processor CLI args and provider factory support HTTP handoff options', () => {
   const previous = process.env.TEST_GNI_TOKEN;
   process.env.TEST_GNI_TOKEN = 'token-from-env';

@@ -87,3 +87,33 @@ test('mock GNI server can accept async jobs and expose a job status URL', async 
     await mock.stop();
   }
 });
+
+test('mock GNI server can keep async jobs pending before they resolve', async () => {
+  const mock = createMockGniServer({
+    mode: 'async',
+    readyAfterPolls: 2,
+    directive: {
+      dreamWeightDeltas: { mirror_hall: 0.25 },
+      symbolEchoes: ['mirror']
+    }
+  });
+
+  try {
+    await mock.start();
+    const response = await fetch(`${mock.url}/gni`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(REQUEST)
+    });
+    const accepted = await response.json();
+    const firstStatus = await (await fetch(accepted.statusUrl)).json();
+    const secondStatus = await (await fetch(accepted.statusUrl)).json();
+
+    assert.equal(firstStatus.status, 'pending');
+    assert.equal(firstStatus.jobId, 'gni-job-001');
+    assert.equal(secondStatus.status, 'ready');
+    assert.equal(secondStatus.directive.dreamWeightDeltas.mirror_hall, 0.25);
+  } finally {
+    await mock.stop();
+  }
+});

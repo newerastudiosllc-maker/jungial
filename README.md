@@ -53,16 +53,17 @@ npm run mock:gni -- --port=8787 --mode=directive --directive=data/mock_gni_direc
 node src/simulation.js --gni-endpoint=http://127.0.0.1:8787/gni
 ```
 
-Use `--mode=async` to make the mock server return HTTP `202` with a `jobId`, `statusUrl`, and `pollAfterMs` instead of an immediate directive.
+Use `--mode=async` to make the mock server return HTTP `202` with a `jobId`, `statusUrl`, and `pollAfterMs` instead of an immediate directive. Add `--ready-after-polls=2` or higher to rehearse jobs that stay pending before they resolve.
 
 To exercise the whole async GNI save/resume path in one command:
 
 ```powershell
 npm run gni:smoke:async
 npm run gni:smoke:async -- --save=saves/async-gni-smoke-session.json --json
+npm run gni:smoke:async -- --ready-after-polls=2 --max-queue-process-attempts=2
 ```
 
-This starts the local mock server in async mode, runs the Threshold-to-dream simulation against it, saves the pending queue, polls the mock job status URL, applies the returned directive, and writes the resolved queue back into the same save.
+This starts the local mock server in async mode, runs the Threshold-to-dream simulation against it, saves the pending queue, polls the mock job status URL, applies the returned directive, and writes the resolved queue back into the same save. The delayed-poll options rehearse jobs that stay pending across multiple background queue passes.
 
 To run a deterministic replay script:
 

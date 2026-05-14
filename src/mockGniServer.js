@@ -8,7 +8,8 @@ export function createMockGniServer({
   host = '127.0.0.1',
   port = 0,
   mode = 'directive',
-  directive = {}
+  directive = {},
+  readyAfterPolls = 1
 } = {}) {
   let server = null;
   let url = null;
@@ -32,7 +33,8 @@ export function createMockGniServer({
         nextJobNumber += 1;
         jobs.set(jobId, {
           request: payload,
-          directive: normalizedDirective
+          directive: normalizedDirective,
+          pollCount: 0
         });
         return sendJson(response, 202, {
           jobId,
@@ -50,6 +52,17 @@ export function createMockGniServer({
       if (!job) {
         return sendJson(response, 404, {
           error: 'job not found'
+        });
+      }
+      job.pollCount += 1;
+
+      if (job.pollCount < Math.max(1, readyAfterPolls)) {
+        return sendJson(response, 200, {
+          schema: 'GniProviderJobStatusV1',
+          status: 'pending',
+          jobId,
+          statusUrl: `${url}/jobs/${jobId}`,
+          pollAfterMs: 0
         });
       }
 
@@ -110,6 +123,8 @@ export function parseMockGniServerArgs(args) {
       options.mode = arg.slice('--mode='.length);
     } else if (arg.startsWith('--directive=')) {
       options.directivePath = arg.slice('--directive='.length);
+    } else if (arg.startsWith('--ready-after-polls=')) {
+      options.readyAfterPolls = Number(arg.slice('--ready-after-polls='.length));
     }
   }
   return options;
@@ -151,7 +166,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     host: options.host,
     port: options.port ?? 8787,
     mode: options.mode ?? 'directive',
-    directive
+    directive,
+    readyAfterPolls: options.readyAfterPolls ?? 1
   });
 
   await mock.start();
