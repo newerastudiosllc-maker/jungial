@@ -3,6 +3,9 @@
   "runId": "trace_0001",
   "eventCounts": {
     "simulation.started": 1,
+    "first.listening.started": 1,
+    "first.listening.beat.recorded": 3,
+    "first.listening.completed": 1,
     "threshold.input": 1,
     "threshold.awakened": 1,
     "portal.opened": 1,
@@ -15,7 +18,6 @@
     "journal.entry.written": 1,
     "witness.bundle.created": 1,
     "gni.request.created": 1,
-    "gni.firebreak.applied": 1,
     "gni.emulator.directive.created": 1,
     "gni.directive.applied": 1,
     "simulation.saved": 1

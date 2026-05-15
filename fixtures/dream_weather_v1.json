@@ -3,16 +3,16 @@
   "schemaVersion": 1,
   "weatherId": "weather-777",
   "mood": "stillness",
-  "pressure": "low",
-  "ceiling": 0.35,
+  "pressure": "medium",
+  "ceiling": 0.44,
   "dreadBudget": {
-    "pursuit": 0.103,
-    "bodyUnease": 0.145,
-    "cosmicDread": 0.161,
-    "disorientation": 0.083,
-    "loss": 0.044,
-    "watching": 0.114,
-    "claustrophobia": 0.05
+    "pursuit": 0.13,
+    "bodyUnease": 0.183,
+    "cosmicDread": 0.203,
+    "disorientation": 0.104,
+    "loss": 0.055,
+    "watching": 0.144,
+    "claustrophobia": 0.063
   },
   "weatherTags": [
     "silence",
@@ -22,11 +22,11 @@
   ],
   "suppressedTags": [],
   "atmosphere": {
-    "lightIntensity": 0.74,
-    "fogDensity": 0.337,
+    "lightIntensity": 0.626,
+    "fogDensity": 0.37,
     "bloom": 0.246,
-    "exposure": 0.48,
-    "warmth": 0.527,
-    "movementDrag": 0.277
+    "exposure": 0.42,
+    "warmth": 0.519,
+    "movementDrag": 0.318
   }
 }

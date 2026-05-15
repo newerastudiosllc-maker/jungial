@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/first_listening.schema.json",
+  "title": "FirstListeningRunV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "schemaVersion",
+    "seed",
+    "beats",
+    "derivedToneTags",
+    "intensityHint",
+    "returnAnchorHint",
+    "redactedSummary"
+  ],
+  "properties": {
+    "schema": { "const": "FirstListeningRunV1" },
+    "schemaVersion": { "const": 1 },
+    "seed": { "type": "number" },
+    "beats": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/listeningBeat" }
+    },
+    "derivedToneTags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "intensityHint": { "type": "number", "minimum": 0, "maximum": 1 },
+    "returnAnchorHint": {
+      "type": "object",
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": { "type": "string", "minLength": 1 },
+        "value": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "redactedSummary": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "listeningBeat": {
+      "type": "object",
+      "required": [
+        "schema",
+        "schemaVersion",
+        "beatId",
+        "symbolicObjectId",
+        "responseKind",
+        "gestureTags",
+        "motifTags",
+        "pressureAccepted",
+        "boundarySignals"
+      ],
+      "properties": {
+        "schema": { "const": "ListeningBeatV1" },
+        "schemaVersion": { "const": 1 },
+        "beatId": { "type": "string", "minLength": 1 },
+        "symbolicObjectId": { "type": "string", "minLength": 1 },
+        "responseKind": { "type": "string", "minLength": 1 },
+        "gestureTags": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "motifTags": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "pressureAccepted": { "type": "number", "minimum": 0, "maximum": 1 },
+        "boundarySignals": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

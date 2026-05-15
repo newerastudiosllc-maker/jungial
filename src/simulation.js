@@ -18,6 +18,7 @@ import { advanceSessionArc } from './sessionArc.js';
 import { createSessionCovenant } from './sessionCovenant.js';
 import { createEchoTrace, selectPassage, toGniPassageContext } from './passageLattice.js';
 import { createDreamWeather, createWeatherTrace, toGniWeatherContext } from './dreamWeather.js';
+import { deriveSessionCovenantFromListening, runFirstListeningSequence } from './firstListening.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -38,6 +39,8 @@ export async function runSimulation({
   incarnationIndex = null,
   sessionArc = null,
   sessionCovenant = null,
+  firstListening = false,
+  firstListeningBeats = undefined,
   passageResponse = null,
   recentEchoTraces = []
 } = {}) {
@@ -87,11 +90,26 @@ export async function runSimulation({
   const activeSaveMode = saveSlot?.mode ?? saveMode;
   const dreamerMemoryContext = saveSlot?.dreamerMemoryContext
     ?? (dreamer ? dreamer.toGniMemoryContext({ slotId: activeSaveSlotId, mode: activeSaveMode }) : null);
-  const activeSessionCovenant = createSessionCovenant(sessionCovenant ?? {});
+  const firstListeningRun = firstListening
+    ? runFirstListeningSequence({
+        seed: effectiveSeed,
+        beats: firstListeningBeats
+      })
+    : null;
+  const activeSessionCovenant = firstListeningRun
+    ? deriveSessionCovenantFromListening({
+        listeningRun: firstListeningRun,
+        explicitSessionSettings: sessionCovenant ?? {}
+      })
+    : createSessionCovenant(sessionCovenant ?? {});
 
   const transcript = [];
   transcript.push('Threshold Chamber: silent, dim, confined.');
   transcript.push(`A small note waits: "${chamber.note}".`);
+  if (firstListeningRun) {
+    transcript.push('The room listens before the key turns.');
+    recordFirstListeningTrace(traceRecorder, firstListeningRun);
+  }
 
   traceRecorder.record('threshold.input', { kind: 'speech', text: 'the word' });
   applyPlayerInput({ source: 'system', kind: 'speech', text: 'the word' }, {
@@ -360,6 +378,7 @@ export async function runSimulation({
     sessionCovenant: activeSessionCovenant,
     echoTrace,
     activePassage,
+    ...(firstListeningRun ? { firstListeningRun } : {}),
     dreamWeather,
     weatherTrace,
     ...(dreamerProfileSnapshot ? { dreamerProfile: dreamerProfileSnapshot } : {}),
@@ -387,6 +406,7 @@ export async function runSimulation({
     sessionArc: activeSessionArc,
     sessionArcDirective,
     sessionCovenant: activeSessionCovenant,
+    firstListeningRun,
     activePassage,
     echoTrace,
     dreamWeather,
@@ -396,6 +416,30 @@ export async function runSimulation({
     effectiveSeed,
     savePath
   };
+}
+
+function recordFirstListeningTrace(traceRecorder, firstListeningRun) {
+  traceRecorder.record('first.listening.started', {
+    seed: firstListeningRun.seed,
+    beatCount: firstListeningRun.beats.length
+  });
+  for (const beat of firstListeningRun.beats) {
+    traceRecorder.record('first.listening.beat.recorded', {
+      beatId: beat.beatId,
+      symbolicObjectId: beat.symbolicObjectId,
+      responseKind: beat.responseKind,
+      gestureTags: beat.gestureTags,
+      motifTags: beat.motifTags,
+      pressureAccepted: beat.pressureAccepted,
+      boundarySignals: beat.boundarySignals
+    });
+  }
+  traceRecorder.record('first.listening.completed', {
+    derivedToneTags: firstListeningRun.derivedToneTags,
+    intensityHint: firstListeningRun.intensityHint,
+    returnAnchorHint: firstListeningRun.returnAnchorHint,
+    redactedSummary: firstListeningRun.redactedSummary
+  });
 }
 
 function shouldPrepareSaveSlot({ dreamerProfile, saveSlotId, saveMode, incarnationIndex }) {
@@ -417,6 +461,8 @@ export function parseSimulationArgs(args) {
       options.gniResponsePath = arg.slice('--gni-response='.length);
     } else if (arg === '--emulate-gni') {
       options.emulateGni = true;
+    } else if (arg === '--first-listening') {
+      options.firstListening = true;
     } else if (arg.startsWith('--gni-endpoint=')) {
       options.gniEndpoint = arg.slice('--gni-endpoint='.length);
     } else if (arg.startsWith('--gni-token-env=')) {
@@ -464,6 +510,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     gniResponse,
     gniProvider: createGniProviderFromOptions(options),
     emulateGni: options.emulateGni,
+    firstListening: options.firstListening,
     clock,
     tracePath: options.tracePath
   });

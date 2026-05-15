@@ -1,20 +1,25 @@
 {
   "schema": "SessionCovenantV1",
   "schemaVersion": 1,
-  "mode": "tonight_shape",
+  "mode": "first_listening",
   "toneTags": [
-    "gentle",
-    "strange"
+    "curious",
+    "deep"
   ],
-  "intensityCeiling": 0.35,
+  "intensityCeiling": 0.44,
   "hardBoundaryTags": [
     "real_world_self_harm"
   ],
   "softBoundaryTags": [],
-  "allowedPressureTags": [],
+  "allowedPressureTags": [
+    "threshold",
+    "word",
+    "lamp",
+    "breath"
+  ],
   "returnAnchor": {
     "kind": "image",
-    "value": "the note in the Threshold Chamber"
+    "value": "threshold_lamp"
   },
   "groundingPreference": "quiet_room",
   "memoryScope": "session_only"

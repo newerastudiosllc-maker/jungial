@@ -203,7 +203,7 @@
     },
     "architectState": {
       "globalDreamWeights": {
-        "white_void": 1.55
+        "white_void": 1.561
       },
       "symbolFrequency": {
         "light": 2,
@@ -244,9 +244,9 @@
             "vibe": 1.005,
             "room": 0.25,
             "portal": 0.35,
-            "directorMultiplier": 1.099,
-            "total": 5.819,
-            "roll": 9.33862
+            "directorMultiplier": 1.1,
+            "total": 5.824,
+            "roll": 9.3456
           }
         },
         {
@@ -264,9 +264,9 @@
             "vibe": -0.038,
             "room": 0.25,
             "portal": 0.35,
-            "directorMultiplier": 1.198,
-            "total": 4.657,
-            "roll": 13.13174
+            "directorMultiplier": 1.2,
+            "total": 4.665,
+            "roll": 13.14156
           }
         },
         {
@@ -284,9 +284,9 @@
             "vibe": -0.038,
             "room": 0.25,
             "portal": 0.35,
-            "directorMultiplier": 1.198,
-            "total": 4.657,
-            "roll": 14.56538
+            "directorMultiplier": 1.2,
+            "total": 4.665,
+            "roll": 14.57627
           }
         },
         {
@@ -304,9 +304,9 @@
             "vibe": 1.005,
             "room": 0.25,
             "portal": 0.35,
-            "directorMultiplier": 1.099,
-            "total": 5.819,
-            "roll": 7.46787
+            "directorMultiplier": 1.1,
+            "total": 5.824,
+            "roll": 7.47346
           }
         }
       ],
@@ -416,7 +416,7 @@
         "schemaVersion": 1,
         "weatherId": "weather-777",
         "mood": "stillness",
-        "pressure": "low",
+        "pressure": "medium",
         "weatherTags": [
           "silence",
           "threshold",
@@ -424,38 +424,38 @@
           "memory"
         ],
         "lighting": {
-          "intensityScale": 0.74,
+          "intensityScale": 0.626,
           "bloom": 0.246,
-          "exposure": 0.48,
-          "flicker": 0.027,
-          "warmth": 0.527
+          "exposure": 0.42,
+          "flicker": 0.072,
+          "warmth": 0.519
         },
         "fog": {
-          "density": 0.337,
-          "drift": 0.162,
-          "veil": 0.052
+          "density": 0.37,
+          "drift": 0.232,
+          "veil": 0.14
         },
         "audio": {
-          "tension": 0.161,
-          "reverb": 0.228,
-          "lowPass": 0.033,
+          "tension": 0.203,
+          "reverb": 0.308,
+          "lowPass": 0.088,
           "silence": 0.65
         },
         "haptics": {
           "enabled": true,
-          "amplitude": 0.113,
-          "pulseRate": 0.143
+          "amplitude": 0.142,
+          "pulseRate": 0.248
         },
         "movement": {
-          "drag": 0.277,
-          "drift": 0.036,
-          "steadinessAssist": 0.839
+          "drag": 0.318,
+          "drift": 0.096,
+          "steadinessAssist": 0.797
         },
         "comfort": {
-          "ceiling": 0.35,
+          "ceiling": 0.44,
           "suddenFlashAllowed": false,
           "pursuitAllowed": true,
-          "locomotionIntensity": 0.283,
+          "locomotionIntensity": 0.42,
           "returnAnchorKind": "image"
         }
       }
@@ -477,6 +477,89 @@
         {
           "index": 2,
           "at": "2060-01-01T00:00:01.000Z",
+          "type": "first.listening.started",
+          "payload": {
+            "seed": 777,
+            "beatCount": 3
+          }
+        },
+        {
+          "index": 3,
+          "at": "2060-01-01T00:00:02.000Z",
+          "type": "first.listening.beat.recorded",
+          "payload": {
+            "beatId": "beat-note",
+            "symbolicObjectId": "threshold_note",
+            "responseKind": "approach",
+            "gestureTags": [
+              "approach"
+            ],
+            "motifTags": [
+              "threshold",
+              "word"
+            ],
+            "pressureAccepted": 0.32,
+            "boundarySignals": []
+          }
+        },
+        {
+          "index": 4,
+          "at": "2060-01-01T00:00:03.000Z",
+          "type": "first.listening.beat.recorded",
+          "payload": {
+            "beatId": "beat-heartlight",
+            "symbolicObjectId": "heartlight",
+            "responseKind": "open",
+            "gestureTags": [
+              "open",
+              "breathe"
+            ],
+            "motifTags": [
+              "lamp",
+              "breath"
+            ],
+            "pressureAccepted": 0.36,
+            "boundarySignals": []
+          }
+        },
+        {
+          "index": 5,
+          "at": "2060-01-01T00:00:04.000Z",
+          "type": "first.listening.beat.recorded",
+          "payload": {
+            "beatId": "beat-return",
+            "symbolicObjectId": "threshold_lamp",
+            "responseKind": "return_anchor",
+            "gestureTags": [
+              "return_anchor"
+            ],
+            "motifTags": [
+              "lamp"
+            ],
+            "pressureAccepted": 0.18,
+            "boundarySignals": []
+          }
+        },
+        {
+          "index": 6,
+          "at": "2060-01-01T00:00:05.000Z",
+          "type": "first.listening.completed",
+          "payload": {
+            "derivedToneTags": [
+              "curious",
+              "deep"
+            ],
+            "intensityHint": 0.36,
+            "returnAnchorHint": {
+              "kind": "image",
+              "value": "threshold_lamp"
+            },
+            "redactedSummary": "threshold_note answered as approach; heartlight answered as open; threshold_lamp answered as return_anchor"
+          }
+        },
+        {
+          "index": 7,
+          "at": "2060-01-01T00:00:06.000Z",
           "type": "threshold.input",
           "payload": {
             "kind": "speech",
@@ -484,8 +567,8 @@
           }
         },
         {
-          "index": 3,
-          "at": "2060-01-01T00:00:02.000Z",
+          "index": 8,
+          "at": "2060-01-01T00:00:07.000Z",
           "type": "threshold.awakened",
           "payload": {
             "room": {
@@ -527,8 +610,8 @@
           }
         },
         {
-          "index": 4,
-          "at": "2060-01-01T00:00:03.000Z",
+          "index": 9,
+          "at": "2060-01-01T00:00:08.000Z",
           "type": "portal.opened",
           "payload": {
             "room": {
@@ -568,8 +651,8 @@
           }
         },
         {
-          "index": 5,
-          "at": "2060-01-01T00:00:04.000Z",
+          "index": 10,
+          "at": "2060-01-01T00:00:09.000Z",
           "type": "passage.gathered",
           "payload": {
             "passageId": "candle_refuses_dark",
@@ -582,8 +665,8 @@
           }
         },
         {
-          "index": 6,
-          "at": "2060-01-01T00:00:05.000Z",
+          "index": 11,
+          "at": "2060-01-01T00:00:10.000Z",
           "type": "echo.trace.created",
           "payload": {
             "schema": "EchoTraceV1",
@@ -606,26 +689,26 @@
           }
         },
         {
-          "index": 7,
-          "at": "2060-01-01T00:00:06.000Z",
+          "index": 12,
+          "at": "2060-01-01T00:00:11.000Z",
           "type": "session.arc.advanced",
           "payload": {
             "phase": "deepening",
             "beatCount": 1,
-            "pressure": 0.155,
+            "pressure": 0.16,
             "returnReadiness": 0.025,
             "decision": "deepen",
             "suggestedRole": "pressure",
             "returnAvailable": false,
             "weightOverrides": {
-              "space_black_hole": 1.198,
-              "white_void": 1.099
+              "space_black_hole": 1.2,
+              "white_void": 1.1
             }
           }
         },
         {
-          "index": 8,
-          "at": "2060-01-01T00:00:07.000Z",
+          "index": 13,
+          "at": "2060-01-01T00:00:12.000Z",
           "type": "dream.journey.selected",
           "payload": {
             "summary": "entry:Boundless White Void -> pressure:Space / Black Hole -> mirror:Space / Black Hole -> return:Boundless White Void",
@@ -653,9 +736,9 @@
                   "vibe": 1.005,
                   "room": 0.25,
                   "portal": 0.35,
-                  "directorMultiplier": 1.099,
-                  "total": 5.819,
-                  "roll": 9.33862
+                  "directorMultiplier": 1.1,
+                  "total": 5.824,
+                  "roll": 9.3456
                 }
               },
               {
@@ -673,9 +756,9 @@
                   "vibe": -0.038,
                   "room": 0.25,
                   "portal": 0.35,
-                  "directorMultiplier": 1.198,
-                  "total": 4.657,
-                  "roll": 13.13174
+                  "directorMultiplier": 1.2,
+                  "total": 4.665,
+                  "roll": 13.14156
                 }
               },
               {
@@ -693,9 +776,9 @@
                   "vibe": -0.038,
                   "room": 0.25,
                   "portal": 0.35,
-                  "directorMultiplier": 1.198,
-                  "total": 4.657,
-                  "roll": 14.56538
+                  "directorMultiplier": 1.2,
+                  "total": 4.665,
+                  "roll": 14.57627
                 }
               },
               {
@@ -713,23 +796,23 @@
                   "vibe": 1.005,
                   "room": 0.25,
                   "portal": 0.35,
-                  "directorMultiplier": 1.099,
-                  "total": 5.819,
-                  "roll": 7.46787
+                  "directorMultiplier": 1.1,
+                  "total": 5.824,
+                  "roll": 7.47346
                 }
               }
             ]
           }
         },
         {
-          "index": 9,
-          "at": "2060-01-01T00:00:08.000Z",
+          "index": 14,
+          "at": "2060-01-01T00:00:13.000Z",
           "type": "dream.weather.created",
           "payload": {
             "weatherId": "weather-777",
             "traceId": "weather-trace-777",
             "mood": "stillness",
-            "pressure": "low",
+            "pressure": "medium",
             "weatherTags": [
               "silence",
               "threshold",
@@ -746,8 +829,8 @@
           }
         },
         {
-          "index": 10,
-          "at": "2060-01-01T00:00:09.000Z",
+          "index": 15,
+          "at": "2060-01-01T00:00:14.000Z",
           "type": "mask.selected",
           "payload": {
             "maskId": "double",
@@ -762,8 +845,8 @@
           }
         },
         {
-          "index": 11,
-          "at": "2060-01-01T00:00:10.000Z",
+          "index": 16,
+          "at": "2060-01-01T00:00:15.000Z",
           "type": "journal.entry.written",
           "payload": {
             "entryId": "journal_001",
@@ -780,8 +863,8 @@
           }
         },
         {
-          "index": 12,
-          "at": "2060-01-01T00:00:11.000Z",
+          "index": 17,
+          "at": "2060-01-01T00:00:16.000Z",
           "type": "witness.bundle.created",
           "payload": {
             "sessionId": "session_0001",
@@ -797,8 +880,8 @@
           }
         },
         {
-          "index": 13,
-          "at": "2060-01-01T00:00:12.000Z",
+          "index": 18,
+          "at": "2060-01-01T00:00:17.000Z",
           "type": "gni.request.created",
           "payload": {
             "provider": "GNI",
@@ -817,38 +900,15 @@
           }
         },
         {
-          "index": 14,
-          "at": "2060-01-01T00:00:13.000Z",
-          "type": "gni.firebreak.applied",
-          "payload": {
-            "source": "emulator",
-            "suppressedCounts": {
-              "fields": 0,
-              "dreamWeightDeltas": 0,
-              "symbolEchoes": 0,
-              "maskPressure": 0,
-              "pacingDelta": 0
-            },
-            "clampCounts": {
-              "dreamWeightDeltas": 1,
-              "maskPressure": 0,
-              "pacingDelta": 0
-            },
-            "boundaryTags": [
-              "real_world_self_harm"
-            ]
-          }
-        },
-        {
-          "index": 15,
-          "at": "2060-01-01T00:00:14.000Z",
+          "index": 19,
+          "at": "2060-01-01T00:00:18.000Z",
           "type": "gni.emulator.directive.created",
           "payload": {
             "directive": {
               "schema": "JungialDirectiveV1",
               "schemaVersion": 1,
               "dreamWeightDeltas": {
-                "white_void": 0.35
+                "white_void": 0.361
               },
               "symbolEchoes": [
                 "light"
@@ -865,15 +925,15 @@
           }
         },
         {
-          "index": 16,
-          "at": "2060-01-01T00:00:15.000Z",
+          "index": 20,
+          "at": "2060-01-01T00:00:19.000Z",
           "type": "gni.directive.applied",
           "payload": {
             "directive": {
               "schema": "JungialDirectiveV1",
               "schemaVersion": 1,
               "dreamWeightDeltas": {
-                "white_void": 0.35
+                "white_void": 0.361
               },
               "symbolEchoes": [
                 "light"
@@ -889,7 +949,7 @@
             },
             "update": {
               "adjustedWeights": {
-                "white_void": 1.55
+                "white_void": 1.561
               },
               "symbolFrequency": {
                 "light": 2,
@@ -910,8 +970,8 @@
           }
         },
         {
-          "index": 17,
-          "at": "2060-01-01T00:00:16.000Z",
+          "index": 21,
+          "at": "2060-01-01T00:00:20.000Z",
           "type": "simulation.saved",
           "payload": {
             "savePath": "fixtures\\fixture-run.save.json",
@@ -925,7 +985,7 @@
       "schemaVersion": 1,
       "phase": "deepening",
       "beatCount": 1,
-      "pressure": 0.155,
+      "pressure": 0.16,
       "returnReadiness": 0.025,
       "continuationSeed": 976368314,
       "recentBeatRoles": [
@@ -934,8 +994,8 @@
       "boundarySignalCount": 0,
       "lastDecision": "deepen",
       "weightOverrides": {
-        "space_black_hole": 1.198,
-        "white_void": 1.099
+        "space_black_hole": 1.2,
+        "white_void": 1.1
       }
     },
     "lastSessionBundle": {
@@ -1004,9 +1064,9 @@
           "vibe": 1.005,
           "room": 0.25,
           "portal": 0.35,
-          "directorMultiplier": 1.099,
-          "total": 5.819,
-          "roll": 9.33862
+          "directorMultiplier": 1.1,
+          "total": 5.824,
+          "roll": 9.3456
         }
       },
       "archetypeVector": {
@@ -1027,20 +1087,25 @@
       "sessionCovenant": {
         "schema": "SessionCovenantV1",
         "schemaVersion": 1,
-        "mode": "tonight_shape",
+        "mode": "first_listening",
         "toneTags": [
-          "gentle",
-          "strange"
+          "curious",
+          "deep"
         ],
-        "intensityCeiling": 0.35,
+        "intensityCeiling": 0.44,
         "hardBoundaryTags": [
           "real_world_self_harm"
         ],
         "softBoundaryTags": [],
-        "allowedPressureTags": [],
+        "allowedPressureTags": [
+          "threshold",
+          "word",
+          "lamp",
+          "breath"
+        ],
         "returnAnchor": {
           "kind": "image",
-          "value": "the note in the Threshold Chamber"
+          "value": "threshold_lamp"
         },
         "groundingPreference": "quiet_room",
         "memoryScope": "session_only"
@@ -1069,15 +1134,15 @@
           "dissolution",
           "memory"
         ],
-        "pressure": "low",
+        "pressure": "medium",
         "dreadBudget": {
-          "pursuit": 0.103,
-          "bodyUnease": 0.145,
-          "cosmicDread": 0.161,
-          "disorientation": 0.083,
-          "loss": 0.044,
-          "watching": 0.114,
-          "claustrophobia": 0.05
+          "pursuit": 0.13,
+          "bodyUnease": 0.183,
+          "cosmicDread": 0.203,
+          "disorientation": 0.104,
+          "loss": 0.055,
+          "watching": 0.144,
+          "claustrophobia": 0.063
         },
         "suppressedTags": []
       }
@@ -1164,9 +1229,9 @@
             "vibe": 1.005,
             "room": 0.25,
             "portal": 0.35,
-            "directorMultiplier": 1.099,
-            "total": 5.819,
-            "roll": 9.33862
+            "directorMultiplier": 1.1,
+            "total": 5.824,
+            "roll": 9.3456
           }
         },
         "archetypeVector": {
@@ -1187,17 +1252,22 @@
         "sessionCovenant": {
           "schema": "SessionCovenantV1",
           "schemaVersion": 1,
-          "mode": "tonight_shape",
+          "mode": "first_listening",
           "toneTags": [
-            "gentle",
-            "strange"
+            "curious",
+            "deep"
           ],
-          "intensityCeiling": 0.35,
+          "intensityCeiling": 0.44,
           "hardBoundaryTags": [
             "real_world_self_harm"
           ],
           "softBoundaryTags": [],
-          "allowedPressureTags": [],
+          "allowedPressureTags": [
+            "threshold",
+            "word",
+            "lamp",
+            "breath"
+          ],
           "returnAnchor": {
             "kind": "image",
             "value": "redacted_anchor"
@@ -1229,15 +1299,15 @@
             "dissolution",
             "memory"
           ],
-          "pressure": "low",
+          "pressure": "medium",
           "dreadBudget": {
-            "pursuit": 0.103,
-            "bodyUnease": 0.145,
-            "cosmicDread": 0.161,
-            "disorientation": 0.083,
-            "loss": 0.044,
-            "watching": 0.114,
-            "claustrophobia": 0.05
+            "pursuit": 0.13,
+            "bodyUnease": 0.183,
+            "cosmicDread": 0.203,
+            "disorientation": 0.104,
+            "loss": 0.055,
+            "watching": 0.144,
+            "claustrophobia": 0.063
           },
           "suppressedTags": []
         }
@@ -1334,9 +1404,9 @@
               "vibe": 1.005,
               "room": 0.25,
               "portal": 0.35,
-              "directorMultiplier": 1.099,
-              "total": 5.819,
-              "roll": 9.33862
+              "directorMultiplier": 1.1,
+              "total": 5.824,
+              "roll": 9.3456
             }
           },
           "archetypeVector": {
@@ -1357,17 +1427,22 @@
           "sessionCovenant": {
             "schema": "SessionCovenantV1",
             "schemaVersion": 1,
-            "mode": "tonight_shape",
+            "mode": "first_listening",
             "toneTags": [
-              "gentle",
-              "strange"
+              "curious",
+              "deep"
             ],
-            "intensityCeiling": 0.35,
+            "intensityCeiling": 0.44,
             "hardBoundaryTags": [
               "real_world_self_harm"
             ],
             "softBoundaryTags": [],
-            "allowedPressureTags": [],
+            "allowedPressureTags": [
+              "threshold",
+              "word",
+              "lamp",
+              "breath"
+            ],
             "returnAnchor": {
               "kind": "image",
               "value": "redacted_anchor"
@@ -1399,15 +1474,15 @@
               "dissolution",
               "memory"
             ],
-            "pressure": "low",
+            "pressure": "medium",
             "dreadBudget": {
-              "pursuit": 0.103,
-              "bodyUnease": 0.145,
-              "cosmicDread": 0.161,
-              "disorientation": 0.083,
-              "loss": 0.044,
-              "watching": 0.114,
-              "claustrophobia": 0.05
+              "pursuit": 0.13,
+              "bodyUnease": 0.183,
+              "cosmicDread": 0.203,
+              "disorientation": 0.104,
+              "loss": 0.055,
+              "watching": 0.144,
+              "claustrophobia": 0.063
             },
             "suppressedTags": []
           }
@@ -1417,7 +1492,7 @@
         "schema": "JungialDirectiveV1",
         "schemaVersion": 1,
         "dreamWeightDeltas": {
-          "white_void": 0.35
+          "white_void": 0.361
         },
         "symbolEchoes": [
           "light"
@@ -1435,7 +1510,7 @@
         "schema": "JungialDirectiveV1",
         "schemaVersion": 1,
         "dreamWeightDeltas": {
-          "white_void": 0.35
+          "white_void": 0.361
         },
         "symbolEchoes": [
           "light"
@@ -1454,8 +1529,8 @@
         "schema": "GniFirebreakTraceV1",
         "schemaVersion": 1,
         "source": "emulator",
-        "changed": true,
-        "ceiling": 0.35,
+        "changed": false,
+        "ceiling": 0.44,
         "boundaryTags": [
           "real_world_self_harm"
         ],
@@ -1467,7 +1542,7 @@
           "pacingDelta": 0
         },
         "clampCounts": {
-          "dreamWeightDeltas": 1,
+          "dreamWeightDeltas": 0,
           "maskPressure": 0,
           "pacingDelta": 0
         }
@@ -1478,7 +1553,7 @@
       "schema": "JungialDirectiveV1",
       "schemaVersion": 1,
       "dreamWeightDeltas": {
-        "white_void": 0.35
+        "white_void": 0.361
       },
       "symbolEchoes": [
         "light"
@@ -1495,20 +1570,25 @@
     "sessionCovenant": {
       "schema": "SessionCovenantV1",
       "schemaVersion": 1,
-      "mode": "tonight_shape",
+      "mode": "first_listening",
       "toneTags": [
-        "gentle",
-        "strange"
+        "curious",
+        "deep"
       ],
-      "intensityCeiling": 0.35,
+      "intensityCeiling": 0.44,
       "hardBoundaryTags": [
         "real_world_self_harm"
       ],
       "softBoundaryTags": [],
-      "allowedPressureTags": [],
+      "allowedPressureTags": [
+        "threshold",
+        "word",
+        "lamp",
+        "breath"
+      ],
       "returnAnchor": {
         "kind": "image",
-        "value": "the note in the Threshold Chamber"
+        "value": "threshold_lamp"
       },
       "groundingPreference": "quiet_room",
       "memoryScope": "session_only"
@@ -1565,21 +1645,86 @@
       "variationFamily": "unspent_lights",
       "baseWeight": 1
     },
+    "firstListeningRun": {
+      "schema": "FirstListeningRunV1",
+      "schemaVersion": 1,
+      "seed": 777,
+      "beats": [
+        {
+          "schema": "ListeningBeatV1",
+          "schemaVersion": 1,
+          "beatId": "beat-note",
+          "symbolicObjectId": "threshold_note",
+          "responseKind": "approach",
+          "gestureTags": [
+            "approach"
+          ],
+          "motifTags": [
+            "threshold",
+            "word"
+          ],
+          "pressureAccepted": 0.32,
+          "boundarySignals": []
+        },
+        {
+          "schema": "ListeningBeatV1",
+          "schemaVersion": 1,
+          "beatId": "beat-heartlight",
+          "symbolicObjectId": "heartlight",
+          "responseKind": "open",
+          "gestureTags": [
+            "open",
+            "breathe"
+          ],
+          "motifTags": [
+            "lamp",
+            "breath"
+          ],
+          "pressureAccepted": 0.36,
+          "boundarySignals": []
+        },
+        {
+          "schema": "ListeningBeatV1",
+          "schemaVersion": 1,
+          "beatId": "beat-return",
+          "symbolicObjectId": "threshold_lamp",
+          "responseKind": "return_anchor",
+          "gestureTags": [
+            "return_anchor"
+          ],
+          "motifTags": [
+            "lamp"
+          ],
+          "pressureAccepted": 0.18,
+          "boundarySignals": []
+        }
+      ],
+      "derivedToneTags": [
+        "curious",
+        "deep"
+      ],
+      "intensityHint": 0.36,
+      "returnAnchorHint": {
+        "kind": "image",
+        "value": "threshold_lamp"
+      },
+      "redactedSummary": "threshold_note answered as approach; heartlight answered as open; threshold_lamp answered as return_anchor"
+    },
     "dreamWeather": {
       "schema": "DreamWeatherV1",
       "schemaVersion": 1,
       "weatherId": "weather-777",
       "mood": "stillness",
-      "pressure": "low",
-      "ceiling": 0.35,
+      "pressure": "medium",
+      "ceiling": 0.44,
       "dreadBudget": {
-        "pursuit": 0.103,
-        "bodyUnease": 0.145,
-        "cosmicDread": 0.161,
-        "disorientation": 0.083,
-        "loss": 0.044,
-        "watching": 0.114,
-        "claustrophobia": 0.05
+        "pursuit": 0.13,
+        "bodyUnease": 0.183,
+        "cosmicDread": 0.203,
+        "disorientation": 0.104,
+        "loss": 0.055,
+        "watching": 0.144,
+        "claustrophobia": 0.063
       },
       "weatherTags": [
         "silence",
@@ -1589,12 +1734,12 @@
       ],
       "suppressedTags": [],
       "atmosphere": {
-        "lightIntensity": 0.74,
-        "fogDensity": 0.337,
+        "lightIntensity": 0.626,
+        "fogDensity": 0.37,
         "bloom": 0.246,
-        "exposure": 0.48,
-        "warmth": 0.527,
-        "movementDrag": 0.277
+        "exposure": 0.42,
+        "warmth": 0.519,
+        "movementDrag": 0.318
       }
     },
     "weatherTrace": {
@@ -1603,7 +1748,7 @@
       "traceId": "weather-trace-777",
       "weatherId": "weather-777",
       "mood": "stillness",
-      "pressure": "low",
+      "pressure": "medium",
       "sourceTags": [
         "dissolution",
         "silence",

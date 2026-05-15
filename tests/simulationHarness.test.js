@@ -49,10 +49,51 @@ test('simulation can apply a mocked GNI directive and persist the result', async
   }
 });
 
+test('simulation can run First Listening before the portal opens', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-first-listening-sim-'));
+  const savePath = join(dir, 'session.json');
+
+  try {
+    const result = await runSimulation({
+      seed: 144,
+      savePath,
+      firstListening: true,
+      firstListeningBeats: [{
+        beatId: 'beat-note',
+        symbolicObjectId: 'threshold_note',
+        responseKind: 'approach',
+        gestureTags: ['approach'],
+        motifTags: ['threshold', 'word'],
+        pressureAccepted: 0.34,
+        rawSpeech: 'do not save the first listening phrase'
+      }],
+      clock: createDeterministicClock({ startIso: '2102-01-01T00:00:00.000Z' })
+    });
+    const saved = await loadGameState(savePath);
+    const traceTypes = result.trace.entries.map((entry) => entry.type);
+    const startedIndex = traceTypes.indexOf('first.listening.started');
+    const portalIndex = traceTypes.indexOf('portal.opened');
+    const serialized = JSON.stringify(saved);
+
+    assert.equal(result.firstListeningRun.schema, 'FirstListeningRunV1');
+    assert.equal(saved.firstListeningRun.schema, 'FirstListeningRunV1');
+    assert.equal(result.sessionCovenant.mode, 'first_listening');
+    assert.equal(traceTypes.includes('first.listening.started'), true);
+    assert.equal(traceTypes.includes('first.listening.beat.recorded'), true);
+    assert.equal(traceTypes.includes('first.listening.completed'), true);
+    assert.equal(startedIndex > -1 && startedIndex < portalIndex, true);
+    assert.equal(serialized.includes('do not save the first listening phrase'), false);
+    assert.equal(serialized.includes('rawSpeech'), false);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
 test('simulation CLI args parse seed, save path, JSON mode, and mock GNI response path', () => {
   const options = parseSimulationArgs([
     '--seed=123',
     '--save=saves/test.json',
+    '--first-listening',
     '--gni-response=data/mock.json',
     '--emulate-gni',
     '--gni-endpoint=https://gni.local/direct',
@@ -67,6 +108,7 @@ test('simulation CLI args parse seed, save path, JSON mode, and mock GNI respons
   assert.deepEqual(options, {
     seed: 123,
     savePath: 'saves/test.json',
+    firstListening: true,
     gniResponsePath: 'data/mock.json',
     emulateGni: true,
     gniEndpoint: 'https://gni.local/direct',

@@ -1,0 +1,65 @@
+{
+  "schema": "FirstListeningRunV1",
+  "schemaVersion": 1,
+  "seed": 777,
+  "beats": [
+    {
+      "schema": "ListeningBeatV1",
+      "schemaVersion": 1,
+      "beatId": "beat-note",
+      "symbolicObjectId": "threshold_note",
+      "responseKind": "approach",
+      "gestureTags": [
+        "approach"
+      ],
+      "motifTags": [
+        "threshold",
+        "word"
+      ],
+      "pressureAccepted": 0.32,
+      "boundarySignals": []
+    },
+    {
+      "schema": "ListeningBeatV1",
+      "schemaVersion": 1,
+      "beatId": "beat-heartlight",
+      "symbolicObjectId": "heartlight",
+      "responseKind": "open",
+      "gestureTags": [
+        "open",
+        "breathe"
+      ],
+      "motifTags": [
+        "lamp",
+        "breath"
+      ],
+      "pressureAccepted": 0.36,
+      "boundarySignals": []
+    },
+    {
+      "schema": "ListeningBeatV1",
+      "schemaVersion": 1,
+      "beatId": "beat-return",
+      "symbolicObjectId": "threshold_lamp",
+      "responseKind": "return_anchor",
+      "gestureTags": [
+        "return_anchor"
+      ],
+      "motifTags": [
+        "lamp"
+      ],
+      "pressureAccepted": 0.18,
+      "boundarySignals": []
+    }
+  ],
+  "derivedToneTags": [
+    "curious",
+    "deep"
+  ],
+  "intensityHint": 0.36,
+  "returnAnchorHint": {
+    "kind": "image",
+    "value": "threshold_lamp"
+  },
+  "redactedSummary": "threshold_note answered as approach; heartlight answered as open; threshold_lamp answered as return_anchor"
+}

@@ -68,7 +68,7 @@
         "schemaVersion": 1,
         "phase": "deepening",
         "beatCount": 1,
-        "pressure": 0.159,
+        "pressure": 0.165,
         "returnReadiness": 0.025,
         "continuationSeed": 3928974574,
         "recentBeatRoles": [
@@ -77,8 +77,8 @@
         "boundarySignalCount": 0,
         "lastDecision": "deepen",
         "weightOverrides": {
-          "space_black_hole": 1.2,
-          "white_void": 1.1
+          "space_black_hole": 1.203,
+          "white_void": 1.101
         }
       },
       "arcDirective": {
@@ -86,11 +86,11 @@
         "schemaVersion": 1,
         "decision": "deepen",
         "suggestedRole": "pressure",
-        "pressureDelta": 0.159,
+        "pressureDelta": 0.165,
         "returnAvailable": false,
         "weightOverrides": {
-          "space_black_hole": 1.2,
-          "white_void": 1.1
+          "space_black_hole": 1.203,
+          "white_void": 1.101
         }
       },
       "selectedDream": {
@@ -107,9 +107,9 @@
           "vibe": -0.038,
           "room": 0.25,
           "portal": 0.35,
-          "directorMultiplier": 1.2,
-          "total": 4.665,
-          "roll": 13.14156
+          "directorMultiplier": 1.203,
+          "total": 4.677,
+          "roll": 13.15516
         }
       },
       "dreamJourney": {
@@ -130,9 +130,9 @@
               "vibe": 1.005,
               "room": 0.25,
               "portal": 0.35,
-              "directorMultiplier": 1.1,
-              "total": 5.824,
-              "roll": 9.3456
+              "directorMultiplier": 1.101,
+              "total": 5.83,
+              "roll": 9.35527
             }
           },
           {
@@ -150,9 +150,9 @@
               "vibe": -0.038,
               "room": 0.25,
               "portal": 0.35,
-              "directorMultiplier": 1.2,
-              "total": 4.665,
-              "roll": 13.14156
+              "directorMultiplier": 1.203,
+              "total": 4.677,
+              "roll": 13.15516
             }
           },
           {
@@ -170,9 +170,9 @@
               "vibe": -0.038,
               "room": 0.25,
               "portal": 0.35,
-              "directorMultiplier": 1.2,
-              "total": 4.665,
-              "roll": 14.57627
+              "directorMultiplier": 1.203,
+              "total": 4.677,
+              "roll": 14.59136
             }
           },
           {
@@ -190,9 +190,9 @@
               "vibe": 1.005,
               "room": 0.25,
               "portal": 0.35,
-              "directorMultiplier": 1.1,
-              "total": 5.824,
-              "roll": 7.47346
+              "directorMultiplier": 1.101,
+              "total": 5.83,
+              "roll": 7.48119
             }
           }
         ],
@@ -211,16 +211,16 @@
         "schemaVersion": 1,
         "weatherId": "weather-1b3iese",
         "mood": "stillness",
-        "pressure": "low",
-        "ceiling": 0.35,
+        "pressure": "medium",
+        "ceiling": 0.44,
         "dreadBudget": {
-          "pursuit": 0.034,
-          "bodyUnease": 0.167,
-          "cosmicDread": 0.157,
-          "disorientation": 0.022,
-          "loss": 0.122,
-          "watching": 0.17,
-          "claustrophobia": 0.131
+          "pursuit": 0.042,
+          "bodyUnease": 0.21,
+          "cosmicDread": 0.198,
+          "disorientation": 0.028,
+          "loss": 0.153,
+          "watching": 0.214,
+          "claustrophobia": 0.164
         },
         "weatherTags": [
           "silence",
@@ -232,12 +232,12 @@
         ],
         "suppressedTags": [],
         "atmosphere": {
-          "lightIntensity": 0.742,
-          "fogDensity": 0.346,
+          "lightIntensity": 0.629,
+          "fogDensity": 0.378,
           "bloom": 0.28,
-          "exposure": 0.48,
-          "warmth": 0.57,
-          "movementDrag": 0.277
+          "exposure": 0.42,
+          "warmth": 0.562,
+          "movementDrag": 0.318
         }
       },
       "weatherTrace": {
@@ -246,7 +246,7 @@
         "traceId": "weather-trace-1b3iese",
         "weatherId": "weather-1b3iese",
         "mood": "stillness",
-        "pressure": "low",
+        "pressure": "medium",
         "sourceTags": [
           "annihilation",
           "rebirth",
@@ -328,7 +328,7 @@
         "schemaVersion": 1,
         "phase": "mirroring",
         "beatCount": 2,
-        "pressure": 0.336,
+        "pressure": 0.348,
         "returnReadiness": 0.235,
         "continuationSeed": 2476735975,
         "recentBeatRoles": [
@@ -338,7 +338,7 @@
         "boundarySignalCount": 0,
         "lastDecision": "mirror",
         "weightOverrides": {
-          "mirror_hall": 1.264
+          "mirror_hall": 1.267
         }
       },
       "arcDirective": {
@@ -346,10 +346,10 @@
         "schemaVersion": 1,
         "decision": "mirror",
         "suggestedRole": "mirror",
-        "pressureDelta": 0.177,
+        "pressureDelta": 0.183,
         "returnAvailable": false,
         "weightOverrides": {
-          "mirror_hall": 1.264
+          "mirror_hall": 1.267
         }
       },
       "selectedDream": {
@@ -369,7 +369,7 @@
           "portal": 0.35,
           "directorMultiplier": 1,
           "total": 3.89,
-          "roll": 4.27059
+          "roll": 4.27163
         }
       },
       "dreamJourney": {
@@ -393,7 +393,7 @@
               "portal": 0.35,
               "directorMultiplier": 1,
               "total": 3.89,
-              "roll": 3.75811
+              "roll": 3.75903
             }
           },
           {
@@ -413,7 +413,7 @@
               "portal": 0.35,
               "directorMultiplier": 1,
               "total": 5.295,
-              "roll": 9.76149
+              "roll": 9.76386
             }
           },
           {
@@ -434,7 +434,7 @@
               "portal": 0.35,
               "directorMultiplier": 1,
               "total": 3.89,
-              "roll": 4.27059
+              "roll": 4.27163
             }
           },
           {
@@ -454,7 +454,7 @@
               "portal": 0.35,
               "directorMultiplier": 1,
               "total": 5.295,
-              "roll": 8.07853
+              "roll": 8.08049
             }
           }
         ],
@@ -474,16 +474,16 @@
         "schemaVersion": 1,
         "weatherId": "weather-1c7low1",
         "mood": "stillness",
-        "pressure": "low",
-        "ceiling": 0.35,
+        "pressure": "medium",
+        "ceiling": 0.44,
         "dreadBudget": {
-          "pursuit": 0.012,
-          "bodyUnease": 0.135,
-          "cosmicDread": 0.07,
-          "disorientation": 0.004,
-          "loss": 0.172,
-          "watching": 0.036,
-          "claustrophobia": 0.119
+          "pursuit": 0.015,
+          "bodyUnease": 0.17,
+          "cosmicDread": 0.088,
+          "disorientation": 0.005,
+          "loss": 0.216,
+          "watching": 0.046,
+          "claustrophobia": 0.149
         },
         "weatherTags": [
           "silence",
@@ -496,12 +496,12 @@
         ],
         "suppressedTags": [],
         "atmosphere": {
-          "lightIntensity": 0.757,
-          "fogDensity": 0.327,
+          "lightIntensity": 0.644,
+          "fogDensity": 0.359,
           "bloom": 0.324,
-          "exposure": 0.48,
-          "warmth": 0.592,
-          "movementDrag": 0.277
+          "exposure": 0.42,
+          "warmth": 0.584,
+          "movementDrag": 0.318
         }
       },
       "weatherTrace": {
@@ -510,7 +510,7 @@
         "traceId": "weather-trace-1c7low1",
         "weatherId": "weather-1c7low1",
         "mood": "stillness",
-        "pressure": "low",
+        "pressure": "medium",
         "sourceTags": [
           "growth",
           "innocence",
@@ -592,31 +592,33 @@
       "sessionArc": {
         "schema": "SessionArcV1",
         "schemaVersion": 1,
-        "phase": "mirroring",
+        "phase": "distorting",
         "beatCount": 3,
-        "pressure": 0.35,
+        "pressure": 0.44,
         "returnReadiness": 0.47,
-        "continuationSeed": 3950016629,
+        "continuationSeed": 1637910124,
         "recentBeatRoles": [
           "pressure",
           "mirror",
           "mirror"
         ],
         "boundarySignalCount": 0,
-        "lastDecision": "mirror",
+        "lastDecision": "distort",
         "weightOverrides": {
-          "mirror_hall": 1.267
+          "mirror_hall": 1.274,
+          "white_void": 1.168
         }
       },
       "arcDirective": {
         "schema": "SessionArcDirectiveV1",
         "schemaVersion": 1,
-        "decision": "mirror",
+        "decision": "distort",
         "suggestedRole": "mirror",
-        "pressureDelta": 0.132,
+        "pressureDelta": 0.137,
         "returnAvailable": false,
         "weightOverrides": {
-          "mirror_hall": 1.267
+          "mirror_hall": 1.274,
+          "white_void": 1.168
         }
       },
       "selectedDream": {
@@ -633,9 +635,9 @@
           "vibe": 1.005,
           "room": 0.25,
           "portal": 0.35,
-          "directorMultiplier": 1,
-          "total": 5.295,
-          "roll": 5.62232
+          "directorMultiplier": 1.168,
+          "total": 6.185,
+          "roll": 5.92972
         }
       },
       "dreamJourney": {
@@ -658,7 +660,7 @@
               "portal": 0.35,
               "directorMultiplier": 1,
               "total": 3.887,
-              "roll": 12.83031
+              "roll": 13.5318
             }
           },
           {
@@ -679,7 +681,7 @@
               "portal": 0.35,
               "directorMultiplier": 1,
               "total": 3.89,
-              "roll": 3.60952
+              "roll": 3.80687
             }
           },
           {
@@ -697,9 +699,9 @@
               "vibe": 1.005,
               "room": 0.25,
               "portal": 0.35,
-              "directorMultiplier": 1,
-              "total": 5.295,
-              "roll": 5.62232
+              "directorMultiplier": 1.168,
+              "total": 6.185,
+              "roll": 5.92972
             }
           },
           {
@@ -719,7 +721,7 @@
               "portal": 0.35,
               "directorMultiplier": 1,
               "total": 3.887,
-              "roll": 13.77163
+              "roll": 14.52459
             }
           }
         ],
@@ -742,16 +744,16 @@
         "schemaVersion": 1,
         "weatherId": "weather-50479c",
         "mood": "stillness",
-        "pressure": "low",
-        "ceiling": 0.35,
+        "pressure": "medium",
+        "ceiling": 0.44,
         "dreadBudget": {
-          "pursuit": 0.053,
-          "bodyUnease": 0.05,
-          "cosmicDread": 0.014,
-          "disorientation": 0.104,
-          "loss": 0.058,
-          "watching": 0.06,
-          "claustrophobia": 0.13
+          "pursuit": 0.067,
+          "bodyUnease": 0.063,
+          "cosmicDread": 0.017,
+          "disorientation": 0.131,
+          "loss": 0.072,
+          "watching": 0.075,
+          "claustrophobia": 0.164
         },
         "weatherTags": [
           "silence",
@@ -761,12 +763,12 @@
         ],
         "suppressedTags": [],
         "atmosphere": {
-          "lightIntensity": 0.724,
-          "fogDensity": 0.342,
+          "lightIntensity": 0.61,
+          "fogDensity": 0.375,
           "bloom": 0.332,
-          "exposure": 0.48,
-          "warmth": 0.486,
-          "movementDrag": 0.277
+          "exposure": 0.42,
+          "warmth": 0.479,
+          "movementDrag": 0.318
         }
       },
       "weatherTrace": {
@@ -775,7 +777,7 @@
         "traceId": "weather-trace-50479c",
         "weatherId": "weather-50479c",
         "mood": "stillness",
-        "pressure": "low",
+        "pressure": "medium",
         "sourceTags": [
           "dissolution",
           "silence",
@@ -797,20 +799,21 @@
   "finalSessionArc": {
     "schema": "SessionArcV1",
     "schemaVersion": 1,
-    "phase": "mirroring",
+    "phase": "distorting",
     "beatCount": 3,
-    "pressure": 0.35,
+    "pressure": 0.44,
     "returnReadiness": 0.47,
-    "continuationSeed": 3950016629,
+    "continuationSeed": 1637910124,
     "recentBeatRoles": [
       "pressure",
       "mirror",
       "mirror"
     ],
     "boundarySignalCount": 0,
-    "lastDecision": "mirror",
+    "lastDecision": "distort",
     "weightOverrides": {
-      "mirror_hall": 1.267
+      "mirror_hall": 1.274,
+      "white_void": 1.168
     }
   },
   "recentEchoTraces": [
@@ -882,16 +885,16 @@
     "schemaVersion": 1,
     "weatherId": "weather-50479c",
     "mood": "stillness",
-    "pressure": "low",
-    "ceiling": 0.35,
+    "pressure": "medium",
+    "ceiling": 0.44,
     "dreadBudget": {
-      "pursuit": 0.053,
-      "bodyUnease": 0.05,
-      "cosmicDread": 0.014,
-      "disorientation": 0.104,
-      "loss": 0.058,
-      "watching": 0.06,
-      "claustrophobia": 0.13
+      "pursuit": 0.067,
+      "bodyUnease": 0.063,
+      "cosmicDread": 0.017,
+      "disorientation": 0.131,
+      "loss": 0.072,
+      "watching": 0.075,
+      "claustrophobia": 0.164
     },
     "weatherTags": [
       "silence",
@@ -901,12 +904,12 @@
     ],
     "suppressedTags": [],
     "atmosphere": {
-      "lightIntensity": 0.724,
-      "fogDensity": 0.342,
+      "lightIntensity": 0.61,
+      "fogDensity": 0.375,
       "bloom": 0.332,
-      "exposure": 0.48,
-      "warmth": 0.486,
-      "movementDrag": 0.277
+      "exposure": 0.42,
+      "warmth": 0.479,
+      "movementDrag": 0.318
     }
   },
   "finalSelectedDream": {
@@ -923,9 +926,9 @@
       "vibe": 1.005,
       "room": 0.25,
       "portal": 0.35,
-      "directorMultiplier": 1,
-      "total": 5.295,
-      "roll": 5.62232
+      "directorMultiplier": 1.168,
+      "total": 6.185,
+      "roll": 5.92972
     }
   }
 }

@@ -79,7 +79,7 @@
     "schemaVersion": 1,
     "weatherId": "weather-777",
     "mood": "stillness",
-    "pressure": "low",
+    "pressure": "medium",
     "weatherTags": [
       "silence",
       "threshold",
@@ -87,38 +87,38 @@
       "memory"
     ],
     "lighting": {
-      "intensityScale": 0.74,
+      "intensityScale": 0.626,
       "bloom": 0.246,
-      "exposure": 0.48,
-      "flicker": 0.027,
-      "warmth": 0.527
+      "exposure": 0.42,
+      "flicker": 0.072,
+      "warmth": 0.519
     },
     "fog": {
-      "density": 0.337,
-      "drift": 0.162,
-      "veil": 0.052
+      "density": 0.37,
+      "drift": 0.232,
+      "veil": 0.14
     },
     "audio": {
-      "tension": 0.161,
-      "reverb": 0.228,
-      "lowPass": 0.033,
+      "tension": 0.203,
+      "reverb": 0.308,
+      "lowPass": 0.088,
       "silence": 0.65
     },
     "haptics": {
       "enabled": true,
-      "amplitude": 0.113,
-      "pulseRate": 0.143
+      "amplitude": 0.142,
+      "pulseRate": 0.248
     },
     "movement": {
-      "drag": 0.277,
-      "drift": 0.036,
-      "steadinessAssist": 0.839
+      "drag": 0.318,
+      "drift": 0.096,
+      "steadinessAssist": 0.797
     },
     "comfort": {
-      "ceiling": 0.35,
+      "ceiling": 0.44,
       "suddenFlashAllowed": false,
       "pursuitAllowed": true,
-      "locomotionIntensity": 0.283,
+      "locomotionIntensity": 0.42,
       "returnAnchorKind": "image"
     }
   }

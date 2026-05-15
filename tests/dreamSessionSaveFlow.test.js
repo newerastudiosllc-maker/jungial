@@ -108,6 +108,50 @@ test('dream session checkpoint demo writes both save files and reports a transcr
   }
 });
 
+test('dream session save flow can run First Listening before checkpoint play', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-dream-session-first-listening-'));
+  const checkpointPath = join(dir, 'checkpoint.json');
+
+  try {
+    const result = await startDreamSessionCheckpointRun({
+      seed: 515,
+      savePath: checkpointPath,
+      maxBeats: 4,
+      checkpointAfterBeats: 2,
+      firstListening: true,
+      firstListeningBeats: [{
+        beatId: 'beat-lamp',
+        symbolicObjectId: 'heartlight',
+        responseKind: 'wait',
+        gestureTags: ['wait', 'observe'],
+        motifTags: ['lamp', 'threshold'],
+        pressureAccepted: 0.16,
+        boundarySignals: ['long_pause'],
+        rawSpeech: 'do not checkpoint this first listening phrase'
+      }],
+      responses: [
+        { kind: 'approach', gestureTags: ['approached'], pressureAccepted: 0.4 },
+        { kind: 'wait', gestureTags: ['listened'], pressureAccepted: 0.2 }
+      ],
+      clock: createDeterministicClock({ startIso: '2103-01-01T00:00:00.000Z' })
+    });
+    const saved = await loadGameState(checkpointPath);
+    const traceTypes = saved.trace.entries.map((entry) => entry.type);
+    const serialized = JSON.stringify(saved);
+
+    assert.equal(result.firstListeningRun.schema, 'FirstListeningRunV1');
+    assert.equal(saved.firstListeningRun.schema, 'FirstListeningRunV1');
+    assert.equal(saved.sessionCovenant.mode, 'first_listening');
+    assert.equal(traceTypes.includes('first.listening.started'), true);
+    assert.equal(traceTypes.includes('first.listening.beat.recorded'), true);
+    assert.equal(traceTypes.includes('first.listening.completed'), true);
+    assert.equal(serialized.includes('do not checkpoint this first listening phrase'), false);
+    assert.equal(serialized.includes('rawSpeech'), false);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
 test('resumed dream sessions queue pending GNI work after final return', async () => {
   const dir = await mkdtemp(join(tmpdir(), 'jungial-dream-session-gni-pending-'));
   const checkpointPath = join(dir, 'checkpoint.json');
@@ -289,6 +333,7 @@ test('dream session checkpoint CLI args parse save paths and deterministic clock
     '--seed=909',
     '--checkpoint-save=saves/checkpoint.json',
     '--final-save=saves/final.json',
+    '--first-listening',
     '--trace=saves/dream-session-trace.json',
     '--gni-response=data/mock_gni_directive.json',
     '--emulate-gni',
@@ -304,6 +349,7 @@ test('dream session checkpoint CLI args parse save paths and deterministic clock
     seed: 909,
     checkpointSavePath: 'saves/checkpoint.json',
     finalSavePath: 'saves/final.json',
+    firstListening: true,
     tracePath: 'saves/dream-session-trace.json',
     gniResponsePath: 'data/mock_gni_directive.json',
     emulateGni: true,

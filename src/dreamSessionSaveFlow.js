@@ -15,6 +15,7 @@ import { createJungialRuntime, createJungialRuntimeFromSave } from './runtime.js
 import { createSessionCovenant } from './sessionCovenant.js';
 import { SymbolGrammar } from './symbolGrammar.js';
 import { TraceRecorder, writeTrace } from './trace.js';
+import { deriveSessionCovenantFromListening, runFirstListeningSequence } from './firstListening.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -28,21 +29,34 @@ export async function startDreamSessionCheckpointRun({
   checkpointAfterBeats = DEFAULT_CHECKPOINT_AFTER_BEATS,
   responses = [],
   sessionCovenant = null,
+  firstListening = false,
+  firstListeningBeats = undefined,
   trace = undefined,
   tracePath = undefined,
   catalog = undefined,
   clock = undefined
 } = {}) {
   const runtime = createJungialRuntime({ seed, catalog, clock });
-  const activeSessionCovenant = createSessionCovenant(sessionCovenant ?? {});
   const traceRecorder = createDreamSessionTraceRecorder({ trace, clock });
+  const firstListeningRun = firstListening
+    ? runFirstListeningSequence({
+        seed,
+        beats: firstListeningBeats
+      })
+    : null;
+  const activeSessionCovenant = firstListeningRun
+    ? deriveSessionCovenantFromListening({
+        listeningRun: firstListeningRun,
+        explicitSessionSettings: sessionCovenant ?? {}
+      })
+    : createSessionCovenant(sessionCovenant ?? {});
   const normalizedCheckpointAfterBeats = normalizeCheckpointBeatCount({ checkpointAfterBeats, maxBeats });
   traceRecorder.record('dream.session.started', {
     seed,
     maxBeats,
     checkpointAfterBeats: normalizedCheckpointAfterBeats
   });
-  const transcript = prepareThreshold(runtime, { traceRecorder });
+  const transcript = prepareThreshold(runtime, { traceRecorder, firstListeningRun });
   const dreamSession = runDreamSessionFromRuntime({
     runtime,
     covenant: activeSessionCovenant,
@@ -65,6 +79,7 @@ export async function startDreamSessionCheckpointRun({
     dreamSession,
     checkpoint,
     sessionCovenant: activeSessionCovenant,
+    firstListeningRun,
     traceSnapshot
   });
 
@@ -81,6 +96,7 @@ export async function startDreamSessionCheckpointRun({
     trace: traceSnapshot,
     thresholdPresentation: savePayload.thresholdPresentation,
     sessionCovenant: activeSessionCovenant,
+    firstListeningRun,
     savePath
   };
 }
@@ -224,6 +240,8 @@ export async function runDreamSessionCheckpointDemo({
   gniResponse = null,
   gniProvider = null,
   emulateGni = false,
+  firstListening = false,
+  firstListeningBeats = undefined,
   tracePath = undefined,
   clock = undefined,
   catalog = undefined
@@ -234,6 +252,8 @@ export async function runDreamSessionCheckpointDemo({
     maxBeats: DEFAULT_MAX_BEATS,
     checkpointAfterBeats: DEFAULT_CHECKPOINT_AFTER_BEATS,
     sessionCovenant,
+    firstListening,
+    firstListeningBeats,
     catalog,
     clock,
     responses: [
@@ -281,6 +301,8 @@ export function parseDreamSessionSaveFlowArgs(args = []) {
       options.checkpointSavePath = arg.slice('--checkpoint-save='.length);
     } else if (arg.startsWith('--final-save=')) {
       options.finalSavePath = arg.slice('--final-save='.length);
+    } else if (arg === '--first-listening') {
+      options.firstListening = true;
     } else if (arg.startsWith('--trace=')) {
       options.tracePath = arg.slice('--trace='.length);
     } else if (arg.startsWith('--gni-response=')) {
@@ -318,11 +340,15 @@ export function createGniProviderFromDreamSessionOptions(options = {}) {
   });
 }
 
-function prepareThreshold(runtime, { traceRecorder = null } = {}) {
+function prepareThreshold(runtime, { traceRecorder = null, firstListeningRun = null } = {}) {
   const transcript = [];
 
   transcript.push('Threshold Chamber: silent, dim, confined.');
   transcript.push(`A small note waits: "${runtime.chamber.note}".`);
+  if (firstListeningRun) {
+    transcript.push('The room listens before the key turns.');
+    recordFirstListeningTrace(traceRecorder, firstListeningRun);
+  }
   traceRecorder?.record('threshold.input', { kind: 'speech', text: 'the word' });
   applyPlayerInput({ source: 'system', kind: 'speech', text: 'the word' }, runtime);
   transcript.push('The Heartlight opens. Tools become visible.');
@@ -336,6 +362,30 @@ function prepareThreshold(runtime, { traceRecorder = null } = {}) {
   traceRecorder?.record('portal.opened', { room: runtime.chamber.snapshot() });
 
   return transcript;
+}
+
+function recordFirstListeningTrace(traceRecorder, firstListeningRun) {
+  traceRecorder?.record('first.listening.started', {
+    seed: firstListeningRun.seed,
+    beatCount: firstListeningRun.beats.length
+  });
+  for (const beat of firstListeningRun.beats) {
+    traceRecorder?.record('first.listening.beat.recorded', {
+      beatId: beat.beatId,
+      symbolicObjectId: beat.symbolicObjectId,
+      responseKind: beat.responseKind,
+      gestureTags: beat.gestureTags,
+      motifTags: beat.motifTags,
+      pressureAccepted: beat.pressureAccepted,
+      boundarySignals: beat.boundarySignals
+    });
+  }
+  traceRecorder?.record('first.listening.completed', {
+    derivedToneTags: firstListeningRun.derivedToneTags,
+    intensityHint: firstListeningRun.intensityHint,
+    returnAnchorHint: firstListeningRun.returnAnchorHint,
+    redactedSummary: firstListeningRun.redactedSummary
+  });
 }
 
 function applyDreamReturnEffects({ runtime, dreamSession, sessionCovenant }) {
@@ -459,6 +509,7 @@ function createDreamSessionSavePayload({
   dreamSession,
   checkpoint,
   sessionCovenant,
+  firstListeningRun = null,
   returnEffects = null,
   gniEffects = null,
   traceSnapshot = null,
@@ -492,6 +543,7 @@ function createDreamSessionSavePayload({
     symbolGrammar,
     thresholdPresentation,
     sessionCovenant,
+    firstListeningRun: firstListeningRun ?? previousState.firstListeningRun,
     activePassage: lastBeat?.passage ?? previousState.activePassage ?? null,
     echoTrace: lastBeat?.echoTrace ?? previousState.echoTrace ?? null,
     dreamWeather: dreamSession.finalDreamWeather ?? previousState.dreamWeather ?? null,

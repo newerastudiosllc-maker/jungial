@@ -695,6 +695,108 @@ export function validateEchoTrace(trace) {
   };
 }
 
+export function validateListeningBeat(beat, label = 'listeningBeat') {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'beatId',
+    'symbolicObjectId',
+    'responseKind',
+    'gestureTags',
+    'motifTags',
+    'pressureAccepted',
+    'boundarySignals'
+  ];
+
+  if (beat?.schema !== 'ListeningBeatV1') {
+    errors.push(`${label === 'listeningBeat' ? 'schema' : `${label}.schema`} must be ListeningBeatV1`);
+  }
+  if (beat?.schemaVersion !== 1) {
+    errors.push(`${label === 'listeningBeat' ? 'schemaVersion' : `${label}.schemaVersion`} must be 1`);
+  }
+  errors.push(...validateKnownKeys(beat, allowedKeys, label));
+  if (!isNonEmptyString(beat?.beatId)) {
+    errors.push(`${label === 'listeningBeat' ? 'beatId' : `${label}.beatId`} is required`);
+  }
+  if (!isNonEmptyString(beat?.symbolicObjectId)) {
+    errors.push(`${label === 'listeningBeat' ? 'symbolicObjectId' : `${label}.symbolicObjectId`} is required`);
+  }
+  if (!isNonEmptyString(beat?.responseKind)) {
+    errors.push(`${label === 'listeningBeat' ? 'responseKind' : `${label}.responseKind`} is required`);
+  }
+  for (const key of ['gestureTags', 'motifTags', 'boundarySignals']) {
+    errors.push(...validateStringList(beat?.[key], label === 'listeningBeat' ? key : `${label}.${key}`));
+  }
+  errors.push(...validateNumberBetween(
+    beat?.pressureAccepted,
+    label === 'listeningBeat' ? 'pressureAccepted' : `${label}.pressureAccepted`,
+    0,
+    1
+  ));
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function validateFirstListeningRun(run) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'seed',
+    'beats',
+    'derivedToneTags',
+    'intensityHint',
+    'returnAnchorHint',
+    'redactedSummary'
+  ];
+
+  if (run?.schema !== 'FirstListeningRunV1') {
+    errors.push('schema must be FirstListeningRunV1');
+  }
+  if (run?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  errors.push(...validateKnownKeys(run, allowedKeys, 'firstListeningRun'));
+  if (!Number.isFinite(run?.seed)) {
+    errors.push('seed must be a number');
+  }
+  if (!Array.isArray(run?.beats)) {
+    errors.push('beats must be an array');
+  } else {
+    run.beats.forEach((beat, index) => {
+      const beatValidation = validateListeningBeat(beat, `beats[${index}]`);
+      if (!beatValidation.valid) {
+        errors.push(...beatValidation.errors);
+      }
+    });
+  }
+  errors.push(...validateStringList(run?.derivedToneTags, 'derivedToneTags'));
+  errors.push(...validateNumberBetween(run?.intensityHint, 'intensityHint', 0, 1));
+  if (!isObject(run?.returnAnchorHint)) {
+    errors.push('returnAnchorHint must be an object');
+  } else {
+    if (!isNonEmptyString(run.returnAnchorHint.kind)) {
+      errors.push('returnAnchorHint.kind is required');
+    }
+    if (!isNonEmptyString(run.returnAnchorHint.value)) {
+      errors.push('returnAnchorHint.value is required');
+    }
+    errors.push(...validateKnownKeys(run.returnAnchorHint, ['kind', 'value'], 'returnAnchorHint'));
+  }
+  if (!isNonEmptyString(run?.redactedSummary)) {
+    errors.push('redactedSummary is required');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
 export function validateDirective(directive) {
   const errors = [];
   const allowedKeys = [
@@ -1812,6 +1914,11 @@ export function validateSaveGame(saveGame) {
     saveGame.payload.echoTrace,
     'payload.echoTrace',
     validateEchoTrace
+  ));
+  errors.push(...validateOptionalNestedContract(
+    saveGame.payload.firstListeningRun,
+    'payload.firstListeningRun',
+    validateFirstListeningRun
   ));
   if (saveGame.payload.dreamWeather !== undefined) {
     if (!isObject(saveGame.payload.dreamWeather)) {

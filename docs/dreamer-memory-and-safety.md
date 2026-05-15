@@ -25,6 +25,8 @@ Inside the experience, Jungial does not show archetype scores, dream weights, mo
 
 It intentionally avoids raw speech, raw room text, transcripts, and arbitrary notes. The memory context sent toward GNI is `DreamerMemoryContextV1`, a smaller redacted view of that profile.
 
+`FirstListeningRunV1` can feed this memory layer, but only as aggregate symbolic residue. It keeps symbolic object ids, motifs, gesture tags, pressure acceptance, boundary signals, tone tags, and a return anchor hint. It must not retain the player's raw spoken words or present itself as intake, diagnosis, or assessment.
+
 ## Save Modes
 
 Use these modes as the product language and system shape:

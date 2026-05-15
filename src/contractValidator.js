@@ -9,6 +9,7 @@ import {
   validateDreamSessionCheckpoint,
   validateDreamWeather,
   validateEchoTrace,
+  validateFirstListeningRun,
   validateFixtureManifest,
   validateGniFirebreakTrace,
   validateGniBridgeResult,
@@ -54,6 +55,8 @@ export function validateContractDocument(document) {
       return validatePassage(document);
     case 'EchoTraceV1':
       return validateEchoTrace(document);
+    case 'FirstListeningRunV1':
+      return validateFirstListeningRun(document);
     case 'ThresholdPresentationV1':
       return validateThresholdPresentation(document);
     case 'GniBridgeResultV1':

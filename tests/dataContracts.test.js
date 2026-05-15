@@ -15,12 +15,14 @@ import {
   validateDreadBudget,
   validateDreamWeather,
   validateDreamWeatherContext,
+  validateFirstListeningRun,
   validateGniBridgeResult,
   validateGniContractCheckReport,
   validateGniDirectiveQueue,
   validateGniFirebreakTrace,
   validateGniQueueProcessResult,
   validateGniProcessingRequest,
+  validateListeningBeat,
   validatePassage,
   validateSaveGame,
   validateSaveSlotPlan,
@@ -75,6 +77,17 @@ test('Dreamer weather schemas encode weather tag and dread axis allowlists', asy
   assert.ok(!profileSchema.$defs.dreadAxisMemoryMap.propertyNames.enum.includes('privateAxis'));
   assert.ok(memoryContextSchema.$defs.weatherTagList.items.enum.includes('mist'));
   assert.ok(memoryContextSchema.$defs.dreadAxisList.items.enum.includes('watching'));
+});
+
+test('First Listening schema documents redacted response contracts', async () => {
+  const schema = await readJson('data/schemas/first_listening.schema.json');
+
+  assert.equal(schema.title, 'FirstListeningRunV1');
+  assert.deepEqual(schema.properties.schema, { const: 'FirstListeningRunV1' });
+  assert.equal(schema.$defs.listeningBeat.additionalProperties, false);
+  assert.equal(schema.properties.additionalProperties, undefined);
+  assert.equal(schema.additionalProperties, false);
+  assert.equal(schema.$defs.listeningBeat.properties.rawSpeech, undefined);
 });
 
 test('session bundle validation reports missing GNI handoff fields', () => {
@@ -406,6 +419,64 @@ test('EchoTrace validation accepts compact symbolic observation', () => {
   });
 
   assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('First Listening validation accepts redacted chamber responses', () => {
+  const beat = {
+    schema: 'ListeningBeatV1',
+    schemaVersion: 1,
+    beatId: 'beat-note',
+    symbolicObjectId: 'threshold_note',
+    responseKind: 'approach',
+    gestureTags: ['approach', 'touch_note'],
+    motifTags: ['threshold', 'word'],
+    pressureAccepted: 0.4,
+    boundarySignals: []
+  };
+  const run = {
+    schema: 'FirstListeningRunV1',
+    schemaVersion: 1,
+    seed: 144,
+    beats: [beat],
+    derivedToneTags: ['curious'],
+    intensityHint: 0.4,
+    returnAnchorHint: { kind: 'image', value: 'threshold_note' },
+    redactedSummary: 'threshold_note answered as approach'
+  };
+
+  assert.deepEqual(validateListeningBeat(beat), { valid: true, errors: [] });
+  assert.deepEqual(validateFirstListeningRun(run), { valid: true, errors: [] });
+});
+
+test('First Listening validation rejects raw private response fields', () => {
+  const result = validateFirstListeningRun({
+    schema: 'FirstListeningRunV1',
+    schemaVersion: 1,
+    seed: 144,
+    beats: [{
+      schema: 'ListeningBeatV1',
+      schemaVersion: 1,
+      beatId: 'beat-note',
+      symbolicObjectId: 'threshold_note',
+      responseKind: 'speak',
+      gestureTags: ['speak'],
+      motifTags: ['word'],
+      pressureAccepted: 0.4,
+      boundarySignals: [],
+      rawSpeech: 'never store this'
+    }],
+    derivedToneTags: ['curious'],
+    intensityHint: 0.4,
+    returnAnchorHint: { kind: 'image', value: 'threshold_note' },
+    redactedSummary: 'threshold_note answered as speak',
+    rawTranscript: 'never store this either'
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'firstListeningRun.rawTranscript is not allowed',
+    'beats[0].rawSpeech is not allowed'
+  ]);
 });
 
 test('session bundle validation checks optional covenant and Passage context', () => {

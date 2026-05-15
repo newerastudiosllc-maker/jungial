@@ -80,9 +80,9 @@
         "vibe": 1.005,
         "room": 0.25,
         "portal": 0.35,
-        "directorMultiplier": 1.099,
-        "total": 5.819,
-        "roll": 9.33862
+        "directorMultiplier": 1.1,
+        "total": 5.824,
+        "roll": 9.3456
       }
     },
     "archetypeVector": {
@@ -103,17 +103,22 @@
     "sessionCovenant": {
       "schema": "SessionCovenantV1",
       "schemaVersion": 1,
-      "mode": "tonight_shape",
+      "mode": "first_listening",
       "toneTags": [
-        "gentle",
-        "strange"
+        "curious",
+        "deep"
       ],
-      "intensityCeiling": 0.35,
+      "intensityCeiling": 0.44,
       "hardBoundaryTags": [
         "real_world_self_harm"
       ],
       "softBoundaryTags": [],
-      "allowedPressureTags": [],
+      "allowedPressureTags": [
+        "threshold",
+        "word",
+        "lamp",
+        "breath"
+      ],
       "returnAnchor": {
         "kind": "image",
         "value": "redacted_anchor"
@@ -145,15 +150,15 @@
         "dissolution",
         "memory"
       ],
-      "pressure": "low",
+      "pressure": "medium",
       "dreadBudget": {
-        "pursuit": 0.103,
-        "bodyUnease": 0.145,
-        "cosmicDread": 0.161,
-        "disorientation": 0.083,
-        "loss": 0.044,
-        "watching": 0.114,
-        "claustrophobia": 0.05
+        "pursuit": 0.13,
+        "bodyUnease": 0.183,
+        "cosmicDread": 0.203,
+        "disorientation": 0.104,
+        "loss": 0.055,
+        "watching": 0.144,
+        "claustrophobia": 0.063
       },
       "suppressedTags": []
     }
