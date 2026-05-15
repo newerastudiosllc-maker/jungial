@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/experience_directive.schema.json",
+  "title": "ExperienceDirectiveV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "schemaVersion",
+    "directiveId",
+    "seed",
+    "nextMove",
+    "suggestedRole",
+    "pressureTarget",
+    "returnReadiness",
+    "toneTags",
+    "weatherTagBias",
+    "dreamWeightOverrides",
+    "pacingBias",
+    "maskPressure",
+    "returnAnchorKind",
+    "returnAnchorValue",
+    "reasonCodes"
+  ],
+  "properties": {
+    "schema": { "const": "ExperienceDirectiveV1" },
+    "schemaVersion": { "const": 1 },
+    "directiveId": { "type": "string", "minLength": 1 },
+    "seed": { "type": "number" },
+    "nextMove": { "enum": ["deepen", "distort", "mirror", "soften", "return"] },
+    "suggestedRole": { "enum": ["entry", "pressure", "mirror", "return"] },
+    "pressureTarget": { "type": "number", "minimum": 0, "maximum": 1 },
+    "returnReadiness": { "type": "number", "minimum": 0, "maximum": 1 },
+    "toneTags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "weatherTagBias": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/weatherTag" }
+    },
+    "dreamWeightOverrides": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0.05,
+        "maximum": 3
+      }
+    },
+    "pacingBias": {
+      "type": "object",
+      "required": ["intensity", "repetition", "silence"],
+      "properties": {
+        "intensity": { "type": "number", "minimum": -1, "maximum": 1 },
+        "repetition": { "type": "number", "minimum": -1, "maximum": 1 },
+        "silence": { "type": "number", "minimum": -1, "maximum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "maskPressure": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": -1,
+        "maximum": 1
+      }
+    },
+    "returnAnchorKind": { "type": "string", "minLength": 1 },
+    "returnAnchorValue": { "type": "string", "minLength": 1 },
+    "reasonCodes": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "weatherTag": {
+      "enum": [
+        "silence",
+        "threshold",
+        "soft_lamp",
+        "mirror",
+        "ash",
+        "mist",
+        "static",
+        "gravity",
+        "garden",
+        "warmth",
+        "cold",
+        "distant_voice",
+        "watching",
+        "boundless",
+        "contained",
+        "pursuit",
+        "bodyUnease",
+        "cosmicDread",
+        "disorientation",
+        "loss",
+        "claustrophobia",
+        "annihilation",
+        "rebirth",
+        "cosmic_mystery",
+        "reflection",
+        "shadow",
+        "self_observation",
+        "safety",
+        "memory",
+        "hearth",
+        "containment",
+        "growth",
+        "innocence",
+        "fertility",
+        "beauty",
+        "dissolution",
+        "void",
+        "star",
+        "unknown",
+        "invitation",
+        "door",
+        "breath",
+        "lamp"
+      ]
+    }
+  }
+}

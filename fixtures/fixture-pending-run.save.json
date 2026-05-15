@@ -827,6 +827,21 @@
         {
           "index": 15,
           "at": "2060-01-01T00:00:14.000Z",
+          "type": "experience.directive.created",
+          "payload": {
+            "directiveId": "experience-31dc28e42a",
+            "nextMove": "deepen",
+            "suggestedRole": "pressure",
+            "pressureTarget": 0.278,
+            "returnReadiness": 0.025,
+            "reasonCodes": [
+              "session_arc_deepen"
+            ]
+          }
+        },
+        {
+          "index": 16,
+          "at": "2060-01-01T00:00:15.000Z",
           "type": "simulation.saved",
           "payload": {
             "savePath": "fixtures\\fixture-pending-run.save.json",
@@ -1578,6 +1593,41 @@
       ],
       "variationFamily": "unspent_lights",
       "baseWeight": 1
+    },
+    "experienceDirective": {
+      "schema": "ExperienceDirectiveV1",
+      "schemaVersion": 1,
+      "directiveId": "experience-31dc28e42a",
+      "seed": 777,
+      "nextMove": "deepen",
+      "suggestedRole": "pressure",
+      "pressureTarget": 0.278,
+      "returnReadiness": 0.025,
+      "toneTags": [
+        "gentle",
+        "strange"
+      ],
+      "weatherTagBias": [
+        "silence",
+        "threshold",
+        "dissolution",
+        "memory"
+      ],
+      "dreamWeightOverrides": {
+        "space_black_hole": 1.198,
+        "white_void": 1.2
+      },
+      "pacingBias": {
+        "intensity": 0.25,
+        "repetition": 0.12,
+        "silence": 0.59
+      },
+      "maskPressure": {},
+      "returnAnchorKind": "image",
+      "returnAnchorValue": "the note in the Threshold Chamber",
+      "reasonCodes": [
+        "session_arc_deepen"
+      ]
     },
     "dreamWeather": {
       "schema": "DreamWeatherV1",

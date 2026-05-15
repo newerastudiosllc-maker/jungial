@@ -226,6 +226,7 @@ The current contract schemas live in `data/schemas/`:
 - `passage.schema.json`
 - `echo_trace.schema.json`
 - `first_listening.schema.json`
+- `experience_directive.schema.json`
 - `dread_budget.schema.json`
 - `dream_weather.schema.json`
 - `weather_trace.schema.json`
@@ -265,7 +266,7 @@ The nested `DreamAtmospherePresentationV1` is deliberately presentation-only. It
 
 ## Trace/Audit Output
 
-`TraceRecorder` writes `JungialTraceV1` developer traces. These are not in-world exposition; they are black-box records for QA and GNI debugging. A trace captures First Listening beats when enabled, threshold input, room awakening, portal opening, dream journey selection, mask selection, journal grounding, Witness bundle creation, GNI requests/directives, Firebreak suppression counts, queue processing summaries, and save output.
+`TraceRecorder` writes `JungialTraceV1` developer traces. These are not in-world exposition; they are black-box records for QA and GNI debugging. A trace captures First Listening beats when enabled, threshold input, room awakening, portal opening, dream journey selection, mask selection, journal grounding, Witness bundle creation, hidden Experience Director directives, GNI requests/directives, Firebreak suppression counts, queue processing summaries, and save output.
 
 Use `--trace=<path>` on simulation runs to write a standalone trace JSON file. Save files also include the trace snapshot, and `processSavedGniQueue()` appends a `gni.queue.processed` event when background AI work is resolved later.
 
@@ -280,6 +281,8 @@ See `docs/dreamer-memory-and-safety.md` for the product/architecture guardrails:
 ## Session Covenant And Passages
 
 `FirstListeningRunV1` is the optional pre-portal listening layer. It is presented as a quiet chamber ritual, not intake or assessment, and stores only redacted symbolic object ids, response kinds, motifs, gestures, pressure acceptance, boundary signals, derived tone tags, intensity hint, return anchor hint, and a redacted summary.
+
+`ExperienceDirectiveV1` is the hidden "what next" packet. It composes First Listening, Session Arc, Dream Weather, Dreamer memory, Architect weights, and any applied GNI directive into bounded next-move guidance: pressure target, return readiness, weather tag bias, dream weight overrides, pacing bias, mask pressure, return anchor, and redacted reason codes. It is not player-facing narration.
 
 `SessionCovenantV1` captures the current session's tone, intensity ceiling, boundaries, and return anchor. `PassageV1` is the dream-native adaptive fragment format, and `EchoTraceV1` records symbolic response patterns without raw speech.
 
@@ -307,7 +310,7 @@ Export GNI contract fixtures:
 npm run fixtures
 ```
 
-This writes `fixtures/session_bundle_v1.json`, `fixtures/session_covenant_v1.json`, `fixtures/passage_v1.json`, `fixtures/echo_trace_v1.json`, `fixtures/first_listening_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/session_arc_v1.json`, `fixtures/dream_session_v1.json`, `fixtures/dream_session_checkpoint_v1.json`, `fixtures/dream_weather_v1.json`, `fixtures/weather_trace_v1.json`, `fixtures/threshold_presentation_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_firebreak_trace_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_contract_check_report_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
+This writes `fixtures/session_bundle_v1.json`, `fixtures/session_covenant_v1.json`, `fixtures/passage_v1.json`, `fixtures/echo_trace_v1.json`, `fixtures/first_listening_v1.json`, `fixtures/experience_directive_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/session_arc_v1.json`, `fixtures/dream_session_v1.json`, `fixtures/dream_session_checkpoint_v1.json`, `fixtures/dream_weather_v1.json`, `fixtures/weather_trace_v1.json`, `fixtures/threshold_presentation_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_firebreak_trace_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_contract_check_report_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
 
 The provider-safe fixture surface is `gni_request_v1.json` and its nested `SessionBundleV1`. Full SaveGame fixtures are internal examples for resume, migration, and QA flows; they may include local or session state that should not be treated as provider input.
 

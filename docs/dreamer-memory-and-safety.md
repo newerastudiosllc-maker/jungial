@@ -27,6 +27,8 @@ It intentionally avoids raw speech, raw room text, transcripts, and arbitrary no
 
 `FirstListeningRunV1` can feed this memory layer, but only as aggregate symbolic residue. It keeps symbolic object ids, motifs, gesture tags, pressure acceptance, boundary signals, tone tags, and a return anchor hint. It must not retain the player's raw spoken words or present itself as intake, diagnosis, or assessment.
 
+`ExperienceDirectiveV1` can use the memory context to bias pacing, dream modules, masks, and return readiness, but it should store only bounded reason codes and aggregate hints. It should never store why in plain language, quote the player, or make clinical claims.
+
 ## Save Modes
 
 Use these modes as the product language and system shape:

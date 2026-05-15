@@ -10,6 +10,7 @@ import {
   validateDreamSession,
   validateDreamSessionCheckpoint,
   validateEchoTrace,
+  validateExperienceDirective,
   validateDreamerMemoryContext,
   validateDreamerProfile,
   validateDreadBudget,
@@ -88,6 +89,16 @@ test('First Listening schema documents redacted response contracts', async () =>
   assert.equal(schema.properties.additionalProperties, undefined);
   assert.equal(schema.additionalProperties, false);
   assert.equal(schema.$defs.listeningBeat.properties.rawSpeech, undefined);
+});
+
+test('Experience Director schema documents bounded hidden direction packets', async () => {
+  const schema = await readJson('data/schemas/experience_directive.schema.json');
+
+  assert.equal(schema.title, 'ExperienceDirectiveV1');
+  assert.deepEqual(schema.properties.schema, { const: 'ExperienceDirectiveV1' });
+  assert.deepEqual(schema.properties.nextMove.enum, ['deepen', 'distort', 'mirror', 'soften', 'return']);
+  assert.equal(schema.additionalProperties, false);
+  assert.equal(schema.properties.rawSpeech, undefined);
 });
 
 test('session bundle validation reports missing GNI handoff fields', () => {
@@ -476,6 +487,67 @@ test('First Listening validation rejects raw private response fields', () => {
   assert.deepEqual(result.errors, [
     'firstListeningRun.rawTranscript is not allowed',
     'beats[0].rawSpeech is not allowed'
+  ]);
+});
+
+test('Experience Directive validation accepts bounded hidden direction packets', () => {
+  const result = validateExperienceDirective({
+    schema: 'ExperienceDirectiveV1',
+    schemaVersion: 1,
+    directiveId: 'experience-144',
+    seed: 144,
+    nextMove: 'soften',
+    suggestedRole: 'return',
+    pressureTarget: 0.28,
+    returnReadiness: 0.68,
+    toneTags: ['gentle'],
+    weatherTagBias: ['threshold', 'lamp'],
+    dreamWeightOverrides: { garden: 1.2 },
+    pacingBias: { intensity: -0.1, repetition: 0, silence: 0.2 },
+    maskPressure: { double: 0.3 },
+    returnAnchorKind: 'image',
+    returnAnchorValue: 'heartlight',
+    reasonCodes: ['first_listening_boundary']
+  });
+
+  assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('Experience Directive validation rejects raw fields and unbounded values', () => {
+  const result = validateExperienceDirective({
+    schema: 'ExperienceDirectiveV1',
+    schemaVersion: 1,
+    directiveId: 'experience-144',
+    seed: 144,
+    nextMove: 'explain',
+    suggestedRole: 'lecture',
+    pressureTarget: 4,
+    returnReadiness: -1,
+    toneTags: ['gentle', ''],
+    weatherTagBias: ['threshold', 'private_place'],
+    dreamWeightOverrides: { garden: 9 },
+    pacingBias: { intensity: 4, noise: 0.2, repetition: 0, silence: 0 },
+    maskPressure: { double: 4 },
+    returnAnchorKind: 'image',
+    returnAnchorValue: 'heartlight',
+    reasonCodes: ['ok', ''],
+    rawSpeech: 'never store this'
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'experienceDirective.rawSpeech is not allowed',
+    'nextMove must be one of deepen, distort, mirror, soften, return',
+    'suggestedRole must be one of entry, pressure, mirror, return',
+    'pressureTarget must be between 0 and 1',
+    'returnReadiness must be between 0 and 1',
+    'toneTags[1] must be a non-empty string',
+    'weatherTagBias[1] must be an allowed weather tag',
+    'dreamWeightOverrides.garden must be between 0.05 and 3',
+    'pacingBias.intensity must be between -1 and 1',
+    'pacingBias.noise is not allowed',
+    'maskPressure.double must be between -1 and 1',
+    'reasonCodes[1] must be a non-empty string'
   ]);
 });
 

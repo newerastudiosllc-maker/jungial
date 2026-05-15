@@ -797,6 +797,82 @@ export function validateFirstListeningRun(run) {
   };
 }
 
+export function validateExperienceDirective(directive) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'directiveId',
+    'seed',
+    'nextMove',
+    'suggestedRole',
+    'pressureTarget',
+    'returnReadiness',
+    'toneTags',
+    'weatherTagBias',
+    'dreamWeightOverrides',
+    'pacingBias',
+    'maskPressure',
+    'returnAnchorKind',
+    'returnAnchorValue',
+    'reasonCodes'
+  ];
+
+  if (directive?.schema !== 'ExperienceDirectiveV1') {
+    errors.push('schema must be ExperienceDirectiveV1');
+  }
+  if (directive?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  errors.push(...validateKnownKeys(directive, allowedKeys, 'experienceDirective'));
+  if (!isNonEmptyString(directive?.directiveId)) {
+    errors.push('directiveId is required');
+  }
+  if (!Number.isFinite(directive?.seed)) {
+    errors.push('seed must be a number');
+  }
+  if (!SESSION_ARC_DECISIONS.includes(directive?.nextMove)) {
+    errors.push(`nextMove must be one of ${SESSION_ARC_DECISIONS.join(', ')}`);
+  }
+  if (!SESSION_ARC_ROLES.includes(directive?.suggestedRole)) {
+    errors.push(`suggestedRole must be one of ${SESSION_ARC_ROLES.join(', ')}`);
+  }
+  errors.push(...validateNumberBetween(directive?.pressureTarget, 'pressureTarget', 0, 1));
+  errors.push(...validateNumberBetween(directive?.returnReadiness, 'returnReadiness', 0, 1));
+  errors.push(...validateStringList(directive?.toneTags, 'toneTags'));
+  errors.push(...validateWeatherTagList(directive?.weatherTagBias, 'weatherTagBias'));
+  errors.push(...validateOptionalNumberMap(directive?.dreamWeightOverrides, 'dreamWeightOverrides', {
+    min: 0.05,
+    max: 3
+  }));
+  errors.push(...validateOptionalNumberMap(directive?.pacingBias, 'pacingBias', {
+    min: -1,
+    max: 1,
+    allowedKeys: ['intensity', 'repetition', 'silence']
+  }));
+  for (const key of ['intensity', 'repetition', 'silence']) {
+    if (!Number.isFinite(directive?.pacingBias?.[key])) {
+      errors.push(`pacingBias.${key} must be a finite number`);
+    }
+  }
+  errors.push(...validateOptionalNumberMap(directive?.maskPressure, 'maskPressure', {
+    min: -1,
+    max: 1
+  }));
+  if (!isNonEmptyString(directive?.returnAnchorKind)) {
+    errors.push('returnAnchorKind is required');
+  }
+  if (!isNonEmptyString(directive?.returnAnchorValue)) {
+    errors.push('returnAnchorValue is required');
+  }
+  errors.push(...validateStringList(directive?.reasonCodes, 'reasonCodes'));
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
 export function validateDirective(directive) {
   const errors = [];
   const allowedKeys = [
@@ -1919,6 +1995,11 @@ export function validateSaveGame(saveGame) {
     saveGame.payload.firstListeningRun,
     'payload.firstListeningRun',
     validateFirstListeningRun
+  ));
+  errors.push(...validateOptionalNestedContract(
+    saveGame.payload.experienceDirective,
+    'payload.experienceDirective',
+    validateExperienceDirective
   ));
   if (saveGame.payload.dreamWeather !== undefined) {
     if (!isObject(saveGame.payload.dreamWeather)) {

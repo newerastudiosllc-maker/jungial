@@ -16,6 +16,7 @@ import { createSessionCovenant } from './sessionCovenant.js';
 import { SymbolGrammar } from './symbolGrammar.js';
 import { TraceRecorder, writeTrace } from './trace.js';
 import { deriveSessionCovenantFromListening, runFirstListeningSequence } from './firstListening.js';
+import { createExperienceDirective } from './experienceDirector.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -170,6 +171,28 @@ export async function resumeDreamSessionCheckpointRun({
         traceRecorder
       })
     : null;
+  const experienceDirective = returnEffects
+    ? createExperienceDirective({
+        seed: dreamSession.seed,
+        firstListeningRun: savedState.firstListeningRun ?? null,
+        sessionCovenant: activeSessionCovenant,
+        sessionArc: dreamSession.finalSessionArc,
+        dreamWeather: dreamSession.finalDreamWeather,
+        dreamerMemoryContext,
+        architectState: runtime.architect.snapshot(),
+        appliedGniDirective: gniEffects?.appliedGniDirective ?? null
+      })
+    : savedState.experienceDirective ?? null;
+  if (experienceDirective) {
+    traceRecorder.record('experience.directive.created', {
+      directiveId: experienceDirective.directiveId,
+      nextMove: experienceDirective.nextMove,
+      suggestedRole: experienceDirective.suggestedRole,
+      pressureTarget: experienceDirective.pressureTarget,
+      returnReadiness: experienceDirective.returnReadiness,
+      reasonCodes: experienceDirective.reasonCodes
+    });
+  }
   traceRecorder.record(resumedCheckpoint.isComplete ? 'dream.session.saved' : 'dream.session.checkpoint.saved', {
     savePath: outputPath,
     sessionId: resumedCheckpoint.sessionId,
@@ -185,6 +208,7 @@ export async function resumeDreamSessionCheckpointRun({
     sessionCovenant: activeSessionCovenant,
     returnEffects,
     gniEffects,
+    experienceDirective,
     traceSnapshot,
     previousState: savedState
   });
@@ -221,6 +245,7 @@ export async function resumeDreamSessionCheckpointRun({
     gniQueue: runtime.gniQueue.snapshot(),
     appliedGniDirective: gniEffects?.appliedGniDirective ?? null,
     directiveUpdate: gniEffects?.directiveUpdate ?? null,
+    experienceDirective,
     trace: traceSnapshot,
     thresholdPresentation: savePayload.thresholdPresentation,
     sessionCovenant: activeSessionCovenant,
@@ -510,6 +535,7 @@ function createDreamSessionSavePayload({
   checkpoint,
   sessionCovenant,
   firstListeningRun = null,
+  experienceDirective = null,
   returnEffects = null,
   gniEffects = null,
   traceSnapshot = null,
@@ -544,6 +570,7 @@ function createDreamSessionSavePayload({
     thresholdPresentation,
     sessionCovenant,
     firstListeningRun: firstListeningRun ?? previousState.firstListeningRun,
+    experienceDirective: experienceDirective ?? previousState.experienceDirective,
     activePassage: lastBeat?.passage ?? previousState.activePassage ?? null,
     echoTrace: lastBeat?.echoTrace ?? previousState.echoTrace ?? null,
     dreamWeather: dreamSession.finalDreamWeather ?? previousState.dreamWeather ?? null,

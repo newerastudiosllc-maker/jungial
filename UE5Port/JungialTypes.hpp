@@ -91,6 +91,24 @@ enum class EJungialSessionArcDecision
     Return
 };
 
+struct FExperienceDirectiveV1
+{
+    String DirectiveId;
+    int32 Seed = 0;
+    EJungialSessionArcDecision NextMove = EJungialSessionArcDecision::Deepen;
+    String SuggestedRole;
+    float PressureTarget = 0.0f;
+    float ReturnReadiness = 0.0f;
+    Array<String> ToneTags;
+    Array<String> WeatherTagBias;
+    Map<String, float> DreamWeightOverrides;
+    Map<String, float> PacingBias;
+    Map<String, float> MaskPressure;
+    String ReturnAnchorKind;
+    String ReturnAnchorValue;
+    Array<String> ReasonCodes;
+};
+
 struct FSessionArcV1
 {
     EJungialSessionArcPhase Phase = EJungialSessionArcPhase::Opening;

@@ -972,6 +972,22 @@
         {
           "index": 21,
           "at": "2060-01-01T00:00:20.000Z",
+          "type": "experience.directive.created",
+          "payload": {
+            "directiveId": "experience-7dcf26c64a",
+            "nextMove": "deepen",
+            "suggestedRole": "pressure",
+            "pressureTarget": 0.386,
+            "returnReadiness": 0.025,
+            "reasonCodes": [
+              "session_arc_deepen",
+              "gni_directive_applied"
+            ]
+          }
+        },
+        {
+          "index": 22,
+          "at": "2060-01-01T00:00:21.000Z",
           "type": "simulation.saved",
           "payload": {
             "savePath": "fixtures\\fixture-run.save.json",
@@ -1709,6 +1725,46 @@
         "value": "threshold_lamp"
       },
       "redactedSummary": "threshold_note answered as approach; heartlight answered as open; threshold_lamp answered as return_anchor"
+    },
+    "experienceDirective": {
+      "schema": "ExperienceDirectiveV1",
+      "schemaVersion": 1,
+      "directiveId": "experience-7dcf26c64a",
+      "seed": 777,
+      "nextMove": "deepen",
+      "suggestedRole": "pressure",
+      "pressureTarget": 0.386,
+      "returnReadiness": 0.025,
+      "toneTags": [
+        "curious",
+        "deep"
+      ],
+      "weatherTagBias": [
+        "silence",
+        "threshold",
+        "dissolution",
+        "memory",
+        "lamp",
+        "breath"
+      ],
+      "dreamWeightOverrides": {
+        "space_black_hole": 1.2,
+        "white_void": 1.922
+      },
+      "pacingBias": {
+        "intensity": 0.466,
+        "repetition": 0.12,
+        "silence": 0.63
+      },
+      "maskPressure": {
+        "double": 0.588
+      },
+      "returnAnchorKind": "image",
+      "returnAnchorValue": "threshold_lamp",
+      "reasonCodes": [
+        "session_arc_deepen",
+        "gni_directive_applied"
+      ]
     },
     "dreamWeather": {
       "schema": "DreamWeatherV1",

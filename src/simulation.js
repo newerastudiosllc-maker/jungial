@@ -19,6 +19,7 @@ import { createSessionCovenant } from './sessionCovenant.js';
 import { createEchoTrace, selectPassage, toGniPassageContext } from './passageLattice.js';
 import { createDreamWeather, createWeatherTrace, toGniWeatherContext } from './dreamWeather.js';
 import { deriveSessionCovenantFromListening, runFirstListeningSequence } from './firstListening.js';
+import { createExperienceDirective } from './experienceDirector.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -346,6 +347,24 @@ export async function runSimulation({
       update: directiveUpdate
     });
   }
+  const experienceDirective = createExperienceDirective({
+    seed: effectiveSeed,
+    firstListeningRun,
+    sessionCovenant: activeSessionCovenant,
+    sessionArc: activeSessionArc,
+    dreamWeather,
+    dreamerMemoryContext,
+    architectState: architect.snapshot(),
+    appliedGniDirective
+  });
+  traceRecorder.record('experience.directive.created', {
+    directiveId: experienceDirective.directiveId,
+    nextMove: experienceDirective.nextMove,
+    suggestedRole: experienceDirective.suggestedRole,
+    pressureTarget: experienceDirective.pressureTarget,
+    returnReadiness: experienceDirective.returnReadiness,
+    reasonCodes: experienceDirective.reasonCodes
+  });
   const dreamerProfileSnapshot = dreamer
     ? dreamer.recordSession({ sessionBundle: bundle, dreamJourney, mask, echoTrace, dreamWeather })
     : null;
@@ -379,6 +398,7 @@ export async function runSimulation({
     echoTrace,
     activePassage,
     ...(firstListeningRun ? { firstListeningRun } : {}),
+    experienceDirective,
     dreamWeather,
     weatherTrace,
     ...(dreamerProfileSnapshot ? { dreamerProfile: dreamerProfileSnapshot } : {}),
@@ -407,6 +427,7 @@ export async function runSimulation({
     sessionArcDirective,
     sessionCovenant: activeSessionCovenant,
     firstListeningRun,
+    experienceDirective,
     activePassage,
     echoTrace,
     dreamWeather,

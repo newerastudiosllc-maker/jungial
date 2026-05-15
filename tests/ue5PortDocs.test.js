@@ -45,3 +45,11 @@ test('UE5 core type pseudocode documents dream session checkpoints', async () =>
   assert.match(text, /struct FDreamSessionCheckpointV1/);
   assert.match(text, /NextBeatIndex/);
 });
+
+test('UE5 core type pseudocode documents hidden Experience Director packets', async () => {
+  const text = await readFile('UE5Port/JungialTypes.hpp', 'utf8');
+
+  assert.match(text, /struct FExperienceDirectiveV1/);
+  assert.match(text, /PressureTarget/);
+  assert.match(text, /ReasonCodes/);
+});

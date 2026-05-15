@@ -1,0 +1,40 @@
+{
+  "schema": "ExperienceDirectiveV1",
+  "schemaVersion": 1,
+  "directiveId": "experience-7dcf26c64a",
+  "seed": 777,
+  "nextMove": "deepen",
+  "suggestedRole": "pressure",
+  "pressureTarget": 0.386,
+  "returnReadiness": 0.025,
+  "toneTags": [
+    "curious",
+    "deep"
+  ],
+  "weatherTagBias": [
+    "silence",
+    "threshold",
+    "dissolution",
+    "memory",
+    "lamp",
+    "breath"
+  ],
+  "dreamWeightOverrides": {
+    "space_black_hole": 1.2,
+    "white_void": 1.922
+  },
+  "pacingBias": {
+    "intensity": 0.466,
+    "repetition": 0.12,
+    "silence": 0.63
+  },
+  "maskPressure": {
+    "double": 0.588
+  },
+  "returnAnchorKind": "image",
+  "returnAnchorValue": "threshold_lamp",
+  "reasonCodes": [
+    "session_arc_deepen",
+    "gni_directive_applied"
+  ]
+}

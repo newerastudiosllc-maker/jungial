@@ -76,12 +76,16 @@ test('simulation can run First Listening before the portal opens', async () => {
     const serialized = JSON.stringify(saved);
 
     assert.equal(result.firstListeningRun.schema, 'FirstListeningRunV1');
+    assert.equal(result.experienceDirective.schema, 'ExperienceDirectiveV1');
     assert.equal(saved.firstListeningRun.schema, 'FirstListeningRunV1');
+    assert.equal(saved.experienceDirective.schema, 'ExperienceDirectiveV1');
     assert.equal(result.sessionCovenant.mode, 'first_listening');
     assert.equal(traceTypes.includes('first.listening.started'), true);
     assert.equal(traceTypes.includes('first.listening.beat.recorded'), true);
     assert.equal(traceTypes.includes('first.listening.completed'), true);
+    assert.equal(traceTypes.includes('experience.directive.created'), true);
     assert.equal(startedIndex > -1 && startedIndex < portalIndex, true);
+    assert.equal(saved.experienceDirective.pressureTarget <= saved.sessionCovenant.intensityCeiling, true);
     assert.equal(serialized.includes('do not save the first listening phrase'), false);
     assert.equal(serialized.includes('rawSpeech'), false);
   } finally {

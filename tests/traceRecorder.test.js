@@ -73,6 +73,7 @@ test('simulation trace explains dream journey and GNI handoff without in-world e
       'gni.firebreak.applied',
       'gni.emulator.directive.created',
       'gni.directive.applied',
+      'experience.directive.created',
       'simulation.saved'
     ]);
     const firebreakEntry = result.trace.entries.find((entry) => entry.type === 'gni.firebreak.applied');
