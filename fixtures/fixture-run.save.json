@@ -408,6 +408,54 @@
           "gravityScale": 0.825
         },
         "thermalHint": "warm"
+      },
+      "dreamAtmosphere": {
+        "schema": "DreamAtmospherePresentationV1",
+        "schemaVersion": 1,
+        "weatherId": "weather-777",
+        "mood": "stillness",
+        "pressure": "low",
+        "weatherTags": [
+          "silence",
+          "threshold",
+          "dissolution",
+          "memory"
+        ],
+        "lighting": {
+          "intensityScale": 0.74,
+          "bloom": 0.246,
+          "exposure": 0.48,
+          "flicker": 0.027,
+          "warmth": 0.527
+        },
+        "fog": {
+          "density": 0.337,
+          "drift": 0.162,
+          "veil": 0.052
+        },
+        "audio": {
+          "tension": 0.161,
+          "reverb": 0.228,
+          "lowPass": 0.033,
+          "silence": 0.65
+        },
+        "haptics": {
+          "enabled": true,
+          "amplitude": 0.113,
+          "pulseRate": 0.143
+        },
+        "movement": {
+          "drag": 0.277,
+          "drift": 0.036,
+          "steadinessAssist": 0.839
+        },
+        "comfort": {
+          "ceiling": 0.35,
+          "suddenFlashAllowed": false,
+          "pursuitAllowed": true,
+          "locomotionIntensity": 0.283,
+          "returnAnchorKind": "image"
+        }
       }
     },
     "trace": {

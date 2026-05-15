@@ -51,6 +51,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - Trace output should be available in development builds and easy to disable or sample in shipping builds.
 - Atmosphere changes should be parameter curves, not one-off hard-coded scene edits.
 - Renderer, audio, UI, and haptic layers should consume presentation packets rather than raw gameplay objects.
+- `DreamAtmospherePresentationV1` should be the handoff for weather-shaped lighting, fog, audio, haptics, movement, and comfort cues; UE actors should not read `DreadBudgetV1` directly.
 - Speech events should be captured as intent/symbol events so platforms without microphone permission still work.
 - Console and VR builds should send the same symbolic intents as speech builds instead of branching chamber logic by platform.
 

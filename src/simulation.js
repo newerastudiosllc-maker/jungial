@@ -272,7 +272,12 @@ export async function runSimulation({
     ? dreamer.recordSession({ sessionBundle: bundle, dreamJourney, mask, echoTrace, dreamWeather })
     : null;
 
-  const thresholdPresentation = buildThresholdPresentation({ chamber, feeling });
+  const thresholdPresentation = buildThresholdPresentation({
+    chamber,
+    feeling,
+    dreamWeather,
+    sessionCovenant: activeSessionCovenant
+  });
   const gniQueueSnapshot = gniQueue.snapshot();
   traceRecorder.record('simulation.saved', { savePath, tracePath: tracePath ?? null });
   const traceSnapshot = traceRecorder.snapshot();

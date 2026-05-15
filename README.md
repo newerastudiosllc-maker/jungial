@@ -228,7 +228,9 @@ Replay, simulation, and campaign runs all pass through this router.
 
 ## Presentation Packets
 
-`src/presentation.js` builds `ThresholdPresentationV1` from chamber and feeling state. This is the renderer-facing packet for lights, fog, bloom, audio mood, movement feel, note material, Heartlight state, portal state, visible tool-sigils, and spawned forms. Simulation saves include this packet so UE5, VR, console UI, or a browser prototype can render from a stable shape without mutating gameplay state.
+`src/presentation.js` builds `ThresholdPresentationV1` from chamber, feeling state, session covenant, and Dream Weather. This is the renderer-facing packet for lights, fog, bloom, audio mood, haptics, movement feel, comfort limits, note material, Heartlight state, portal state, visible tool-sigils, and spawned forms. Simulation saves include this packet so UE5, VR, console UI, or a browser prototype can render from a stable shape without mutating gameplay state.
+
+The nested `DreamAtmospherePresentationV1` is deliberately presentation-only. It carries bounded lighting, fog, audio, haptic, movement, and comfort cues derived from Dream Weather without exposing the hidden pressure machinery or sending raw player input to a renderer.
 
 ## Trace/Audit Output
 

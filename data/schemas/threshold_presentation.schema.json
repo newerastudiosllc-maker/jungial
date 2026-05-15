@@ -11,7 +11,8 @@
     "portal",
     "toolSigils",
     "forms",
-    "atmosphere"
+    "atmosphere",
+    "dreamAtmosphere"
   ],
   "properties": {
     "schema": { "const": "ThresholdPresentationV1" },
@@ -21,7 +22,71 @@
     "portal": { "type": "object" },
     "toolSigils": { "type": "object" },
     "forms": { "type": "array" },
-    "atmosphere": { "type": "object" }
+    "atmosphere": { "type": "object" },
+    "dreamAtmosphere": {
+      "type": "object",
+      "required": [
+        "schema",
+        "schemaVersion",
+        "weatherId",
+        "mood",
+        "pressure",
+        "weatherTags",
+        "lighting",
+        "fog",
+        "audio",
+        "haptics",
+        "movement",
+        "comfort"
+      ],
+      "properties": {
+        "schema": { "const": "DreamAtmospherePresentationV1" },
+        "schemaVersion": { "const": 1 },
+        "weatherId": { "type": ["string", "null"] },
+        "mood": { "type": "string" },
+        "pressure": { "type": "string" },
+        "weatherTags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "lighting": { "$ref": "#/$defs/numberMap" },
+        "fog": { "$ref": "#/$defs/numberMap" },
+        "audio": { "$ref": "#/$defs/numberMap" },
+        "haptics": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "amplitude": { "type": "number", "minimum": 0, "maximum": 1 },
+            "pulseRate": { "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "additionalProperties": false
+        },
+        "movement": { "$ref": "#/$defs/numberMap" },
+        "comfort": {
+          "type": "object",
+          "properties": {
+            "ceiling": { "type": "number", "minimum": 0, "maximum": 1 },
+            "suddenFlashAllowed": { "type": "boolean" },
+            "pursuitAllowed": { "type": "boolean" },
+            "locomotionIntensity": { "type": "number", "minimum": 0, "maximum": 1 },
+            "returnAnchorKind": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "numberMap": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      }
+    }
   },
   "additionalProperties": false
 }
