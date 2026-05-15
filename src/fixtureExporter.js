@@ -20,6 +20,7 @@ const FIXTURE_FILES = Object.freeze([
   'echo_trace_v1.json',
   'first_listening_v1.json',
   'experience_directive_v1.json',
+  'session_frame_v1.json',
   'dreamer_profile_v1.json',
   'dreamer_memory_context_v1.json',
   'session_arc_v1.json',
@@ -65,6 +66,7 @@ export async function exportContractFixtures({
   const echoTrace = run.echoTrace;
   const firstListeningRun = run.firstListeningRun;
   const experienceDirective = run.experienceDirective;
+  const sessionFrame = run.sessionFrame;
   const dreamer = new DreamerProfile({
     profileId: 'fixture-dreamer',
     rootSeed: 'fixture-root-seed',
@@ -145,6 +147,7 @@ export async function exportContractFixtures({
     'echo_trace_v1.json': echoTrace,
     'first_listening_v1.json': firstListeningRun,
     'experience_directive_v1.json': experienceDirective,
+    'session_frame_v1.json': sessionFrame,
     'dreamer_profile_v1.json': dreamerProfile,
     'dreamer_memory_context_v1.json': dreamerMemoryContext,
     'session_arc_v1.json': sessionArc,

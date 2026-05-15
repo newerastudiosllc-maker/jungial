@@ -20,6 +20,7 @@ import { createEchoTrace, selectPassage, toGniPassageContext } from './passageLa
 import { createDreamWeather, createWeatherTrace, toGniWeatherContext } from './dreamWeather.js';
 import { deriveSessionCovenantFromListening, runFirstListeningSequence } from './firstListening.js';
 import { createExperienceDirective } from './experienceDirector.js';
+import { buildSessionFrame } from './sessionFrame.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -376,6 +377,13 @@ export async function runSimulation({
     sessionCovenant: activeSessionCovenant
   });
   const gniQueueSnapshot = gniQueue.snapshot();
+  const sessionFrame = buildSessionFrame({
+    seed: effectiveSeed,
+    thresholdPresentation,
+    experienceDirective,
+    sessionCovenant: activeSessionCovenant,
+    trace: traceRecorder.snapshot()
+  });
   traceRecorder.record('simulation.saved', { savePath, tracePath: tracePath ?? null });
   const traceSnapshot = traceRecorder.snapshot();
   await saveGameState(savePath, {
@@ -387,6 +395,7 @@ export async function runSimulation({
     dreamJourney,
     symbolGrammar: symbolGrammar.snapshot(),
     thresholdPresentation,
+    sessionFrame,
     trace: traceSnapshot,
     sessionArc: activeSessionArc,
     lastSessionBundle: bundle,
@@ -422,6 +431,7 @@ export async function runSimulation({
     gniQueue: gniQueueSnapshot,
     appliedGniDirective,
     thresholdPresentation,
+    sessionFrame,
     trace: traceSnapshot,
     sessionArc: activeSessionArc,
     sessionArcDirective,

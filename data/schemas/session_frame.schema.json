@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/session_frame.schema.json",
+  "title": "SessionFrameV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "schemaVersion",
+    "frameId",
+    "frameIndex",
+    "frameKind",
+    "presentation",
+    "experienceDirective",
+    "comfort",
+    "rendererHints",
+    "debug",
+    "playerFacingText"
+  ],
+  "properties": {
+    "schema": { "const": "SessionFrameV1" },
+    "schemaVersion": { "const": 1 },
+    "frameId": { "type": "string", "minLength": 1 },
+    "frameIndex": { "type": "integer", "minimum": 0 },
+    "frameKind": { "enum": ["threshold_silent", "threshold_awake", "threshold_portal", "dream", "return"] },
+    "presentation": { "type": "object" },
+    "experienceDirective": { "type": "object" },
+    "comfort": {
+      "type": "object",
+      "required": [
+        "intensityCeiling",
+        "returnAvailable",
+        "returnAnchorKind",
+        "suddenFlashAllowed",
+        "pursuitAllowed",
+        "hapticsEnabled",
+        "locomotionIntensity"
+      ],
+      "properties": {
+        "intensityCeiling": { "type": "number", "minimum": 0, "maximum": 1 },
+        "returnAvailable": { "type": "boolean" },
+        "returnAnchorKind": { "type": "string", "minLength": 1 },
+        "suddenFlashAllowed": { "type": "boolean" },
+        "pursuitAllowed": { "type": "boolean" },
+        "hapticsEnabled": { "type": "boolean" },
+        "locomotionIntensity": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "rendererHints": {
+      "type": "object",
+      "required": [
+        "nextMove",
+        "suggestedRole",
+        "pressureTarget",
+        "returnReadiness",
+        "atmosphereMood",
+        "weatherPressure",
+        "lightingIntensityScale",
+        "fogDensity",
+        "audioTension",
+        "hapticAmplitude",
+        "movementDrag"
+      ],
+      "properties": {
+        "nextMove": { "enum": ["deepen", "distort", "mirror", "soften", "return"] },
+        "suggestedRole": { "enum": ["entry", "pressure", "mirror", "return"] },
+        "pressureTarget": { "type": "number", "minimum": 0, "maximum": 1 },
+        "returnReadiness": { "type": "number", "minimum": 0, "maximum": 1 },
+        "atmosphereMood": { "type": "string", "minLength": 1 },
+        "weatherPressure": { "enum": ["low", "medium", "heavy", "storm"] },
+        "lightingIntensityScale": { "type": "number", "minimum": 0, "maximum": 1 },
+        "fogDensity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "audioTension": { "type": "number", "minimum": 0, "maximum": 1 },
+        "hapticAmplitude": { "type": "number", "minimum": 0, "maximum": 1 },
+        "movementDrag": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "debug": {
+      "type": "object",
+      "required": ["eventCount", "lastEventType"],
+      "properties": {
+        "eventCount": { "type": "integer", "minimum": 0 },
+        "lastEventType": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "playerFacingText": { "type": "null" }
+  },
+  "additionalProperties": false
+}

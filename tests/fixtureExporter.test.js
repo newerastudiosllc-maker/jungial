@@ -23,6 +23,7 @@ test('fixture exporter writes stable GNI handoff fixtures', async () => {
       'echo_trace_v1.json',
       'first_listening_v1.json',
       'experience_directive_v1.json',
+      'session_frame_v1.json',
       'dreamer_profile_v1.json',
       'dreamer_memory_context_v1.json',
       'session_arc_v1.json',
@@ -50,6 +51,7 @@ test('fixture exporter writes stable GNI handoff fixtures', async () => {
     const echoTrace = JSON.parse(await readFile(join(dir, 'echo_trace_v1.json'), 'utf8'));
     const firstListening = JSON.parse(await readFile(join(dir, 'first_listening_v1.json'), 'utf8'));
     const experienceDirective = JSON.parse(await readFile(join(dir, 'experience_directive_v1.json'), 'utf8'));
+    const sessionFrame = JSON.parse(await readFile(join(dir, 'session_frame_v1.json'), 'utf8'));
     const dreamerProfile = JSON.parse(await readFile(join(dir, 'dreamer_profile_v1.json'), 'utf8'));
     const memoryContext = JSON.parse(await readFile(join(dir, 'dreamer_memory_context_v1.json'), 'utf8'));
     const sessionArc = JSON.parse(await readFile(join(dir, 'session_arc_v1.json'), 'utf8'));
@@ -76,6 +78,8 @@ test('fixture exporter writes stable GNI handoff fixtures', async () => {
     assert.equal(firstListening.beats[0].schema, 'ListeningBeatV1');
     assert.equal(experienceDirective.schema, 'ExperienceDirectiveV1');
     assert.deepEqual(experienceDirective, fixtureRunSave.payload.experienceDirective);
+    assert.equal(sessionFrame.schema, 'SessionFrameV1');
+    assert.deepEqual(sessionFrame, fixtureRunSave.payload.sessionFrame);
     assert.equal(dreamerProfile.schema, 'DreamerProfileV1');
     assert.equal(memoryContext.schema, 'DreamerMemoryContextV1');
     assert.equal(memoryContext.profileId, null);

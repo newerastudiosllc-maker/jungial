@@ -53,3 +53,12 @@ test('UE5 core type pseudocode documents hidden Experience Director packets', as
   assert.match(text, /PressureTarget/);
   assert.match(text, /ReasonCodes/);
 });
+
+test('UE5 presentation pseudocode documents renderer session frames', async () => {
+  const text = await readFile('UE5Port/JungialPresentationTypes.hpp', 'utf8');
+
+  assert.match(text, /struct FSessionFrameV1/);
+  assert.match(text, /FThresholdPresentationV1 Presentation/);
+  assert.match(text, /FExperienceDirectiveV1 ExperienceDirective/);
+  assert.match(text, /PlayerFacingText must stay empty/);
+});

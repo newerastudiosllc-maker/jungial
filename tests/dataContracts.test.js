@@ -29,6 +29,7 @@ import {
   validateSaveSlotPlan,
   validateSessionArc,
   validateSessionCovenant,
+  validateSessionFrame,
   validateSessionBundle,
   validateThresholdPresentation,
   validateWeatherTrace
@@ -97,6 +98,16 @@ test('Experience Director schema documents bounded hidden direction packets', as
   assert.equal(schema.title, 'ExperienceDirectiveV1');
   assert.deepEqual(schema.properties.schema, { const: 'ExperienceDirectiveV1' });
   assert.deepEqual(schema.properties.nextMove.enum, ['deepen', 'distort', 'mirror', 'soften', 'return']);
+  assert.equal(schema.additionalProperties, false);
+  assert.equal(schema.properties.rawSpeech, undefined);
+});
+
+test('Session Frame schema documents renderer handoff packets', async () => {
+  const schema = await readJson('data/schemas/session_frame.schema.json');
+
+  assert.equal(schema.title, 'SessionFrameV1');
+  assert.deepEqual(schema.properties.schema, { const: 'SessionFrameV1' });
+  assert.deepEqual(schema.properties.frameKind.enum, ['threshold_silent', 'threshold_awake', 'threshold_portal', 'dream', 'return']);
   assert.equal(schema.additionalProperties, false);
   assert.equal(schema.properties.rawSpeech, undefined);
 });
@@ -549,6 +560,125 @@ test('Experience Directive validation rejects raw fields and unbounded values', 
     'maskPressure.double must be between -1 and 1',
     'reasonCodes[1] must be a non-empty string'
   ]);
+});
+
+test('Session Frame validation accepts renderer handoff packets', () => {
+  const thresholdPresentation = buildThresholdPresentation({
+    chamber: {
+      awakened: true,
+      boundaryState: 'boundless',
+      note: 'the word',
+      heartlight: { awake: true, intensity: 1, color: 'silver-blue placeholder' },
+      portalOpen: true,
+      visibleToolSigils: [],
+      spawnedForms: []
+    },
+    feeling: {}
+  });
+  const result = validateSessionFrame({
+    schema: 'SessionFrameV1',
+    schemaVersion: 1,
+    frameId: 'session-frame-001',
+    frameIndex: 1,
+    frameKind: 'threshold_portal',
+    presentation: thresholdPresentation,
+    experienceDirective: {
+      schema: 'ExperienceDirectiveV1',
+      schemaVersion: 1,
+      directiveId: 'experience-001',
+      seed: 1,
+      nextMove: 'deepen',
+      suggestedRole: 'pressure',
+      pressureTarget: 0.25,
+      returnReadiness: 0.1,
+      toneTags: ['gentle'],
+      weatherTagBias: ['threshold'],
+      dreamWeightOverrides: { garden: 1.1 },
+      pacingBias: { intensity: 0, repetition: 0, silence: 0 },
+      maskPressure: {},
+      returnAnchorKind: 'image',
+      returnAnchorValue: 'heartlight',
+      reasonCodes: ['session_arc_deepen']
+    },
+    comfort: {
+      intensityCeiling: 0.35,
+      returnAvailable: false,
+      returnAnchorKind: 'image',
+      suddenFlashAllowed: false,
+      pursuitAllowed: true,
+      hapticsEnabled: true,
+      locomotionIntensity: 0.28
+    },
+    rendererHints: {
+      nextMove: 'deepen',
+      suggestedRole: 'pressure',
+      pressureTarget: 0.25,
+      returnReadiness: 0.1,
+      atmosphereMood: 'stillness',
+      weatherPressure: 'low',
+      lightingIntensityScale: 0.72,
+      fogDensity: 0.2,
+      audioTension: 0.1,
+      hapticAmplitude: 0.05,
+      movementDrag: 0.12
+    },
+    debug: {
+      eventCount: 2,
+      lastEventType: 'experience.directive.created'
+    },
+    playerFacingText: null
+  });
+
+  assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('Session Frame validation rejects raw fields and unbounded renderer values', () => {
+  const result = validateSessionFrame({
+    schema: 'SessionFrameV1',
+    schemaVersion: 1,
+    frameId: '',
+    frameIndex: -1,
+    frameKind: 'explanation',
+    presentation: {},
+    experienceDirective: {},
+    comfort: {
+      intensityCeiling: 2,
+      returnAvailable: 'sometimes',
+      returnAnchorKind: '',
+      suddenFlashAllowed: false,
+      pursuitAllowed: true,
+      hapticsEnabled: true,
+      locomotionIntensity: -1
+    },
+    rendererHints: {
+      nextMove: 'deepen',
+      suggestedRole: 'pressure',
+      pressureTarget: 2,
+      returnReadiness: 0,
+      atmosphereMood: '',
+      weatherPressure: 'low',
+      lightingIntensityScale: 0.72,
+      fogDensity: 0.2,
+      audioTension: 0.1,
+      hapticAmplitude: 0.05,
+      movementDrag: 0.12
+    },
+    debug: {
+      eventCount: -1,
+      lastEventType: 7
+    },
+    playerFacingText: 'The hidden system decided this.',
+    rawSpeech: 'never store'
+  });
+
+  assert.equal(result.valid, false);
+  assert.equal(result.errors.includes('sessionFrame.rawSpeech is not allowed'), true);
+  assert.equal(result.errors.includes('frameId is required'), true);
+  assert.equal(result.errors.includes('frameIndex must be a non-negative integer'), true);
+  assert.equal(result.errors.includes('frameKind is unsupported'), true);
+  assert.equal(result.errors.includes('comfort.intensityCeiling must be between 0 and 1'), true);
+  assert.equal(result.errors.includes('rendererHints.pressureTarget must be between 0 and 1'), true);
+  assert.equal(result.errors.includes('playerFacingText must be null'), true);
 });
 
 test('session bundle validation checks optional covenant and Passage context', () => {

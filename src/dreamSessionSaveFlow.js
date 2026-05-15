@@ -17,6 +17,7 @@ import { SymbolGrammar } from './symbolGrammar.js';
 import { TraceRecorder, writeTrace } from './trace.js';
 import { deriveSessionCovenantFromListening, runFirstListeningSequence } from './firstListening.js';
 import { createExperienceDirective } from './experienceDirector.js';
+import { buildSessionFrame } from './sessionFrame.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -556,6 +557,15 @@ function createDreamSessionSavePayload({
     dreamWeather: dreamSession.finalDreamWeather,
     sessionCovenant
   });
+  const sessionFrame = experienceDirective
+    ? buildSessionFrame({
+        seed: dreamSession.seed,
+        thresholdPresentation,
+        experienceDirective,
+        sessionCovenant,
+        trace: traceSnapshot ?? previousState.trace
+      })
+    : previousState.sessionFrame;
 
   return stripUndefined({
     room: runtime.chamber.snapshot(),
@@ -568,6 +578,7 @@ function createDreamSessionSavePayload({
     dreamJourney,
     symbolGrammar,
     thresholdPresentation,
+    sessionFrame,
     sessionCovenant,
     firstListeningRun: firstListeningRun ?? previousState.firstListeningRun,
     experienceDirective: experienceDirective ?? previousState.experienceDirective,

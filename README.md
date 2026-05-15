@@ -221,6 +221,7 @@ The current contract schemas live in `data/schemas/`:
 
 - `input_intent.schema.json`
 - `threshold_presentation.schema.json`
+- `session_frame.schema.json`
 - `session_bundle.schema.json`
 - `session_covenant.schema.json`
 - `passage.schema.json`
@@ -263,6 +264,8 @@ Replay, simulation, and campaign runs all pass through this router.
 `src/presentation.js` builds `ThresholdPresentationV1` from chamber, feeling state, session covenant, and Dream Weather. This is the renderer-facing packet for lights, fog, bloom, audio mood, haptics, movement feel, comfort limits, note material, Heartlight state, portal state, visible tool-sigils, and spawned forms. Simulation saves include this packet so UE5, VR, console UI, or a browser prototype can render from a stable shape without mutating gameplay state.
 
 The nested `DreamAtmospherePresentationV1` is deliberately presentation-only. It carries bounded lighting, fog, audio, haptic, movement, and comfort cues derived from Dream Weather without exposing the hidden pressure machinery or sending raw player input to a renderer.
+
+`src/sessionFrame.js` builds `SessionFrameV1`, the complete renderer handoff packet for one moment of play. It wraps `ThresholdPresentationV1`, hidden `ExperienceDirectiveV1`, comfort bounds, haptic/audio/movement hints, and small debug counters while keeping player-facing text empty and raw speech out of the renderer path.
 
 ## Trace/Audit Output
 
@@ -310,7 +313,7 @@ Export GNI contract fixtures:
 npm run fixtures
 ```
 
-This writes `fixtures/session_bundle_v1.json`, `fixtures/session_covenant_v1.json`, `fixtures/passage_v1.json`, `fixtures/echo_trace_v1.json`, `fixtures/first_listening_v1.json`, `fixtures/experience_directive_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/session_arc_v1.json`, `fixtures/dream_session_v1.json`, `fixtures/dream_session_checkpoint_v1.json`, `fixtures/dream_weather_v1.json`, `fixtures/weather_trace_v1.json`, `fixtures/threshold_presentation_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_firebreak_trace_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_contract_check_report_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
+This writes `fixtures/session_bundle_v1.json`, `fixtures/session_covenant_v1.json`, `fixtures/passage_v1.json`, `fixtures/echo_trace_v1.json`, `fixtures/first_listening_v1.json`, `fixtures/experience_directive_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/session_arc_v1.json`, `fixtures/dream_session_v1.json`, `fixtures/dream_session_checkpoint_v1.json`, `fixtures/dream_weather_v1.json`, `fixtures/weather_trace_v1.json`, `fixtures/threshold_presentation_v1.json`, `fixtures/session_frame_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_firebreak_trace_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_contract_check_report_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
 
 The provider-safe fixture surface is `gni_request_v1.json` and its nested `SessionBundleV1`. Full SaveGame fixtures are internal examples for resume, migration, and QA flows; they may include local or session state that should not be treated as provider input.
 
@@ -348,6 +351,7 @@ For longer play, `src/dreamSession.js` can chain many hidden beats after the por
 - `ArchitectState` -> SaveGame-backed director service
 - `GniAdapter` -> `IJungialAiProvider` implementation
 - `GniDirectiveQueue` -> SaveGame-backed async GNI request queue
+- `SessionFrameV1` -> renderer/audio/haptics handoff packet for UE5, VR, console, and browser prototypes
 - `JournalOfMirrors` -> SaveGame-backed library model
 - `MaskRegistry` -> emergent presence spawner
 

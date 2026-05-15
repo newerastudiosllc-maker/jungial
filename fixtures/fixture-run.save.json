@@ -460,6 +460,205 @@
         }
       }
     },
+    "sessionFrame": {
+      "schema": "SessionFrameV1",
+      "schemaVersion": 1,
+      "frameId": "session-frame-4f8d650ce1",
+      "frameIndex": 1,
+      "frameKind": "threshold_portal",
+      "presentation": {
+        "schema": "ThresholdPresentationV1",
+        "room": {
+          "awakened": true,
+          "boundaryState": "boundless",
+          "atmosphereState": "calm_hopeful_boundless_bright_warm"
+        },
+        "note": {
+          "text": "the word",
+          "visible": true,
+          "material": "ink_warmed_by_heartlight"
+        },
+        "heartlight": {
+          "awake": true,
+          "intensity": 1,
+          "color": "pearl-gold placeholder",
+          "bloom": 0.815
+        },
+        "portal": {
+          "open": true,
+          "material": "threshold_rim_light"
+        },
+        "toolSigils": {
+          "visible": [
+            {
+              "id": "key_of_portals",
+              "name": "Key of Portals",
+              "effect": "opens_dream_transition",
+              "material": "key_of_portals_sigil_placeholder"
+            },
+            {
+              "id": "glyph_quill",
+              "name": "Glyph Quill",
+              "effect": "writes_journal_placeholder",
+              "material": "glyph_quill_sigil_placeholder"
+            },
+            {
+              "id": "mirror_lens",
+              "name": "Mirror Lens",
+              "effect": "changes_visual_mood",
+              "material": "mirror_lens_sigil_placeholder"
+            },
+            {
+              "id": "lamp_of_forms",
+              "name": "Lamp of Forms",
+              "effect": "spawns_forms_lights_mirrors",
+              "material": "lamp_of_forms_sigil_placeholder"
+            }
+          ]
+        },
+        "forms": [],
+        "atmosphere": {
+          "lighting": {
+            "intensity": 1.357,
+            "colorTemperature": 5950,
+            "placeholder": "UE LightComponent intensity/color"
+          },
+          "fog": {
+            "density": 0.21,
+            "placeholder": "UE ExponentialHeightFog density"
+          },
+          "postProcess": {
+            "bloom": 0.815,
+            "exposure": 1.12,
+            "placeholder": "UE PostProcessVolume bloom/exposure"
+          },
+          "audio": {
+            "parameterMood": "calm_hopeful_boundless_bright_warm",
+            "placeholder": "ambient_calm_hopeful_boundless_bright_warm"
+          },
+          "movement": {
+            "feel": "drifting, slow acceleration placeholder",
+            "gravityScale": 0.825
+          },
+          "thermalHint": "warm"
+        },
+        "dreamAtmosphere": {
+          "schema": "DreamAtmospherePresentationV1",
+          "schemaVersion": 1,
+          "weatherId": "weather-777",
+          "mood": "stillness",
+          "pressure": "medium",
+          "weatherTags": [
+            "silence",
+            "threshold",
+            "dissolution",
+            "memory"
+          ],
+          "lighting": {
+            "intensityScale": 0.626,
+            "bloom": 0.246,
+            "exposure": 0.42,
+            "flicker": 0.072,
+            "warmth": 0.519
+          },
+          "fog": {
+            "density": 0.37,
+            "drift": 0.232,
+            "veil": 0.14
+          },
+          "audio": {
+            "tension": 0.203,
+            "reverb": 0.308,
+            "lowPass": 0.088,
+            "silence": 0.65
+          },
+          "haptics": {
+            "enabled": true,
+            "amplitude": 0.142,
+            "pulseRate": 0.248
+          },
+          "movement": {
+            "drag": 0.318,
+            "drift": 0.096,
+            "steadinessAssist": 0.797
+          },
+          "comfort": {
+            "ceiling": 0.44,
+            "suddenFlashAllowed": false,
+            "pursuitAllowed": true,
+            "locomotionIntensity": 0.42,
+            "returnAnchorKind": "image"
+          }
+        }
+      },
+      "experienceDirective": {
+        "schema": "ExperienceDirectiveV1",
+        "schemaVersion": 1,
+        "directiveId": "experience-7dcf26c64a",
+        "seed": 777,
+        "nextMove": "deepen",
+        "suggestedRole": "pressure",
+        "pressureTarget": 0.386,
+        "returnReadiness": 0.025,
+        "toneTags": [
+          "curious",
+          "deep"
+        ],
+        "weatherTagBias": [
+          "silence",
+          "threshold",
+          "dissolution",
+          "memory",
+          "lamp",
+          "breath"
+        ],
+        "dreamWeightOverrides": {
+          "space_black_hole": 1.2,
+          "white_void": 1.922
+        },
+        "pacingBias": {
+          "intensity": 0.466,
+          "repetition": 0.12,
+          "silence": 0.63
+        },
+        "maskPressure": {
+          "double": 0.588
+        },
+        "returnAnchorKind": "image",
+        "returnAnchorValue": "threshold_lamp",
+        "reasonCodes": [
+          "session_arc_deepen",
+          "gni_directive_applied"
+        ]
+      },
+      "comfort": {
+        "intensityCeiling": 0.44,
+        "returnAvailable": false,
+        "returnAnchorKind": "image",
+        "suddenFlashAllowed": false,
+        "pursuitAllowed": true,
+        "hapticsEnabled": true,
+        "locomotionIntensity": 0.42
+      },
+      "rendererHints": {
+        "nextMove": "deepen",
+        "suggestedRole": "pressure",
+        "pressureTarget": 0.386,
+        "returnReadiness": 0.025,
+        "atmosphereMood": "stillness",
+        "weatherPressure": "medium",
+        "lightingIntensityScale": 0.626,
+        "fogDensity": 0.37,
+        "audioTension": 0.203,
+        "hapticAmplitude": 0.142,
+        "movementDrag": 0.318
+      },
+      "debug": {
+        "eventCount": 21,
+        "lastEventType": "experience.directive.created"
+      },
+      "playerFacingText": null
+    },
     "trace": {
       "schema": "JungialTraceV1",
       "runId": "trace_0001",

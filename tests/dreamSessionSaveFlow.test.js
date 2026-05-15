@@ -321,6 +321,8 @@ test('dream session save flow records combined developer trace without raw respo
     assert.equal(finalSave.trace.entries.filter((entry) => entry.type === 'dream.session.beat.completed').length, 4);
     assert.equal(finalSave.experienceDirective.schema, 'ExperienceDirectiveV1');
     assert.equal(finalSave.experienceDirective.pressureTarget <= finalSave.sessionCovenant.intensityCeiling, true);
+    assert.equal(finalSave.sessionFrame.schema, 'SessionFrameV1');
+    assert.equal(finalSave.sessionFrame.rendererHints.nextMove, finalSave.experienceDirective.nextMove);
     assert.equal(summary.gniQueuedRequestCount, 1);
     assert.match(summary.journeySummary, /->/);
     assert.equal(serializedTrace.includes('do not trace this first private phrase'), false);

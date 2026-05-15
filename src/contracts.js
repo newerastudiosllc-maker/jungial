@@ -332,6 +332,60 @@ export function validateThresholdPresentation(presentation) {
   };
 }
 
+export function validateSessionFrame(frame) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'frameId',
+    'frameIndex',
+    'frameKind',
+    'presentation',
+    'experienceDirective',
+    'comfort',
+    'rendererHints',
+    'debug',
+    'playerFacingText'
+  ];
+  const frameKinds = ['threshold_silent', 'threshold_awake', 'threshold_portal', 'dream', 'return'];
+
+  if (frame?.schema !== 'SessionFrameV1') {
+    errors.push('schema must be SessionFrameV1');
+  }
+  if (frame?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  errors.push(...validateKnownKeys(frame, allowedKeys, 'sessionFrame'));
+  if (!isNonEmptyString(frame?.frameId)) {
+    errors.push('frameId is required');
+  }
+  if (!isNonNegativeInteger(frame?.frameIndex)) {
+    errors.push('frameIndex must be a non-negative integer');
+  }
+  if (!frameKinds.includes(frame?.frameKind)) {
+    errors.push('frameKind is unsupported');
+  }
+  const presentationValidation = validateThresholdPresentation(frame?.presentation);
+  if (!presentationValidation.valid) {
+    errors.push(...prefixNestedErrors(presentationValidation.errors, 'presentation', 'thresholdPresentation'));
+  }
+  const directiveValidation = validateExperienceDirective(frame?.experienceDirective);
+  if (!directiveValidation.valid) {
+    errors.push(...prefixNestedErrors(directiveValidation.errors, 'experienceDirective', 'experienceDirective'));
+  }
+  errors.push(...validateSessionFrameComfort(frame?.comfort));
+  errors.push(...validateSessionFrameRendererHints(frame?.rendererHints));
+  errors.push(...validateSessionFrameDebug(frame?.debug));
+  if (frame?.playerFacingText !== null) {
+    errors.push('playerFacingText must be null');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
 export function validateDreamAtmospherePresentation(dreamAtmosphere) {
   const errors = [];
   const allowedKeys = [
@@ -2001,6 +2055,11 @@ export function validateSaveGame(saveGame) {
     'payload.experienceDirective',
     validateExperienceDirective
   ));
+  errors.push(...validateOptionalNestedContract(
+    saveGame.payload.sessionFrame,
+    'payload.sessionFrame',
+    validateSessionFrame
+  ));
   if (saveGame.payload.dreamWeather !== undefined) {
     if (!isObject(saveGame.payload.dreamWeather)) {
       errors.push('payload.dreamWeather must be an object');
@@ -2213,6 +2272,95 @@ function validatePresentationComfort(value) {
   errors.push(...validateNumberBetween(value.locomotionIntensity, 'comfort.locomotionIntensity', 0, 1));
   if (!isNonEmptyString(value.returnAnchorKind)) {
     errors.push('comfort.returnAnchorKind is required');
+  }
+  return errors;
+}
+
+function validateSessionFrameComfort(value) {
+  const errors = [];
+  const allowedKeys = [
+    'intensityCeiling',
+    'returnAvailable',
+    'returnAnchorKind',
+    'suddenFlashAllowed',
+    'pursuitAllowed',
+    'hapticsEnabled',
+    'locomotionIntensity'
+  ];
+  if (!isObject(value)) {
+    return ['comfort must be an object'];
+  }
+  errors.push(...validateKnownKeys(value, allowedKeys, 'comfort'));
+  errors.push(...validateNumberBetween(value.intensityCeiling, 'comfort.intensityCeiling', 0, 1));
+  for (const key of ['returnAvailable', 'suddenFlashAllowed', 'pursuitAllowed', 'hapticsEnabled']) {
+    if (typeof value[key] !== 'boolean') {
+      errors.push(`comfort.${key} must be a boolean`);
+    }
+  }
+  if (!isNonEmptyString(value.returnAnchorKind)) {
+    errors.push('comfort.returnAnchorKind is required');
+  }
+  errors.push(...validateNumberBetween(value.locomotionIntensity, 'comfort.locomotionIntensity', 0, 1));
+  return errors;
+}
+
+function validateSessionFrameRendererHints(value) {
+  const errors = [];
+  const allowedKeys = [
+    'nextMove',
+    'suggestedRole',
+    'pressureTarget',
+    'returnReadiness',
+    'atmosphereMood',
+    'weatherPressure',
+    'lightingIntensityScale',
+    'fogDensity',
+    'audioTension',
+    'hapticAmplitude',
+    'movementDrag'
+  ];
+  if (!isObject(value)) {
+    return ['rendererHints must be an object'];
+  }
+  errors.push(...validateKnownKeys(value, allowedKeys, 'rendererHints'));
+  if (!SESSION_ARC_DECISIONS.includes(value.nextMove)) {
+    errors.push(`rendererHints.nextMove must be one of ${SESSION_ARC_DECISIONS.join(', ')}`);
+  }
+  if (!SESSION_ARC_ROLES.includes(value.suggestedRole)) {
+    errors.push(`rendererHints.suggestedRole must be one of ${SESSION_ARC_ROLES.join(', ')}`);
+  }
+  for (const key of [
+    'pressureTarget',
+    'returnReadiness',
+    'lightingIntensityScale',
+    'fogDensity',
+    'audioTension',
+    'hapticAmplitude',
+    'movementDrag'
+  ]) {
+    errors.push(...validateNumberBetween(value[key], `rendererHints.${key}`, 0, 1));
+  }
+  if (!isNonEmptyString(value.atmosphereMood)) {
+    errors.push('rendererHints.atmosphereMood is required');
+  }
+  if (!DREAM_WEATHER_PRESSURES.includes(value.weatherPressure)) {
+    errors.push(`rendererHints.weatherPressure must be one of ${DREAM_WEATHER_PRESSURES.join(', ')}`);
+  }
+  return errors;
+}
+
+function validateSessionFrameDebug(value) {
+  const errors = [];
+  const allowedKeys = ['eventCount', 'lastEventType'];
+  if (!isObject(value)) {
+    return ['debug must be an object'];
+  }
+  errors.push(...validateKnownKeys(value, allowedKeys, 'debug'));
+  if (!isNonNegativeInteger(value.eventCount)) {
+    errors.push('debug.eventCount must be a non-negative integer');
+  }
+  if (!isNullableString(value.lastEventType)) {
+    errors.push('debug.lastEventType must be a string or null');
   }
   return errors;
 }

@@ -29,6 +29,8 @@ It intentionally avoids raw speech, raw room text, transcripts, and arbitrary no
 
 `ExperienceDirectiveV1` can use the memory context to bias pacing, dream modules, masks, and return readiness, but it should store only bounded reason codes and aggregate hints. It should never store why in plain language, quote the player, or make clinical claims.
 
+`SessionFrameV1` is the renderer handoff that combines presentation state and hidden direction. It should never contain raw speech, private memory, diagnostic explanation, or player-facing rationale; it exists so lights, audio, haptics, movement, and VR comfort can react without learning the hidden machinery.
+
 ## Save Modes
 
 Use these modes as the product language and system shape:

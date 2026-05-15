@@ -9,6 +9,7 @@
     "echo_trace_v1.json",
     "first_listening_v1.json",
     "experience_directive_v1.json",
+    "session_frame_v1.json",
     "dreamer_profile_v1.json",
     "dreamer_memory_context_v1.json",
     "session_arc_v1.json",
@@ -28,5 +29,5 @@
     "fixture-pending-run.save.json",
     "trace_summary_v1.json"
   ],
-  "hash": "2e8ef77d948e2e1908b302dda689aaf2cd44b6f902c10fcfaeadcebeeedf86d6"
+  "hash": "48733999697b4eea2c5e74a10e057baaa80002d15afc232ef9471a5d0748077e"
 }

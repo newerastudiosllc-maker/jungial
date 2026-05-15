@@ -24,6 +24,7 @@ import {
   validateSessionArc,
   validateSessionCovenant,
   validateSessionBundle,
+  validateSessionFrame,
   validateThresholdPresentation,
   validateTrace,
   validateTraceSummary,
@@ -60,6 +61,8 @@ export function validateContractDocument(document) {
       return validateFirstListeningRun(document);
     case 'ExperienceDirectiveV1':
       return validateExperienceDirective(document);
+    case 'SessionFrameV1':
+      return validateSessionFrame(document);
     case 'ThresholdPresentationV1':
       return validateThresholdPresentation(document);
     case 'GniBridgeResultV1':
