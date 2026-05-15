@@ -2162,6 +2162,7 @@ function validateDreamJourneyPolicy(policy, label) {
     'schemaVersion',
     'hardBoundaryTags',
     'suppressedModuleIds',
+    'replacementRoutes',
     'fallbackUsed',
     'playerFacingText'
   ];
@@ -2178,12 +2179,57 @@ function validateDreamJourneyPolicy(policy, label) {
   }
   errors.push(...validateStringList(policy.hardBoundaryTags, `${label}.hardBoundaryTags`));
   errors.push(...validateStringList(policy.suppressedModuleIds, `${label}.suppressedModuleIds`));
+  errors.push(...validateDreamJourneyReplacementRoutes(policy.replacementRoutes, `${label}.replacementRoutes`));
   if (typeof policy.fallbackUsed !== 'boolean') {
     errors.push(`${label}.fallbackUsed must be a boolean`);
   }
   if (policy.playerFacingText !== null) {
     errors.push(`${label}.playerFacingText must be null`);
   }
+  return errors;
+}
+
+function validateDreamJourneyReplacementRoutes(routes, label) {
+  const errors = [];
+  if (!Array.isArray(routes)) {
+    return [`${label} must be an array`];
+  }
+
+  routes.forEach((route, index) => {
+    const routeLabel = `${label}[${index}]`;
+    const allowedKeys = [
+      'target',
+      'action',
+      'blockedId',
+      'selectedId',
+      'carriedTags',
+      'suppressedTags',
+      'reason'
+    ];
+    if (!isObject(route)) {
+      errors.push(`${routeLabel} must be an object`);
+      return;
+    }
+    errors.push(...validateKnownKeys(route, allowedKeys, routeLabel));
+    if (route.target !== 'dreamModule') {
+      errors.push(`${routeLabel}.target must be dreamModule`);
+    }
+    if (route.action !== 'replace') {
+      errors.push(`${routeLabel}.action must be replace`);
+    }
+    if (!isNonEmptyString(route.blockedId)) {
+      errors.push(`${routeLabel}.blockedId is required`);
+    }
+    if (!isNonEmptyString(route.selectedId)) {
+      errors.push(`${routeLabel}.selectedId is required`);
+    }
+    errors.push(...validateStringList(route.carriedTags, `${routeLabel}.carriedTags`));
+    errors.push(...validateStringList(route.suppressedTags, `${routeLabel}.suppressedTags`));
+    if (!isNonEmptyString(route.reason)) {
+      errors.push(`${routeLabel}.reason is required`);
+    }
+  });
+
   return errors;
 }
 

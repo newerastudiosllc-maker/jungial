@@ -164,14 +164,18 @@ test('Session Content Replacement schema documents internal reroute plans', asyn
 test('DreamSession schema documents hidden DreamJourney policy reports', async () => {
   const schema = await readJson('data/schemas/dream_session.schema.json');
   const policy = schema.$defs.dreamJourney.properties.policy;
+  const route = policy.properties.replacementRoutes.items;
 
   assert.equal(policy.properties.schema.const, 'DreamJourneyPolicyV1');
   assert.equal(policy.properties.playerFacingText.type, 'null');
+  assert.equal(route.properties.target.const, 'dreamModule');
+  assert.equal(route.properties.action.const, 'replace');
   assert.deepEqual(policy.required, [
     'schema',
     'schemaVersion',
     'hardBoundaryTags',
     'suppressedModuleIds',
+    'replacementRoutes',
     'fallbackUsed',
     'playerFacingText'
   ]);

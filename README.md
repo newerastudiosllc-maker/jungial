@@ -318,7 +318,7 @@ See `docs/dreamer-memory-and-safety.md` for the product/architecture guardrails:
 
 The system can become strange, dark, or horrific when the covenant allows it, while exact Passage repeats and boundary violations are filtered before GNI or Dreamflow can use them.
 
-`DreamJourneyPolicyV1` is embedded in `DreamJourneyV1`. It records which hard-boundary tags shaped module selection, which dream modules were suppressed, and whether the quiet threshold fallback was used. It is internal QA/replay evidence only; no player-facing text is allowed.
+`DreamJourneyPolicyV1` is embedded in `DreamJourneyV1`. It records which hard-boundary tags shaped module selection, which dream modules were suppressed, any internal dream-module reroutes, and whether the quiet threshold fallback was used. It is internal QA/replay evidence only; no player-facing text is allowed.
 
 `SessionArcV1` is the hidden pacing layer for immersive long sessions. It tracks pressure, return readiness, recent beat roles, and the current arc decision so Dreamflow can deepen, distort, mirror, soften, or return without showing the machinery to the player.
 
@@ -376,7 +376,7 @@ For longer play, `src/dreamSession.js` can chain many hidden beats after the por
 - `normalizePlayerInput` / `applyPlayerInput` -> `UJungialInputRouter`
 - `ThresholdChamber` -> `AThresholdChamberActor`
 - `DreamflowGenerator` -> `UDreamflowComponent` plus Dream Module DataAssets
-- `DreamJourneyPolicyV1` -> hidden Dreamflow selection policy report for covenant-based module suppression
+- `DreamJourneyPolicyV1` -> hidden Dreamflow selection policy report for covenant-based module suppression and reroutes
 - `runDreamSession` -> `UJungialDreamSessionRunner` or an async gameplay task that owns multi-beat dream pacing
 - `DreamSessionCheckpointV1` -> SaveGame-backed suspend/resume packet for long dreams
 - `WitnessState` -> local/session observer component

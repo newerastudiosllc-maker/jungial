@@ -678,6 +678,7 @@ function createDreamSessionJourney(dreamSession) {
       schemaVersion: 1,
       hardBoundaryTags: uniqueTags(policies.flatMap((policy) => policy.hardBoundaryTags ?? [])),
       suppressedModuleIds: uniqueTags(policies.flatMap((policy) => policy.suppressedModuleIds ?? [])),
+      replacementRoutes: uniqueRoutes(policies.flatMap((policy) => policy.replacementRoutes ?? [])),
       fallbackUsed: policies.some((policy) => policy.fallbackUsed),
       playerFacingText: null
     }
@@ -709,6 +710,19 @@ function normalizeCheckpointBeatCount({ checkpointAfterBeats, maxBeats }) {
 
 function uniqueTags(tags = []) {
   return [...new Set(tags.filter(Boolean))];
+}
+
+function uniqueRoutes(routes = []) {
+  const seen = new Set();
+  const result = [];
+  for (const route of routes) {
+    const key = JSON.stringify(route);
+    if (!seen.has(key)) {
+      seen.add(key);
+      result.push(route);
+    }
+  }
+  return result;
 }
 
 function stripUndefined(input) {

@@ -62,21 +62,26 @@ function createDreamJourneyPolicy({ modules = [], covenant = null } = {}) {
     schemaVersion: 1,
     hardBoundaryTags,
     suppressedModuleIds,
+    replacementRoutes: [],
     fallbackUsed: allowedModuleCount === 0,
     playerFacingText: null
   };
 }
 
 function selectNextModule({ dreamflow, archetypeState, feelingState, roomConfig, weightOverrides, policy }) {
-  if (policy.fallbackUsed) {
-    return selectFallbackModule({ dreamflow, policy });
-  }
-
   const suppressed = new Set(policy.suppressedModuleIds);
-  const scored = dreamflow
-    .scoreModules({ archetypeState, feelingState, roomConfig, weightOverrides })
-    .filter((entry) => !suppressed.has(entry.id));
+  const scored = dreamflow.scoreModules({ archetypeState, feelingState, roomConfig, weightOverrides });
   const selected = dreamflow.random.pickWeighted(scored, (entry) => entry.weightBreakdown.total);
+
+  if (selected.item && suppressed.has(selected.item.id)) {
+    return selectReplacementModule({
+      dreamflow,
+      scored,
+      blockedEntry: selected.item,
+      policy,
+      suppressed
+    });
+  }
 
   return {
     ...selected.item.module,
@@ -85,6 +90,84 @@ function selectNextModule({ dreamflow, archetypeState, feelingState, roomConfig,
       roll: Number(selected.roll.toFixed(5))
     }
   };
+}
+
+function selectReplacementModule({ dreamflow, scored, blockedEntry, policy, suppressed }) {
+  if (policy.fallbackUsed) {
+    const fallback = selectFallbackModule({ dreamflow, policy });
+    recordReplacementRoute(policy, createReplacementRoute({
+      blockedEntry,
+      selectedModule: fallback,
+      policy
+    }));
+    return fallback;
+  }
+
+  const allowedEntries = scored.filter((entry) => !suppressed.has(entry.id));
+  const replacementEntry = selectSymbolCompatibleReplacement({ allowedEntries, blockedEntry, policy })
+    ?? dreamflow.random.pickWeighted(allowedEntries, (entry) => entry.weightBreakdown.total).item;
+  const replacement = {
+    ...replacementEntry.module,
+    weightBreakdown: {
+      ...replacementEntry.weightBreakdown,
+      roll: 0
+    }
+  };
+
+  recordReplacementRoute(policy, createReplacementRoute({
+    blockedEntry,
+    selectedModule: replacement,
+    policy
+  }));
+
+  return replacement;
+}
+
+function selectSymbolCompatibleReplacement({ allowedEntries, blockedEntry, policy }) {
+  const sourceTags = safeSourceTags(blockedEntry.module, policy);
+  if (sourceTags.length === 0) {
+    return null;
+  }
+
+  const ranked = allowedEntries
+    .map((entry) => ({
+      entry,
+      carriedTags: carriedTagsFor(entry.module, sourceTags)
+    }))
+    .filter((candidate) => candidate.carriedTags.length > 0)
+    .sort((left, right) => {
+      const compatibility = right.carriedTags.length - left.carriedTags.length;
+      if (compatibility !== 0) {
+        return compatibility;
+      }
+      const weight = right.entry.weightBreakdown.total - left.entry.weightBreakdown.total;
+      if (weight !== 0) {
+        return weight;
+      }
+      return left.entry.id.localeCompare(right.entry.id);
+    });
+
+  return ranked[0]?.entry ?? null;
+}
+
+function createReplacementRoute({ blockedEntry, selectedModule, policy }) {
+  return {
+    target: 'dreamModule',
+    action: 'replace',
+    blockedId: blockedEntry.id,
+    selectedId: selectedModule.id,
+    carriedTags: carriedTagsFor(selectedModule, safeSourceTags(blockedEntry.module, policy)),
+    suppressedTags: suppressedTagsFor(blockedEntry.module, policy),
+    reason: 'dream_journey_boundary_reroute'
+  };
+}
+
+function recordReplacementRoute(policy, route) {
+  const key = JSON.stringify(route);
+  const exists = policy.replacementRoutes.some((existing) => JSON.stringify(existing) === key);
+  if (!exists) {
+    policy.replacementRoutes.push(route);
+  }
 }
 
 function selectFallbackModule({ dreamflow, policy }) {
@@ -117,6 +200,28 @@ function createFallbackSymbols(policy) {
   const boundaries = createBoundarySet(policy.hardBoundaryTags);
   const symbols = FALLBACK_SYMBOLS.filter((symbol) => !boundaryHas(boundaries, symbol));
   return symbols.length > 0 ? symbols.slice(0, 2) : ['quiet_fallback'];
+}
+
+function safeSourceTags(module, policy) {
+  const boundaries = createBoundarySet(policy.hardBoundaryTags);
+  return (module?.symbolicTags ?? []).filter((tag) => !boundaryHas(boundaries, tag));
+}
+
+function suppressedTagsFor(module, policy) {
+  const boundaries = createBoundarySet(policy.hardBoundaryTags);
+  return normalizeTags((module?.symbolicTags ?? []).filter((tag) => boundaryHas(boundaries, tag)));
+}
+
+function carriedTagsFor(module, sourceTags) {
+  const sourceByToken = new Map(sourceTags.map((tag) => [normalizeToken(tag), tag]));
+  const carried = [];
+  for (const tag of module?.symbolicTags ?? []) {
+    const sourceTag = sourceByToken.get(normalizeToken(tag));
+    if (sourceTag) {
+      carried.push(sourceTag);
+    }
+  }
+  return [...new Set(carried)];
 }
 
 function moduleCrossesHardBoundary(module, boundarySet) {

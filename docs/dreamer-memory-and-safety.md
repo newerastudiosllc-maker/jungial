@@ -37,7 +37,7 @@ It intentionally avoids raw speech, raw room text, transcripts, and arbitrary no
 
 `SessionContentReplacementPlanV1` is the hidden follow-up route. It can carry a safer Passage and Dream Weather packet when the gate blocks content, but it should still feel like dream continuity to the player rather than a rule correction.
 
-`DreamJourneyPolicyV1` filters dream modules against the active covenant before a journey is finalized. It may store suppressed module ids and boundary tags for QA/replay, but it must keep `playerFacingText` null and must not describe why the dream changed.
+`DreamJourneyPolicyV1` routes blocked weighted dream-module picks through compatible allowed symbols before a journey is finalized. It may store suppressed module ids, replacement routes, and boundary tags for QA/replay, but it must keep `playerFacingText` null and must not describe why the dream changed.
 
 Continuous `DreamSessionV1` beats should use the shared content surface resolver so the stored beat, checkpoint, renderer handoff, and eventual GNI context all see the same final Passage and Dream Weather. The gate report and replacement plan remain internal evidence, not world language.
 

@@ -22,7 +22,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - `UJungialInputRouter`: converts speech, keyboard, controller, and VR events into `JungialInputIntentV1`.
 - `UJungialPresentationMapper`: builds renderer-facing packets without mutating gameplay state.
 - `UDreamflowComponent`: selects dream modules and four-beat `DreamJourneyV1` paths.
-- `FDreamJourneyPolicyV1`: hidden module-selection audit for covenant hard-boundary suppression and deterministic fallback use.
+- `FDreamJourneyPolicyV1`: hidden module-selection audit for covenant hard-boundary suppression, internal dream-module reroutes, and deterministic fallback use.
 - `UJungialCampaignRunner`: executes repeated Threshold-to-dream cycles while preserving Architect state.
 - `UJungialSymbolGrammar`: tracks recurrence, contradiction, tension, and symbol echoes.
 - `UJungialSymbolLexicon`: central DataAsset/registry for valid symbolic tags.
@@ -54,7 +54,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - GNI/GNI-emulator outputs must pass through the Firebreak before touching gameplay state.
 - GNI contract fixtures should pass strict validation before provider changes are accepted.
 - Selected content should pass through the content surface resolver before save, renderer handoff, or GNI context.
-- Dreamflow should suppress modules whose symbolic tags cross the active covenant before selecting a `DreamJourneyV1`; the content gate remains the final audit.
+- Dreamflow should route blocked weighted module picks into compatible allowed modules before finalizing a `DreamJourneyV1`; the content gate remains the final audit.
 - `SessionContentReplacementPlanV1` should be deterministic from gate report, covenant, catalog, and seed so QA can replay reroutes.
 - Content validation must run before packaged builds and before accepting AI-authored content.
 - `RuntimeReadinessV1` should run before a playable session starts so missing GNI can degrade safely while broken content blocks startup.

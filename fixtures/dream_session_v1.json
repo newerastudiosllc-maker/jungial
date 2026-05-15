@@ -212,6 +212,7 @@
             "real_world_self_harm"
           ],
           "suppressedModuleIds": [],
+          "replacementRoutes": [],
           "fallbackUsed": false,
           "playerFacingText": null
         }
@@ -556,6 +557,7 @@
             "real_world_self_harm"
           ],
           "suppressedModuleIds": [],
+          "replacementRoutes": [],
           "fallbackUsed": false,
           "playerFacingText": null
         }
@@ -907,6 +909,7 @@
             "real_world_self_harm"
           ],
           "suppressedModuleIds": [],
+          "replacementRoutes": [],
           "fallbackUsed": false,
           "playerFacingText": null
         }

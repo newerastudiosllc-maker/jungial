@@ -55,6 +55,40 @@ test('dream journey suppresses modules that cross covenant hard boundaries', () 
   assert.equal(journey.policy.playerFacingText, null);
 });
 
+test('dream journey reroutes blocked weighted picks through compatible allowed symbols', () => {
+  const dreamflow = new DreamflowGenerator({
+    seed: 21,
+    modules: [
+      dreamModule('black_star', 'Black Star', ['annihilation', 'rebirth', 'cosmic mystery'], 5000),
+      dreamModule('rebirth_garden', 'Rebirth Garden', ['rebirth', 'growth'], 1),
+      dreamModule('blank_room', 'Blank Room', ['blankness'], 1)
+    ]
+  });
+
+  const journey = selectDreamJourney({
+    dreamflow,
+    archetypeState: { archetypeVector: {} },
+    feelingState: { axes: {} },
+    roomConfig: { portalOpen: true },
+    covenant: createSessionCovenant({ hardBoundaryTags: ['annihilation'] })
+  });
+
+  assert.equal(journey.beats.some((beat) => beat.moduleId === 'black_star'), false);
+  assert.equal(journey.symbolTrail.includes('annihilation'), false);
+  assert.equal(journey.symbolTrail.includes('rebirth'), true);
+  assert.deepEqual(journey.policy.replacementRoutes, [
+    {
+      target: 'dreamModule',
+      action: 'replace',
+      blockedId: 'black_star',
+      selectedId: 'rebirth_garden',
+      carriedTags: ['rebirth'],
+      suppressedTags: ['annihilation'],
+      reason: 'dream_journey_boundary_reroute'
+    }
+  ]);
+});
+
 test('dream journey uses a deterministic hidden fallback when every module is blocked', () => {
   const dreamflow = new DreamflowGenerator({
     seed: 11,

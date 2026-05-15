@@ -254,6 +254,7 @@ struct FDreamJourneyPolicyV1
 {
     Array<String> HardBoundaryTags;
     Array<String> SuppressedModuleIds;
+    Array<JsonObject> ReplacementRoutes; // Internal dream-module reroutes for blocked symbolic material.
     bool bFallbackUsed = false;
     String PlayerFacingText; // Must stay empty/null; this report is internal only.
 };
