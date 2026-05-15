@@ -250,6 +250,14 @@ struct FDreamflowRuntimeStateV1
     int64 RandomState = -1;
 };
 
+struct FDreamJourneyPolicyV1
+{
+    Array<String> HardBoundaryTags;
+    Array<String> SuppressedModuleIds;
+    bool bFallbackUsed = false;
+    String PlayerFacingText; // Must stay empty/null; this report is internal only.
+};
+
 struct FDreamSessionBeatV1
 {
     int32 Index = 0;

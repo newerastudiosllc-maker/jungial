@@ -132,7 +132,7 @@
     },
     "dreamJourney": {
       "type": "object",
-      "required": ["schema", "beats", "symbolTrail", "summary"],
+      "required": ["schema", "beats", "symbolTrail", "summary", "policy"],
       "properties": {
         "schema": { "const": "DreamJourneyV1" },
         "beats": {
@@ -157,7 +157,33 @@
           "type": "array",
           "items": { "type": "string", "minLength": 1 }
         },
-        "summary": { "type": "string", "minLength": 1 }
+        "summary": { "type": "string", "minLength": 1 },
+        "policy": {
+          "type": "object",
+          "required": [
+            "schema",
+            "schemaVersion",
+            "hardBoundaryTags",
+            "suppressedModuleIds",
+            "fallbackUsed",
+            "playerFacingText"
+          ],
+          "properties": {
+            "schema": { "const": "DreamJourneyPolicyV1" },
+            "schemaVersion": { "const": 1 },
+            "hardBoundaryTags": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "suppressedModuleIds": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "fallbackUsed": { "type": "boolean" },
+            "playerFacingText": { "type": "null" }
+          },
+          "additionalProperties": false
+        }
       },
       "additionalProperties": false
     },

@@ -203,7 +203,8 @@ export async function runSimulation({
     archetypeState: archetypes,
     feelingState: feeling,
     roomConfig: chamber.snapshot(),
-    weightOverrides: sessionArcDirective.weightOverrides
+    weightOverrides: sessionArcDirective.weightOverrides,
+    covenant: activeSessionCovenant
   });
   const firstBeat = dreamJourney.beats[0];
   const selectedDream = {

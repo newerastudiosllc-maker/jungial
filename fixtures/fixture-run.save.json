@@ -318,7 +318,17 @@
         "rebirth",
         "cosmic mystery"
       ],
-      "summary": "entry:Boundless White Void -> pressure:Space / Black Hole -> mirror:Space / Black Hole -> return:Boundless White Void"
+      "summary": "entry:Boundless White Void -> pressure:Space / Black Hole -> mirror:Space / Black Hole -> return:Boundless White Void",
+      "policy": {
+        "schema": "DreamJourneyPolicyV1",
+        "schemaVersion": 1,
+        "hardBoundaryTags": [
+          "real_world_self_harm"
+        ],
+        "suppressedModuleIds": [],
+        "fallbackUsed": false,
+        "playerFacingText": null
+      }
     },
     "symbolGrammar": {
       "schema": "SymbolGrammarSnapshotV1",

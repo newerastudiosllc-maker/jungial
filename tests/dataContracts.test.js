@@ -161,6 +161,22 @@ test('Session Content Replacement schema documents internal reroute plans', asyn
   assert.equal(schema.properties.rawSpeech, undefined);
 });
 
+test('DreamSession schema documents hidden DreamJourney policy reports', async () => {
+  const schema = await readJson('data/schemas/dream_session.schema.json');
+  const policy = schema.$defs.dreamJourney.properties.policy;
+
+  assert.equal(policy.properties.schema.const, 'DreamJourneyPolicyV1');
+  assert.equal(policy.properties.playerFacingText.type, 'null');
+  assert.deepEqual(policy.required, [
+    'schema',
+    'schemaVersion',
+    'hardBoundaryTags',
+    'suppressedModuleIds',
+    'fallbackUsed',
+    'playerFacingText'
+  ]);
+});
+
 test('session bundle validation reports missing GNI handoff fields', () => {
   const result = validateSessionBundle({
     schema: 'SessionBundleV1',

@@ -664,12 +664,23 @@ function createDreamSessionJourney(dreamSession) {
     weightBreakdown: { ...(beat.selectedDream?.weightBreakdown ?? {}) }
   }));
   const symbolTrail = uniqueTags(beats.flatMap((beat) => beat.symbolicTags));
+  const policies = dreamSession.beats
+    .map((beat) => beat.dreamJourney?.policy)
+    .filter(Boolean);
 
   return {
     schema: 'DreamJourneyV1',
     beats,
     symbolTrail,
-    summary: beats.map((beat) => `${beat.role}:${beat.moduleName}`).join(' -> ')
+    summary: beats.map((beat) => `${beat.role}:${beat.moduleName}`).join(' -> '),
+    policy: {
+      schema: 'DreamJourneyPolicyV1',
+      schemaVersion: 1,
+      hardBoundaryTags: uniqueTags(policies.flatMap((policy) => policy.hardBoundaryTags ?? [])),
+      suppressedModuleIds: uniqueTags(policies.flatMap((policy) => policy.suppressedModuleIds ?? [])),
+      fallbackUsed: policies.some((policy) => policy.fallbackUsed),
+      playerFacingText: null
+    }
   };
 }
 

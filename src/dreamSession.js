@@ -100,7 +100,8 @@ export function runDreamSession({
       archetypeState,
       feelingState,
       roomConfig,
-      weightOverrides: candidateArcAdvance.directive.weightOverrides
+      weightOverrides: candidateArcAdvance.directive.weightOverrides,
+      covenant: activeCovenant
     });
     const selectedDream = selectDreamFromJourney(dreamJourney, candidateArcAdvance.directive.suggestedRole);
     const currentEchoTraces = [...echoWindow, candidateEchoTrace];

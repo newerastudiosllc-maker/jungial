@@ -204,7 +204,17 @@
           "rebirth",
           "cosmic mystery"
         ],
-        "summary": "entry:Boundless White Void -> pressure:Space / Black Hole -> mirror:Space / Black Hole -> return:Boundless White Void"
+        "summary": "entry:Boundless White Void -> pressure:Space / Black Hole -> mirror:Space / Black Hole -> return:Boundless White Void",
+        "policy": {
+          "schema": "DreamJourneyPolicyV1",
+          "schemaVersion": 1,
+          "hardBoundaryTags": [
+            "real_world_self_harm"
+          ],
+          "suppressedModuleIds": [],
+          "fallbackUsed": false,
+          "playerFacingText": null
+        }
       },
       "dreamWeather": {
         "schema": "DreamWeatherV1",
@@ -538,7 +548,17 @@
           "dissolution",
           "silence"
         ],
-        "summary": "entry:Garden -> pressure:Boundless White Void -> mirror:Garden -> return:Boundless White Void"
+        "summary": "entry:Garden -> pressure:Boundless White Void -> mirror:Garden -> return:Boundless White Void",
+        "policy": {
+          "schema": "DreamJourneyPolicyV1",
+          "schemaVersion": 1,
+          "hardBoundaryTags": [
+            "real_world_self_harm"
+          ],
+          "suppressedModuleIds": [],
+          "fallbackUsed": false,
+          "playerFacingText": null
+        }
       },
       "dreamWeather": {
         "schema": "DreamWeatherV1",
@@ -879,7 +899,17 @@
           "dissolution",
           "silence"
         ],
-        "summary": "entry:Space / Black Hole -> pressure:Garden -> mirror:Boundless White Void -> return:Space / Black Hole"
+        "summary": "entry:Space / Black Hole -> pressure:Garden -> mirror:Boundless White Void -> return:Space / Black Hole",
+        "policy": {
+          "schema": "DreamJourneyPolicyV1",
+          "schemaVersion": 1,
+          "hardBoundaryTags": [
+            "real_world_self_harm"
+          ],
+          "suppressedModuleIds": [],
+          "fallbackUsed": false,
+          "playerFacingText": null
+        }
       },
       "dreamWeather": {
         "schema": "DreamWeatherV1",

@@ -116,6 +116,27 @@ test('continuous dream sessions can stop as soon as return becomes available', (
   assert.equal(session.beats[0].returnAvailable, true);
 });
 
+test('continuous dream sessions avoid dream modules that cross covenant hard boundaries', () => {
+  const session = runDreamSessionFromRuntime({
+    runtime: createReadyRuntime(45),
+    covenant: createSessionCovenant({
+      intensityCeiling: 0.82,
+      hardBoundaryTags: ['annihilation', 'shadow', 'dissolution']
+    }),
+    seed: 1045,
+    maxBeats: 3
+  });
+  const blockedSymbols = new Set(['annihilation', 'shadow', 'dissolution']);
+
+  for (const beat of session.beats) {
+    assert.equal(beat.dreamJourney.policy.schema, 'DreamJourneyPolicyV1');
+    assert.equal(beat.dreamJourney.policy.playerFacingText, null);
+    assert.equal(beat.dreamJourney.symbolTrail.some((symbol) => blockedSymbols.has(symbol)), false);
+    assert.equal(beat.selectedDream.symbolicTags.some((symbol) => blockedSymbols.has(symbol)), false);
+  }
+  assert.deepEqual(validateDreamSession(session), { valid: true, errors: [] });
+});
+
 test('continuous dream sessions are deterministic from runtime seed and response trace', () => {
   const first = runDreamSessionFromRuntime({
     runtime: createReadyRuntime(44),

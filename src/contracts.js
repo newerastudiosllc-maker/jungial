@@ -2111,7 +2111,7 @@ function validateSelectedDream(selectedDream, label) {
 
 function validateDreamJourney(journey, label) {
   const errors = [];
-  const allowedKeys = ['schema', 'beats', 'symbolTrail', 'summary'];
+  const allowedKeys = ['schema', 'beats', 'symbolTrail', 'summary', 'policy'];
 
   if (!isObject(journey)) {
     return {
@@ -2147,11 +2147,44 @@ function validateDreamJourney(journey, label) {
   if (!isNonEmptyString(journey.summary)) {
     errors.push(`${label}.summary is required`);
   }
+  errors.push(...validateDreamJourneyPolicy(journey.policy, `${label}.policy`));
 
   return {
     valid: errors.length === 0,
     errors
   };
+}
+
+function validateDreamJourneyPolicy(policy, label) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'hardBoundaryTags',
+    'suppressedModuleIds',
+    'fallbackUsed',
+    'playerFacingText'
+  ];
+
+  if (!isObject(policy)) {
+    return [`${label} must be an object`];
+  }
+  errors.push(...validateKnownKeys(policy, allowedKeys, label));
+  if (policy.schema !== 'DreamJourneyPolicyV1') {
+    errors.push(`${label}.schema must be DreamJourneyPolicyV1`);
+  }
+  if (policy.schemaVersion !== 1) {
+    errors.push(`${label}.schemaVersion must be 1`);
+  }
+  errors.push(...validateStringList(policy.hardBoundaryTags, `${label}.hardBoundaryTags`));
+  errors.push(...validateStringList(policy.suppressedModuleIds, `${label}.suppressedModuleIds`));
+  if (typeof policy.fallbackUsed !== 'boolean') {
+    errors.push(`${label}.fallbackUsed must be a boolean`);
+  }
+  if (policy.playerFacingText !== null) {
+    errors.push(`${label}.playerFacingText must be null`);
+  }
+  return errors;
 }
 
 function validateWeightBreakdown(weightBreakdown, label) {

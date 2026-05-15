@@ -22,6 +22,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - `UJungialInputRouter`: converts speech, keyboard, controller, and VR events into `JungialInputIntentV1`.
 - `UJungialPresentationMapper`: builds renderer-facing packets without mutating gameplay state.
 - `UDreamflowComponent`: selects dream modules and four-beat `DreamJourneyV1` paths.
+- `FDreamJourneyPolicyV1`: hidden module-selection audit for covenant hard-boundary suppression and deterministic fallback use.
 - `UJungialCampaignRunner`: executes repeated Threshold-to-dream cycles while preserving Architect state.
 - `UJungialSymbolGrammar`: tracks recurrence, contradiction, tension, and symbol echoes.
 - `UJungialSymbolLexicon`: central DataAsset/registry for valid symbolic tags.
@@ -53,6 +54,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - GNI/GNI-emulator outputs must pass through the Firebreak before touching gameplay state.
 - GNI contract fixtures should pass strict validation before provider changes are accepted.
 - Selected content should pass through the content surface resolver before save, renderer handoff, or GNI context.
+- Dreamflow should suppress modules whose symbolic tags cross the active covenant before selecting a `DreamJourneyV1`; the content gate remains the final audit.
 - `SessionContentReplacementPlanV1` should be deterministic from gate report, covenant, catalog, and seed so QA can replay reroutes.
 - Content validation must run before packaged builds and before accepting AI-authored content.
 - `RuntimeReadinessV1` should run before a playable session starts so missing GNI can degrade safely while broken content blocks startup.
@@ -69,7 +71,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - Renderer, audio, UI, and haptic layers should consume presentation packets rather than raw gameplay objects.
 - `DreamAtmospherePresentationV1` should be the handoff for weather-shaped lighting, fog, audio, haptics, movement, and comfort cues; UE actors should not read `DreadBudgetV1` directly.
 - `SessionArcV1` should remain a hidden director packet; renderer/audio/haptics should receive only presentation-safe consequences.
-- `DreamSessionV1` should remain a hidden orchestration packet; individual beats carry their `SessionContentGateV1` and `SessionContentReplacementPlanV1` so level streaming, presentation, and GNI context all use the same resolved surface without exposing the runner to the player.
+- `DreamSessionV1` should remain a hidden orchestration packet; individual beats carry `DreamJourneyPolicyV1`, `SessionContentGateV1`, and `SessionContentReplacementPlanV1` so level streaming, presentation, and GNI context all use the same resolved surface without exposing the runner to the player.
 - `DreamflowRuntimeStateV1` should be stored only in SaveGame/developer traces, never surfaced as UI or player-facing language.
 - `SessionContentGateV1` should stay internal to tooling, traces, and replacement routing; UE widgets and world actors should not expose blocked reasons to the player.
 - `SessionContentReplacementPlanV1` should be applied before presentation mapping, so unsafe content never needs to be hidden by UI after it appears.
