@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/dream_session.schema.json",
+  "title": "DreamSessionV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "schemaVersion",
+    "sessionId",
+    "seed",
+    "maxBeats",
+    "completedBeats",
+    "endedBecause",
+    "beats",
+    "finalSessionArc",
+    "recentEchoTraces",
+    "finalDreamWeather",
+    "finalSelectedDream"
+  ],
+  "properties": {
+    "schema": { "const": "DreamSessionV1" },
+    "schemaVersion": { "const": 1 },
+    "sessionId": { "type": "string", "minLength": 1 },
+    "seed": { "type": ["string", "number"] },
+    "maxBeats": { "type": "integer", "minimum": 1, "maximum": 24 },
+    "completedBeats": { "type": "integer", "minimum": 0 },
+    "endedBecause": { "enum": ["max_beats", "return_anchor", "return_available"] },
+    "beats": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/dreamSessionBeat" }
+    },
+    "finalSessionArc": { "$ref": "session_arc.schema.json" },
+    "recentEchoTraces": {
+      "type": "array",
+      "items": { "$ref": "echo_trace.schema.json" }
+    },
+    "finalDreamWeather": {
+      "anyOf": [
+        { "$ref": "dream_weather.schema.json" },
+        { "type": "null" }
+      ]
+    },
+    "finalSelectedDream": {
+      "anyOf": [
+        { "$ref": "#/$defs/selectedDream" },
+        { "type": "null" }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "dreamSessionBeat": {
+      "type": "object",
+      "required": [
+        "schema",
+        "schemaVersion",
+        "index",
+        "passage",
+        "echoTrace",
+        "sessionArc",
+        "arcDirective",
+        "selectedDream",
+        "dreamJourney",
+        "dreamWeather",
+        "weatherTrace",
+        "returnAvailable"
+      ],
+      "properties": {
+        "schema": { "const": "DreamSessionBeatV1" },
+        "schemaVersion": { "const": 1 },
+        "index": { "type": "integer", "minimum": 1 },
+        "passage": { "$ref": "passage.schema.json" },
+        "echoTrace": { "$ref": "echo_trace.schema.json" },
+        "sessionArc": { "$ref": "session_arc.schema.json" },
+        "arcDirective": { "$ref": "#/$defs/sessionArcDirective" },
+        "selectedDream": { "$ref": "#/$defs/selectedDream" },
+        "dreamJourney": { "$ref": "#/$defs/dreamJourney" },
+        "dreamWeather": { "$ref": "dream_weather.schema.json" },
+        "weatherTrace": { "$ref": "weather_trace.schema.json" },
+        "returnAvailable": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "sessionArcDirective": {
+      "type": "object",
+      "required": [
+        "schema",
+        "schemaVersion",
+        "decision",
+        "suggestedRole",
+        "pressureDelta",
+        "returnAvailable",
+        "weightOverrides"
+      ],
+      "properties": {
+        "schema": { "const": "SessionArcDirectiveV1" },
+        "schemaVersion": { "const": 1 },
+        "decision": { "enum": ["deepen", "distort", "mirror", "soften", "return"] },
+        "suggestedRole": { "enum": ["entry", "pressure", "mirror", "return"] },
+        "pressureDelta": { "type": "number", "minimum": -1, "maximum": 1 },
+        "returnAvailable": { "type": "boolean" },
+        "weightOverrides": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "minimum": 0.05,
+            "maximum": 3
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "selectedDream": {
+      "type": "object",
+      "required": ["id", "name", "symbolicTags", "weightBreakdown"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "symbolicTags": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "weightBreakdown": { "$ref": "#/$defs/weightBreakdown" }
+      },
+      "additionalProperties": false
+    },
+    "dreamJourney": {
+      "type": "object",
+      "required": ["schema", "beats", "symbolTrail", "summary"],
+      "properties": {
+        "schema": { "const": "DreamJourneyV1" },
+        "beats": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["role", "moduleId", "moduleName", "symbolicTags", "weightBreakdown"],
+            "properties": {
+              "role": { "enum": ["entry", "pressure", "mirror", "return"] },
+              "moduleId": { "type": "string", "minLength": 1 },
+              "moduleName": { "type": "string", "minLength": 1 },
+              "symbolicTags": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 }
+              },
+              "weightBreakdown": { "$ref": "#/$defs/weightBreakdown" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "symbolTrail": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "summary": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "weightBreakdown": {
+      "type": "object",
+      "properties": {
+        "base": { "type": "number" },
+        "archetype": { "type": "number" },
+        "vibe": { "type": "number" },
+        "room": { "type": "number" },
+        "portal": { "type": "number" },
+        "directorMultiplier": { "type": "number" },
+        "total": { "type": "number" },
+        "roll": { "type": "number" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

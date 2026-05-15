@@ -9,6 +9,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - `UJungialRuntimeSubsystem`: validates DataAssets and wires services.
 - `UJungialSaveSlotSubsystem`: prepares `SaveSlotPlanV1` for fresh, continue, and new incarnation starts before runtime bootstrap.
 - `UJungialSessionArcDirector`: advances hidden pressure, return readiness, and beat-role pacing before Dreamflow selection.
+- `UJungialDreamSessionRunner`: orchestrates multi-beat dream sessions from Passage, EchoTrace, SessionArc, DreamJourney, and DreamWeather packets.
 - `UArchetypeResonanceComponent`: tracks local archetype vector and event history.
 - `UFeelingEngineComponent`: maps feeling axes to lighting, fog, post-process, audio, and movement parameters.
 - `AThresholdChamberActor`: owns chamber objects, Heartlight, note, portal, and tool-sigil actors.
@@ -35,6 +36,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - QA and GNI debugging should use `JungialTraceV1` audit output rather than adding exposition to the world.
 - Scenario matrices should gate changes to procedural logic with stable hashes for selected dream, journey, trace summary, and journal shape.
 - Multi-cycle campaign tests should prove Architect state affects later Dreamflow selection through explicit director multipliers.
+- Continuous dream sessions should remain deterministic from seed, response traces, prior arc state, and redacted memory context so QA can replay long sessions.
 - Baseline updates should be intentional and reviewed because they represent accepted changes to Jungial's procedural behavior.
 - GNI provider calls should stay behind the bridge so failed/empty responses cannot mutate gameplay state.
 - Empty or delayed GNI responses should be queued in SaveGame-backed state instead of blocking travel, VR comfort flow, or console suspend/resume.
@@ -56,6 +58,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - Renderer, audio, UI, and haptic layers should consume presentation packets rather than raw gameplay objects.
 - `DreamAtmospherePresentationV1` should be the handoff for weather-shaped lighting, fog, audio, haptics, movement, and comfort cues; UE actors should not read `DreadBudgetV1` directly.
 - `SessionArcV1` should remain a hidden director packet; renderer/audio/haptics should receive only presentation-safe consequences.
+- `DreamSessionV1` should remain a hidden orchestration packet; individual beats can feed level streaming, presentation, and GNI context without exposing the runner to the player.
 - Speech events should be captured as intent/symbol events so platforms without microphone permission still work.
 - Console and VR builds should send the same symbolic intents as speech builds instead of branching chamber logic by platform.
 

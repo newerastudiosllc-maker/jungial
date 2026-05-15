@@ -5,9 +5,14 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
 import { validateContractDocument, validateContractFiles } from '../src/contractValidator.js';
+import { createDeterministicClock } from '../src/clock.js';
 import { createDreamWeather, createWeatherTrace } from '../src/dreamWeather.js';
 import { exportContractFixtures } from '../src/fixtureExporter.js';
+import { applyPlayerInput } from '../src/input.js';
 import { buildThresholdPresentation } from '../src/presentation.js';
+import { createJungialRuntime } from '../src/runtime.js';
+import { createSessionCovenant } from '../src/sessionCovenant.js';
+import { runDreamSessionFromRuntime } from '../src/dreamSession.js';
 
 test('contract validator routes known Jungial contract schemas', () => {
   const directiveResult = validateContractDocument({
@@ -240,6 +245,24 @@ test('contract validator routes WeatherTraceV1 documents', () => {
   assert.deepEqual(result, { valid: true, errors: [] });
 });
 
+test('contract validator routes DreamSessionV1 documents', () => {
+  const runtime = createJungialRuntime({
+    seed: 88,
+    clock: createDeterministicClock({ startIso: '2088-01-01T00:00:00.000Z' })
+  });
+  applyPlayerInput({ source: 'system', kind: 'speech', text: 'the word' }, runtime);
+  applyPlayerInput({ source: 'system', kind: 'action', name: 'open_portal' }, runtime);
+
+  const result = validateContractDocument(runDreamSessionFromRuntime({
+    runtime,
+    covenant: createSessionCovenant({ intensityCeiling: 0.45 }),
+    seed: 88,
+    maxBeats: 2
+  }));
+
+  assert.deepEqual(result, { valid: true, errors: [] });
+});
+
 test('contract validator validates generated Dream Weather and summary fixture files', async () => {
   const dir = await mkdtemp(join(tmpdir(), 'jungial-weather-contracts-'));
 
@@ -254,6 +277,7 @@ test('contract validator validates generated Dream Weather and summary fixture f
       join(dir, 'threshold_presentation_v1.json'),
       join(dir, 'dream_weather_v1.json'),
       join(dir, 'weather_trace_v1.json'),
+      join(dir, 'dream_session_v1.json'),
       join(dir, 'session_arc_v1.json'),
       join(dir, 'gni_firebreak_trace_v1.json'),
       join(dir, 'trace_summary_v1.json'),
@@ -265,12 +289,13 @@ test('contract validator validates generated Dream Weather and summary fixture f
       'ThresholdPresentationV1',
       'DreamWeatherV1',
       'WeatherTraceV1',
+      'DreamSessionV1',
       'SessionArcV1',
       'GniFirebreakTraceV1',
       'JungialTraceSummaryV1',
       'JungialContractFixtureManifestV1'
     ]);
-    assert.deepEqual(report.files.map((file) => file.valid), [true, true, true, true, true, true, true]);
+    assert.deepEqual(report.files.map((file) => file.valid), [true, true, true, true, true, true, true, true]);
   } finally {
     await rm(dir, { recursive: true, force: true });
   }

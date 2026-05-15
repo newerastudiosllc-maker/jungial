@@ -26,6 +26,7 @@
         "lastGniQueueProcessResult": { "type": "object" },
         "saveSlot": { "$ref": "save_slot_plan.schema.json" },
         "sessionArc": { "$ref": "session_arc.schema.json" },
+        "dreamSession": { "$ref": "dream_session.schema.json" },
         "dreamerProfile": { "$ref": "dreamer_profile.schema.json" },
         "sessionCovenant": { "$ref": "session_covenant.schema.json" },
         "echoTrace": { "$ref": "echo_trace.schema.json" },

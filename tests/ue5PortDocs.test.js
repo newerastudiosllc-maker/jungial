@@ -29,3 +29,11 @@ test('UE5 core type pseudocode documents hidden session arc pacing', async () =>
   assert.match(text, /EJungialSessionArcPhase/);
   assert.match(text, /ReturnReadiness/);
 });
+
+test('UE5 core type pseudocode documents continuous dream sessions', async () => {
+  const text = await readFile('UE5Port/JungialTypes.hpp', 'utf8');
+
+  assert.match(text, /struct FDreamSessionBeatV1/);
+  assert.match(text, /struct FDreamSessionV1/);
+  assert.match(text, /ReturnAvailable/);
+});

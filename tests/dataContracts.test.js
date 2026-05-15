@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { ARCHETYPES } from '../src/constants.js';
 import {
   validateDirective,
+  validateDreamSession,
   validateEchoTrace,
   validateDreamerMemoryContext,
   validateDreamerProfile,
@@ -38,6 +39,10 @@ import {
   toGniWeatherContext
 } from '../src/dreamWeather.js';
 import { buildThresholdPresentation } from '../src/presentation.js';
+import { createDeterministicClock } from '../src/clock.js';
+import { applyPlayerInput } from '../src/input.js';
+import { createJungialRuntime } from '../src/runtime.js';
+import { runDreamSessionFromRuntime } from '../src/dreamSession.js';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 
@@ -905,6 +910,37 @@ test('SessionArc validation accepts hidden pacing state', () => {
   assert.deepEqual(result, { valid: true, errors: [] });
 });
 
+test('DreamSession validation accepts continuous hidden session results', () => {
+  const result = validateDreamSession(validDreamSession());
+
+  assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('save game validation checks optional DreamSession payload', () => {
+  const result = validateSaveGame({
+    ...validSaveGame(),
+    payload: {
+      ...validSaveGame().payload,
+      dreamSession: {
+        ...validDreamSession(),
+        sessionId: '',
+        completedBeats: 4,
+        endedBecause: 'lost_inside',
+        recentEchoTraces: 'not-an-array'
+      }
+    }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'payload.dreamSession.sessionId is required',
+    'payload.dreamSession.completedBeats cannot exceed maxBeats',
+    'payload.dreamSession.endedBecause is unsupported',
+    'payload.dreamSession.completedBeats must equal beats length',
+    'payload.dreamSession.recentEchoTraces must be an array'
+  ]);
+});
+
 test('save game validation checks optional SessionArc payload', () => {
   const result = validateSaveGame({
     ...validSaveGame(),
@@ -1429,4 +1465,24 @@ function validSaveGame() {
       architectState: {}
     }
   };
+}
+
+function validDreamSession() {
+  const runtime = createJungialRuntime({
+    seed: 505,
+    clock: createDeterministicClock({ startIso: '2080-01-01T00:00:00.000Z' })
+  });
+  applyPlayerInput({ source: 'system', kind: 'speech', text: 'the word' }, runtime);
+  applyPlayerInput({ source: 'system', kind: 'action', name: 'open_portal' }, runtime);
+
+  return runDreamSessionFromRuntime({
+    runtime,
+    covenant: createSessionCovenant({ toneTags: ['strange'], intensityCeiling: 0.45 }),
+    seed: 505,
+    maxBeats: 2,
+    responses: [
+      { kind: 'approach', gestureTags: ['approached'], pressureAccepted: 0.4 },
+      { kind: 'wait', gestureTags: ['listened'], pressureAccepted: 0.3 }
+    ]
+  });
 }

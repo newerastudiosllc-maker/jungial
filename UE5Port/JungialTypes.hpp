@@ -103,3 +103,38 @@ struct FSessionArcV1
     EJungialSessionArcDecision LastDecision = EJungialSessionArcDecision::Deepen;
     Map<String, float> WeightOverrides;
 };
+
+enum class EDreamSessionEndReason
+{
+    MaxBeats,
+    ReturnAnchor,
+    ReturnAvailable
+};
+
+struct FDreamSessionBeatV1
+{
+    int32 Index = 0;
+    JsonObject Passage;
+    JsonObject EchoTrace;
+    FSessionArcV1 SessionArc;
+    JsonObject ArcDirective;
+    JsonObject SelectedDream;
+    JsonObject DreamJourney;
+    JsonObject DreamWeather;
+    JsonObject WeatherTrace;
+    bool bReturnAvailable = false;
+};
+
+struct FDreamSessionV1
+{
+    String SessionId;
+    String Seed;
+    int32 MaxBeats = 0;
+    int32 CompletedBeats = 0;
+    EDreamSessionEndReason EndedBecause = EDreamSessionEndReason::MaxBeats;
+    Array<FDreamSessionBeatV1> Beats;
+    FSessionArcV1 FinalSessionArc;
+    Array<JsonObject> RecentEchoTraces;
+    JsonObject FinalDreamWeather;
+    JsonObject FinalSelectedDream;
+};

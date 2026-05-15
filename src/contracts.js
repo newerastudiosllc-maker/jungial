@@ -59,6 +59,17 @@ const DREAM_WEATHER_PRESSURES = Object.freeze(['low', 'medium', 'heavy', 'storm'
 const SESSION_ARC_PHASES = Object.freeze(['opening', 'deepening', 'distorting', 'mirroring', 'softening', 'returning']);
 const SESSION_ARC_DECISIONS = Object.freeze(['deepen', 'distort', 'mirror', 'soften', 'return']);
 const SESSION_ARC_ROLES = Object.freeze(['entry', 'pressure', 'mirror', 'return']);
+const DREAM_SESSION_END_REASONS = Object.freeze(['max_beats', 'return_anchor', 'return_available']);
+const DREAM_JOURNEY_WEIGHT_KEYS = Object.freeze([
+  'base',
+  'archetype',
+  'vibe',
+  'room',
+  'portal',
+  'directorMultiplier',
+  'total',
+  'roll'
+]);
 
 export function validateSessionBundle(bundle) {
   const errors = [];
@@ -1257,6 +1268,297 @@ export function validateSessionArc(arc) {
   };
 }
 
+export function validateSessionArcDirective(directive) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'decision',
+    'suggestedRole',
+    'pressureDelta',
+    'returnAvailable',
+    'weightOverrides'
+  ];
+
+  if (directive?.schema !== 'SessionArcDirectiveV1') {
+    errors.push('schema must be SessionArcDirectiveV1');
+  }
+  if (directive?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  errors.push(...validateKnownKeys(directive, allowedKeys, 'arcDirective'));
+  if (!SESSION_ARC_DECISIONS.includes(directive?.decision)) {
+    errors.push('decision is unsupported');
+  }
+  if (!SESSION_ARC_ROLES.includes(directive?.suggestedRole)) {
+    errors.push('suggestedRole must be entry, pressure, mirror, or return');
+  }
+  errors.push(...validateNumberBetween(directive?.pressureDelta, 'pressureDelta', -1, 1));
+  if (typeof directive?.returnAvailable !== 'boolean') {
+    errors.push('returnAvailable must be a boolean');
+  }
+  errors.push(...validateOptionalNumberMap(directive?.weightOverrides, 'weightOverrides', { min: 0.05, max: 3 }));
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function validateDreamSession(session) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'sessionId',
+    'seed',
+    'maxBeats',
+    'completedBeats',
+    'endedBecause',
+    'beats',
+    'finalSessionArc',
+    'recentEchoTraces',
+    'finalDreamWeather',
+    'finalSelectedDream'
+  ];
+
+  if (session?.schema !== 'DreamSessionV1') {
+    errors.push('schema must be DreamSessionV1');
+  }
+  if (session?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  errors.push(...validateKnownKeys(session, allowedKeys, 'dreamSession'));
+  if (!isNonEmptyString(session?.sessionId)) {
+    errors.push('sessionId is required');
+  }
+  if (!(typeof session?.seed === 'string' || Number.isFinite(session?.seed))) {
+    errors.push('seed must be a string or number');
+  }
+  if (!Number.isInteger(session?.maxBeats) || session.maxBeats < 1 || session.maxBeats > 24) {
+    errors.push('maxBeats must be an integer between 1 and 24');
+  }
+  if (!isNonNegativeInteger(session?.completedBeats)) {
+    errors.push('completedBeats must be a non-negative integer');
+  } else if (Number.isInteger(session?.maxBeats) && session.completedBeats > session.maxBeats) {
+    errors.push('completedBeats cannot exceed maxBeats');
+  }
+  if (!DREAM_SESSION_END_REASONS.includes(session?.endedBecause)) {
+    errors.push('endedBecause is unsupported');
+  }
+  if (!Array.isArray(session?.beats)) {
+    errors.push('beats must be an array');
+  } else {
+    if (isNonNegativeInteger(session?.completedBeats) && session.completedBeats !== session.beats.length) {
+      errors.push('completedBeats must equal beats length');
+    }
+    session.beats.forEach((beat, index) => {
+      const beatValidation = validateDreamSessionBeat(beat, index);
+      if (!beatValidation.valid) {
+        errors.push(...beatValidation.errors);
+      }
+    });
+  }
+
+  if (!isObject(session?.finalSessionArc)) {
+    errors.push('finalSessionArc must be an object');
+  } else {
+    errors.push(...validateOptionalNestedContract(
+      session.finalSessionArc,
+      'finalSessionArc',
+      validateSessionArc
+    ));
+  }
+  if (!Array.isArray(session?.recentEchoTraces)) {
+    errors.push('recentEchoTraces must be an array');
+  } else {
+    session.recentEchoTraces.forEach((trace, index) => {
+      const traceValidation = validateEchoTrace(trace);
+      if (!traceValidation.valid) {
+        errors.push(...prefixNestedErrors(traceValidation.errors, `recentEchoTraces[${index}]`, 'echoTrace'));
+      }
+    });
+  }
+  if (!hasOwn(session, 'finalDreamWeather')) {
+    errors.push('finalDreamWeather is required');
+  } else if (session?.finalDreamWeather !== null) {
+    errors.push(...validateOptionalNestedContract(
+      session.finalDreamWeather,
+      'finalDreamWeather',
+      validateDreamWeather
+    ));
+  }
+  if (!hasOwn(session, 'finalSelectedDream')) {
+    errors.push('finalSelectedDream is required');
+  } else if (session?.finalSelectedDream !== null) {
+    const selectedValidation = validateSelectedDream(session.finalSelectedDream, 'finalSelectedDream');
+    if (!selectedValidation.valid) {
+      errors.push(...selectedValidation.errors);
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+function validateDreamSessionBeat(beat, index) {
+  const errors = [];
+  const label = `beats[${index}]`;
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'index',
+    'passage',
+    'echoTrace',
+    'sessionArc',
+    'arcDirective',
+    'selectedDream',
+    'dreamJourney',
+    'dreamWeather',
+    'weatherTrace',
+    'returnAvailable'
+  ];
+
+  if (beat?.schema !== 'DreamSessionBeatV1') {
+    errors.push(`${label}.schema must be DreamSessionBeatV1`);
+  }
+  if (beat?.schemaVersion !== 1) {
+    errors.push(`${label}.schemaVersion must be 1`);
+  }
+  errors.push(...validateKnownKeys(beat, allowedKeys, label));
+  if (beat?.index !== index + 1) {
+    errors.push(`${label}.index must be ${index + 1}`);
+  }
+  if (typeof beat?.returnAvailable !== 'boolean') {
+    errors.push(`${label}.returnAvailable must be a boolean`);
+  }
+
+  const passageValidation = validatePassage(beat?.passage);
+  if (!passageValidation.valid) {
+    errors.push(...prefixNestedErrors(passageValidation.errors, `${label}.passage`, 'passage'));
+  }
+  const echoValidation = validateEchoTrace(beat?.echoTrace);
+  if (!echoValidation.valid) {
+    errors.push(...prefixNestedErrors(echoValidation.errors, `${label}.echoTrace`, 'echoTrace'));
+  }
+  const arcValidation = validateSessionArc(beat?.sessionArc);
+  if (!arcValidation.valid) {
+    errors.push(...prefixNestedErrors(arcValidation.errors, `${label}.sessionArc`, 'sessionArc'));
+  }
+  const directiveValidation = validateSessionArcDirective(beat?.arcDirective);
+  if (!directiveValidation.valid) {
+    errors.push(...prefixNestedErrors(directiveValidation.errors, `${label}.arcDirective`, 'arcDirective'));
+  }
+  const selectedValidation = validateSelectedDream(beat?.selectedDream, `${label}.selectedDream`);
+  if (!selectedValidation.valid) {
+    errors.push(...selectedValidation.errors);
+  }
+  const journeyValidation = validateDreamJourney(beat?.dreamJourney, `${label}.dreamJourney`);
+  if (!journeyValidation.valid) {
+    errors.push(...journeyValidation.errors);
+  }
+  const weatherValidation = validateDreamWeather(beat?.dreamWeather);
+  if (!weatherValidation.valid) {
+    errors.push(...prefixNestedErrors(weatherValidation.errors, `${label}.dreamWeather`, 'dreamWeather'));
+  }
+  const traceValidation = validateWeatherTrace(beat?.weatherTrace);
+  if (!traceValidation.valid) {
+    errors.push(...prefixNestedErrors(traceValidation.errors, `${label}.weatherTrace`, 'weatherTrace'));
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+function validateSelectedDream(selectedDream, label) {
+  const errors = [];
+  const allowedKeys = ['id', 'name', 'symbolicTags', 'weightBreakdown'];
+
+  if (!isObject(selectedDream)) {
+    return {
+      valid: false,
+      errors: [`${label} must be an object`]
+    };
+  }
+  errors.push(...validateKnownKeys(selectedDream, allowedKeys, label));
+  if (!isNonEmptyString(selectedDream.id)) {
+    errors.push(`${label}.id is required`);
+  }
+  if (!isNonEmptyString(selectedDream.name)) {
+    errors.push(`${label}.name is required`);
+  }
+  errors.push(...validateStringList(selectedDream.symbolicTags, `${label}.symbolicTags`));
+  errors.push(...validateWeightBreakdown(selectedDream.weightBreakdown, `${label}.weightBreakdown`));
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+function validateDreamJourney(journey, label) {
+  const errors = [];
+  const allowedKeys = ['schema', 'beats', 'symbolTrail', 'summary'];
+
+  if (!isObject(journey)) {
+    return {
+      valid: false,
+      errors: [`${label} must be an object`]
+    };
+  }
+  if (journey.schema !== 'DreamJourneyV1') {
+    errors.push(`${label}.schema must be DreamJourneyV1`);
+  }
+  errors.push(...validateKnownKeys(journey, allowedKeys, label));
+  if (!Array.isArray(journey.beats)) {
+    errors.push(`${label}.beats must be an array`);
+  } else {
+    journey.beats.forEach((beat, index) => {
+      const beatLabel = `${label}.beats[${index}]`;
+      const allowedBeatKeys = ['role', 'moduleId', 'moduleName', 'symbolicTags', 'weightBreakdown'];
+      errors.push(...validateKnownKeys(beat, allowedBeatKeys, beatLabel));
+      if (!SESSION_ARC_ROLES.includes(beat?.role)) {
+        errors.push(`${beatLabel}.role must be entry, pressure, mirror, or return`);
+      }
+      if (!isNonEmptyString(beat?.moduleId)) {
+        errors.push(`${beatLabel}.moduleId is required`);
+      }
+      if (!isNonEmptyString(beat?.moduleName)) {
+        errors.push(`${beatLabel}.moduleName is required`);
+      }
+      errors.push(...validateStringList(beat?.symbolicTags, `${beatLabel}.symbolicTags`));
+      errors.push(...validateWeightBreakdown(beat?.weightBreakdown, `${beatLabel}.weightBreakdown`));
+    });
+  }
+  errors.push(...validateStringList(journey.symbolTrail, `${label}.symbolTrail`));
+  if (!isNonEmptyString(journey.summary)) {
+    errors.push(`${label}.summary is required`);
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+function validateWeightBreakdown(weightBreakdown, label) {
+  const errors = [];
+  if (!isObject(weightBreakdown)) {
+    return [`${label} must be an object`];
+  }
+  errors.push(...validateKnownKeys(weightBreakdown, DREAM_JOURNEY_WEIGHT_KEYS, label));
+  for (const [key, value] of Object.entries(weightBreakdown)) {
+    if (!Number.isFinite(value)) {
+      errors.push(`${label}.${key} must be a finite number`);
+    }
+  }
+  return errors;
+}
+
 export function validateSaveGame(saveGame) {
   const errors = [];
 
@@ -1342,6 +1644,11 @@ export function validateSaveGame(saveGame) {
     saveGame.payload.sessionArc,
     'payload.sessionArc',
     validateSessionArc
+  ));
+  errors.push(...validateOptionalNestedContract(
+    saveGame.payload.dreamSession,
+    'payload.dreamSession',
+    validateDreamSession
   ));
   errors.push(...validateOptionalNestedContract(
     saveGame.payload.sessionCovenant,
@@ -1754,6 +2061,10 @@ function normalizeStringList(input) {
 
 function isObject(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function hasOwn(input, key) {
+  return isObject(input) && Object.prototype.hasOwnProperty.call(input, key);
 }
 
 function isNonEmptyString(value) {

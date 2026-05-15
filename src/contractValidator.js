@@ -5,6 +5,7 @@ import {
   validateDirective,
   validateDreamerMemoryContext,
   validateDreamerProfile,
+  validateDreamSession,
   validateDreamWeather,
   validateEchoTrace,
   validateFixtureManifest,
@@ -38,6 +39,8 @@ export function validateContractDocument(document) {
       return validateDreamerProfile(document);
     case 'DreamerMemoryContextV1':
       return validateDreamerMemoryContext(document);
+    case 'DreamSessionV1':
+      return validateDreamSession(document);
     case 'DreamWeatherV1':
       return validateDreamWeather(document);
     case 'WeatherTraceV1':

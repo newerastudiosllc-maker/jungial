@@ -1,0 +1,926 @@
+{
+  "schema": "DreamSessionV1",
+  "schemaVersion": 1,
+  "sessionId": "dream-session-b4d4135a7e9b",
+  "seed": 777,
+  "maxBeats": 3,
+  "completedBeats": 3,
+  "endedBecause": "max_beats",
+  "beats": [
+    {
+      "schema": "DreamSessionBeatV1",
+      "schemaVersion": 1,
+      "index": 1,
+      "passage": {
+        "schema": "PassageV1",
+        "schemaVersion": 1,
+        "id": "candle_refuses_dark",
+        "motifs": [
+          "light",
+          "threshold",
+          "memory"
+        ],
+        "pressureTags": [
+          "hope",
+          "refusal"
+        ],
+        "formTags": [
+          "candle",
+          "dim_room",
+          "held_flame"
+        ],
+        "intensityBand": "gentle",
+        "allowedResponseKinds": [
+          "protect",
+          "speak",
+          "wait",
+          "alter_object"
+        ],
+        "returnAnchorTags": [
+          "lamp",
+          "note",
+          "hearth"
+        ],
+        "variationFamily": "unspent_lights",
+        "baseWeight": 1
+      },
+      "echoTrace": {
+        "schema": "EchoTraceV1",
+        "schemaVersion": 1,
+        "passageId": "candle_refuses_dark",
+        "motifsTouched": [
+          "light",
+          "threshold",
+          "memory"
+        ],
+        "gestureTags": [
+          "approached",
+          "approach"
+        ],
+        "tempo": "unhurried",
+        "pressureAccepted": 0.4,
+        "returnAnchorUsed": false,
+        "boundarySignals": [],
+        "dreamflowDeltas": {}
+      },
+      "sessionArc": {
+        "schema": "SessionArcV1",
+        "schemaVersion": 1,
+        "phase": "deepening",
+        "beatCount": 1,
+        "pressure": 0.159,
+        "returnReadiness": 0.025,
+        "continuationSeed": 3928974574,
+        "recentBeatRoles": [
+          "pressure"
+        ],
+        "boundarySignalCount": 0,
+        "lastDecision": "deepen",
+        "weightOverrides": {
+          "space_black_hole": 1.2,
+          "white_void": 1.1
+        }
+      },
+      "arcDirective": {
+        "schema": "SessionArcDirectiveV1",
+        "schemaVersion": 1,
+        "decision": "deepen",
+        "suggestedRole": "pressure",
+        "pressureDelta": 0.159,
+        "returnAvailable": false,
+        "weightOverrides": {
+          "space_black_hole": 1.2,
+          "white_void": 1.1
+        }
+      },
+      "selectedDream": {
+        "id": "space_black_hole",
+        "name": "Space / Black Hole",
+        "symbolicTags": [
+          "annihilation",
+          "rebirth",
+          "cosmic mystery"
+        ],
+        "weightBreakdown": {
+          "base": 1,
+          "archetype": 2.325,
+          "vibe": -0.038,
+          "room": 0.25,
+          "portal": 0.35,
+          "directorMultiplier": 1.2,
+          "total": 4.665,
+          "roll": 13.14156
+        }
+      },
+      "dreamJourney": {
+        "schema": "DreamJourneyV1",
+        "beats": [
+          {
+            "role": "entry",
+            "moduleId": "white_void",
+            "moduleName": "Boundless White Void",
+            "symbolicTags": [
+              "boundlessness",
+              "dissolution",
+              "silence"
+            ],
+            "weightBreakdown": {
+              "base": 1,
+              "archetype": 2.69,
+              "vibe": 1.005,
+              "room": 0.25,
+              "portal": 0.35,
+              "directorMultiplier": 1.1,
+              "total": 5.824,
+              "roll": 9.3456
+            }
+          },
+          {
+            "role": "pressure",
+            "moduleId": "space_black_hole",
+            "moduleName": "Space / Black Hole",
+            "symbolicTags": [
+              "annihilation",
+              "rebirth",
+              "cosmic mystery"
+            ],
+            "weightBreakdown": {
+              "base": 1,
+              "archetype": 2.325,
+              "vibe": -0.038,
+              "room": 0.25,
+              "portal": 0.35,
+              "directorMultiplier": 1.2,
+              "total": 4.665,
+              "roll": 13.14156
+            }
+          },
+          {
+            "role": "mirror",
+            "moduleId": "space_black_hole",
+            "moduleName": "Space / Black Hole",
+            "symbolicTags": [
+              "annihilation",
+              "rebirth",
+              "cosmic mystery"
+            ],
+            "weightBreakdown": {
+              "base": 1,
+              "archetype": 2.325,
+              "vibe": -0.038,
+              "room": 0.25,
+              "portal": 0.35,
+              "directorMultiplier": 1.2,
+              "total": 4.665,
+              "roll": 14.57627
+            }
+          },
+          {
+            "role": "return",
+            "moduleId": "white_void",
+            "moduleName": "Boundless White Void",
+            "symbolicTags": [
+              "boundlessness",
+              "dissolution",
+              "silence"
+            ],
+            "weightBreakdown": {
+              "base": 1,
+              "archetype": 2.69,
+              "vibe": 1.005,
+              "room": 0.25,
+              "portal": 0.35,
+              "directorMultiplier": 1.1,
+              "total": 5.824,
+              "roll": 7.47346
+            }
+          }
+        ],
+        "symbolTrail": [
+          "boundlessness",
+          "dissolution",
+          "silence",
+          "annihilation",
+          "rebirth",
+          "cosmic mystery"
+        ],
+        "summary": "entry:Boundless White Void -> pressure:Space / Black Hole -> mirror:Space / Black Hole -> return:Boundless White Void"
+      },
+      "dreamWeather": {
+        "schema": "DreamWeatherV1",
+        "schemaVersion": 1,
+        "weatherId": "weather-1b3iese",
+        "mood": "stillness",
+        "pressure": "low",
+        "ceiling": 0.35,
+        "dreadBudget": {
+          "pursuit": 0.034,
+          "bodyUnease": 0.167,
+          "cosmicDread": 0.157,
+          "disorientation": 0.022,
+          "loss": 0.122,
+          "watching": 0.17,
+          "claustrophobia": 0.131
+        },
+        "weatherTags": [
+          "silence",
+          "threshold",
+          "annihilation",
+          "rebirth",
+          "cosmic_mystery",
+          "memory"
+        ],
+        "suppressedTags": [],
+        "atmosphere": {
+          "lightIntensity": 0.742,
+          "fogDensity": 0.346,
+          "bloom": 0.28,
+          "exposure": 0.48,
+          "warmth": 0.57,
+          "movementDrag": 0.277
+        }
+      },
+      "weatherTrace": {
+        "schema": "WeatherTraceV1",
+        "schemaVersion": 1,
+        "traceId": "weather-trace-1b3iese",
+        "weatherId": "weather-1b3iese",
+        "mood": "stillness",
+        "pressure": "low",
+        "sourceTags": [
+          "annihilation",
+          "rebirth",
+          "cosmic_mystery",
+          "threshold",
+          "memory"
+        ],
+        "resultingTags": [
+          "silence",
+          "threshold",
+          "annihilation",
+          "rebirth",
+          "cosmic_mystery",
+          "memory"
+        ],
+        "suppressedTags": [],
+        "strongestDreadAxis": "watching"
+      },
+      "returnAvailable": false
+    },
+    {
+      "schema": "DreamSessionBeatV1",
+      "schemaVersion": 1,
+      "index": 2,
+      "passage": {
+        "schema": "PassageV1",
+        "schemaVersion": 1,
+        "id": "candle_refuses_dark",
+        "motifs": [
+          "light",
+          "threshold",
+          "memory"
+        ],
+        "pressureTags": [
+          "hope",
+          "refusal"
+        ],
+        "formTags": [
+          "candle",
+          "dim_room",
+          "held_flame"
+        ],
+        "intensityBand": "gentle",
+        "allowedResponseKinds": [
+          "protect",
+          "speak",
+          "wait",
+          "alter_object"
+        ],
+        "returnAnchorTags": [
+          "lamp",
+          "note",
+          "hearth"
+        ],
+        "variationFamily": "unspent_lights",
+        "baseWeight": 1
+      },
+      "echoTrace": {
+        "schema": "EchoTraceV1",
+        "schemaVersion": 1,
+        "passageId": "candle_refuses_dark",
+        "motifsTouched": [
+          "light",
+          "threshold",
+          "memory"
+        ],
+        "gestureTags": [
+          "answered",
+          "speak"
+        ],
+        "tempo": "unhurried",
+        "pressureAccepted": 0.48,
+        "returnAnchorUsed": false,
+        "boundarySignals": [],
+        "dreamflowDeltas": {}
+      },
+      "sessionArc": {
+        "schema": "SessionArcV1",
+        "schemaVersion": 1,
+        "phase": "mirroring",
+        "beatCount": 2,
+        "pressure": 0.336,
+        "returnReadiness": 0.235,
+        "continuationSeed": 2476735975,
+        "recentBeatRoles": [
+          "pressure",
+          "mirror"
+        ],
+        "boundarySignalCount": 0,
+        "lastDecision": "mirror",
+        "weightOverrides": {
+          "mirror_hall": 1.264
+        }
+      },
+      "arcDirective": {
+        "schema": "SessionArcDirectiveV1",
+        "schemaVersion": 1,
+        "decision": "mirror",
+        "suggestedRole": "mirror",
+        "pressureDelta": 0.177,
+        "returnAvailable": false,
+        "weightOverrides": {
+          "mirror_hall": 1.264
+        }
+      },
+      "selectedDream": {
+        "id": "garden",
+        "name": "Garden",
+        "symbolicTags": [
+          "growth",
+          "innocence",
+          "fertility",
+          "beauty"
+        ],
+        "weightBreakdown": {
+          "base": 1,
+          "archetype": 1.87,
+          "vibe": 0.42,
+          "room": 0.25,
+          "portal": 0.35,
+          "directorMultiplier": 1,
+          "total": 3.89,
+          "roll": 4.27059
+        }
+      },
+      "dreamJourney": {
+        "schema": "DreamJourneyV1",
+        "beats": [
+          {
+            "role": "entry",
+            "moduleId": "garden",
+            "moduleName": "Garden",
+            "symbolicTags": [
+              "growth",
+              "innocence",
+              "fertility",
+              "beauty"
+            ],
+            "weightBreakdown": {
+              "base": 1,
+              "archetype": 1.87,
+              "vibe": 0.42,
+              "room": 0.25,
+              "portal": 0.35,
+              "directorMultiplier": 1,
+              "total": 3.89,
+              "roll": 3.75811
+            }
+          },
+          {
+            "role": "pressure",
+            "moduleId": "white_void",
+            "moduleName": "Boundless White Void",
+            "symbolicTags": [
+              "boundlessness",
+              "dissolution",
+              "silence"
+            ],
+            "weightBreakdown": {
+              "base": 1,
+              "archetype": 2.69,
+              "vibe": 1.005,
+              "room": 0.25,
+              "portal": 0.35,
+              "directorMultiplier": 1,
+              "total": 5.295,
+              "roll": 9.76149
+            }
+          },
+          {
+            "role": "mirror",
+            "moduleId": "garden",
+            "moduleName": "Garden",
+            "symbolicTags": [
+              "growth",
+              "innocence",
+              "fertility",
+              "beauty"
+            ],
+            "weightBreakdown": {
+              "base": 1,
+              "archetype": 1.87,
+              "vibe": 0.42,
+              "room": 0.25,
+              "portal": 0.35,
+              "directorMultiplier": 1,
+              "total": 3.89,
+              "roll": 4.27059
+            }
+          },
+          {
+            "role": "return",
+            "moduleId": "white_void",
+            "moduleName": "Boundless White Void",
+            "symbolicTags": [
+              "boundlessness",
+              "dissolution",
+              "silence"
+            ],
+            "weightBreakdown": {
+              "base": 1,
+              "archetype": 2.69,
+              "vibe": 1.005,
+              "room": 0.25,
+              "portal": 0.35,
+              "directorMultiplier": 1,
+              "total": 5.295,
+              "roll": 8.07853
+            }
+          }
+        ],
+        "symbolTrail": [
+          "growth",
+          "innocence",
+          "fertility",
+          "beauty",
+          "boundlessness",
+          "dissolution",
+          "silence"
+        ],
+        "summary": "entry:Garden -> pressure:Boundless White Void -> mirror:Garden -> return:Boundless White Void"
+      },
+      "dreamWeather": {
+        "schema": "DreamWeatherV1",
+        "schemaVersion": 1,
+        "weatherId": "weather-1c7low1",
+        "mood": "stillness",
+        "pressure": "low",
+        "ceiling": 0.35,
+        "dreadBudget": {
+          "pursuit": 0.012,
+          "bodyUnease": 0.135,
+          "cosmicDread": 0.07,
+          "disorientation": 0.004,
+          "loss": 0.172,
+          "watching": 0.036,
+          "claustrophobia": 0.119
+        },
+        "weatherTags": [
+          "silence",
+          "threshold",
+          "growth",
+          "innocence",
+          "fertility",
+          "beauty",
+          "memory"
+        ],
+        "suppressedTags": [],
+        "atmosphere": {
+          "lightIntensity": 0.757,
+          "fogDensity": 0.327,
+          "bloom": 0.324,
+          "exposure": 0.48,
+          "warmth": 0.592,
+          "movementDrag": 0.277
+        }
+      },
+      "weatherTrace": {
+        "schema": "WeatherTraceV1",
+        "schemaVersion": 1,
+        "traceId": "weather-trace-1c7low1",
+        "weatherId": "weather-1c7low1",
+        "mood": "stillness",
+        "pressure": "low",
+        "sourceTags": [
+          "growth",
+          "innocence",
+          "fertility",
+          "beauty",
+          "threshold",
+          "memory"
+        ],
+        "resultingTags": [
+          "silence",
+          "threshold",
+          "growth",
+          "innocence",
+          "fertility",
+          "beauty",
+          "memory"
+        ],
+        "suppressedTags": [],
+        "strongestDreadAxis": "loss"
+      },
+      "returnAvailable": false
+    },
+    {
+      "schema": "DreamSessionBeatV1",
+      "schemaVersion": 1,
+      "index": 3,
+      "passage": {
+        "schema": "PassageV1",
+        "schemaVersion": 1,
+        "id": "candle_refuses_dark",
+        "motifs": [
+          "light",
+          "threshold",
+          "memory"
+        ],
+        "pressureTags": [
+          "hope",
+          "refusal"
+        ],
+        "formTags": [
+          "candle",
+          "dim_room",
+          "held_flame"
+        ],
+        "intensityBand": "gentle",
+        "allowedResponseKinds": [
+          "protect",
+          "speak",
+          "wait",
+          "alter_object"
+        ],
+        "returnAnchorTags": [
+          "lamp",
+          "note",
+          "hearth"
+        ],
+        "variationFamily": "unspent_lights",
+        "baseWeight": 1
+      },
+      "echoTrace": {
+        "schema": "EchoTraceV1",
+        "schemaVersion": 1,
+        "passageId": "candle_refuses_dark",
+        "motifsTouched": [
+          "light",
+          "threshold",
+          "memory"
+        ],
+        "gestureTags": [
+          "listened",
+          "wait"
+        ],
+        "tempo": "unhurried",
+        "pressureAccepted": 0.3,
+        "returnAnchorUsed": false,
+        "boundarySignals": [],
+        "dreamflowDeltas": {}
+      },
+      "sessionArc": {
+        "schema": "SessionArcV1",
+        "schemaVersion": 1,
+        "phase": "mirroring",
+        "beatCount": 3,
+        "pressure": 0.35,
+        "returnReadiness": 0.47,
+        "continuationSeed": 3950016629,
+        "recentBeatRoles": [
+          "pressure",
+          "mirror",
+          "mirror"
+        ],
+        "boundarySignalCount": 0,
+        "lastDecision": "mirror",
+        "weightOverrides": {
+          "mirror_hall": 1.267
+        }
+      },
+      "arcDirective": {
+        "schema": "SessionArcDirectiveV1",
+        "schemaVersion": 1,
+        "decision": "mirror",
+        "suggestedRole": "mirror",
+        "pressureDelta": 0.132,
+        "returnAvailable": false,
+        "weightOverrides": {
+          "mirror_hall": 1.267
+        }
+      },
+      "selectedDream": {
+        "id": "white_void",
+        "name": "Boundless White Void",
+        "symbolicTags": [
+          "boundlessness",
+          "dissolution",
+          "silence"
+        ],
+        "weightBreakdown": {
+          "base": 1,
+          "archetype": 2.69,
+          "vibe": 1.005,
+          "room": 0.25,
+          "portal": 0.35,
+          "directorMultiplier": 1,
+          "total": 5.295,
+          "roll": 5.62232
+        }
+      },
+      "dreamJourney": {
+        "schema": "DreamJourneyV1",
+        "beats": [
+          {
+            "role": "entry",
+            "moduleId": "space_black_hole",
+            "moduleName": "Space / Black Hole",
+            "symbolicTags": [
+              "annihilation",
+              "rebirth",
+              "cosmic mystery"
+            ],
+            "weightBreakdown": {
+              "base": 1,
+              "archetype": 2.325,
+              "vibe": -0.038,
+              "room": 0.25,
+              "portal": 0.35,
+              "directorMultiplier": 1,
+              "total": 3.887,
+              "roll": 12.83031
+            }
+          },
+          {
+            "role": "pressure",
+            "moduleId": "garden",
+            "moduleName": "Garden",
+            "symbolicTags": [
+              "growth",
+              "innocence",
+              "fertility",
+              "beauty"
+            ],
+            "weightBreakdown": {
+              "base": 1,
+              "archetype": 1.87,
+              "vibe": 0.42,
+              "room": 0.25,
+              "portal": 0.35,
+              "directorMultiplier": 1,
+              "total": 3.89,
+              "roll": 3.60952
+            }
+          },
+          {
+            "role": "mirror",
+            "moduleId": "white_void",
+            "moduleName": "Boundless White Void",
+            "symbolicTags": [
+              "boundlessness",
+              "dissolution",
+              "silence"
+            ],
+            "weightBreakdown": {
+              "base": 1,
+              "archetype": 2.69,
+              "vibe": 1.005,
+              "room": 0.25,
+              "portal": 0.35,
+              "directorMultiplier": 1,
+              "total": 5.295,
+              "roll": 5.62232
+            }
+          },
+          {
+            "role": "return",
+            "moduleId": "space_black_hole",
+            "moduleName": "Space / Black Hole",
+            "symbolicTags": [
+              "annihilation",
+              "rebirth",
+              "cosmic mystery"
+            ],
+            "weightBreakdown": {
+              "base": 1,
+              "archetype": 2.325,
+              "vibe": -0.038,
+              "room": 0.25,
+              "portal": 0.35,
+              "directorMultiplier": 1,
+              "total": 3.887,
+              "roll": 13.77163
+            }
+          }
+        ],
+        "symbolTrail": [
+          "annihilation",
+          "rebirth",
+          "cosmic mystery",
+          "growth",
+          "innocence",
+          "fertility",
+          "beauty",
+          "boundlessness",
+          "dissolution",
+          "silence"
+        ],
+        "summary": "entry:Space / Black Hole -> pressure:Garden -> mirror:Boundless White Void -> return:Space / Black Hole"
+      },
+      "dreamWeather": {
+        "schema": "DreamWeatherV1",
+        "schemaVersion": 1,
+        "weatherId": "weather-50479c",
+        "mood": "stillness",
+        "pressure": "low",
+        "ceiling": 0.35,
+        "dreadBudget": {
+          "pursuit": 0.053,
+          "bodyUnease": 0.05,
+          "cosmicDread": 0.014,
+          "disorientation": 0.104,
+          "loss": 0.058,
+          "watching": 0.06,
+          "claustrophobia": 0.13
+        },
+        "weatherTags": [
+          "silence",
+          "threshold",
+          "dissolution",
+          "memory"
+        ],
+        "suppressedTags": [],
+        "atmosphere": {
+          "lightIntensity": 0.724,
+          "fogDensity": 0.342,
+          "bloom": 0.332,
+          "exposure": 0.48,
+          "warmth": 0.486,
+          "movementDrag": 0.277
+        }
+      },
+      "weatherTrace": {
+        "schema": "WeatherTraceV1",
+        "schemaVersion": 1,
+        "traceId": "weather-trace-50479c",
+        "weatherId": "weather-50479c",
+        "mood": "stillness",
+        "pressure": "low",
+        "sourceTags": [
+          "dissolution",
+          "silence",
+          "threshold",
+          "memory"
+        ],
+        "resultingTags": [
+          "silence",
+          "threshold",
+          "dissolution",
+          "memory"
+        ],
+        "suppressedTags": [],
+        "strongestDreadAxis": "claustrophobia"
+      },
+      "returnAvailable": false
+    }
+  ],
+  "finalSessionArc": {
+    "schema": "SessionArcV1",
+    "schemaVersion": 1,
+    "phase": "mirroring",
+    "beatCount": 3,
+    "pressure": 0.35,
+    "returnReadiness": 0.47,
+    "continuationSeed": 3950016629,
+    "recentBeatRoles": [
+      "pressure",
+      "mirror",
+      "mirror"
+    ],
+    "boundarySignalCount": 0,
+    "lastDecision": "mirror",
+    "weightOverrides": {
+      "mirror_hall": 1.267
+    }
+  },
+  "recentEchoTraces": [
+    {
+      "schema": "EchoTraceV1",
+      "schemaVersion": 1,
+      "passageId": "candle_refuses_dark",
+      "motifsTouched": [
+        "light",
+        "threshold",
+        "memory"
+      ],
+      "gestureTags": [
+        "approached",
+        "approach"
+      ],
+      "tempo": "unhurried",
+      "pressureAccepted": 0.4,
+      "returnAnchorUsed": false,
+      "boundarySignals": [],
+      "dreamflowDeltas": {}
+    },
+    {
+      "schema": "EchoTraceV1",
+      "schemaVersion": 1,
+      "passageId": "candle_refuses_dark",
+      "motifsTouched": [
+        "light",
+        "threshold",
+        "memory"
+      ],
+      "gestureTags": [
+        "answered",
+        "speak"
+      ],
+      "tempo": "unhurried",
+      "pressureAccepted": 0.48,
+      "returnAnchorUsed": false,
+      "boundarySignals": [],
+      "dreamflowDeltas": {}
+    },
+    {
+      "schema": "EchoTraceV1",
+      "schemaVersion": 1,
+      "passageId": "candle_refuses_dark",
+      "motifsTouched": [
+        "light",
+        "threshold",
+        "memory"
+      ],
+      "gestureTags": [
+        "listened",
+        "wait"
+      ],
+      "tempo": "unhurried",
+      "pressureAccepted": 0.3,
+      "returnAnchorUsed": false,
+      "boundarySignals": [],
+      "dreamflowDeltas": {}
+    }
+  ],
+  "finalDreamWeather": {
+    "schema": "DreamWeatherV1",
+    "schemaVersion": 1,
+    "weatherId": "weather-50479c",
+    "mood": "stillness",
+    "pressure": "low",
+    "ceiling": 0.35,
+    "dreadBudget": {
+      "pursuit": 0.053,
+      "bodyUnease": 0.05,
+      "cosmicDread": 0.014,
+      "disorientation": 0.104,
+      "loss": 0.058,
+      "watching": 0.06,
+      "claustrophobia": 0.13
+    },
+    "weatherTags": [
+      "silence",
+      "threshold",
+      "dissolution",
+      "memory"
+    ],
+    "suppressedTags": [],
+    "atmosphere": {
+      "lightIntensity": 0.724,
+      "fogDensity": 0.342,
+      "bloom": 0.332,
+      "exposure": 0.48,
+      "warmth": 0.486,
+      "movementDrag": 0.277
+    }
+  },
+  "finalSelectedDream": {
+    "id": "white_void",
+    "name": "Boundless White Void",
+    "symbolicTags": [
+      "boundlessness",
+      "dissolution",
+      "silence"
+    ],
+    "weightBreakdown": {
+      "base": 1,
+      "archetype": 2.69,
+      "vibe": 1.005,
+      "room": 0.25,
+      "portal": 0.35,
+      "directorMultiplier": 1,
+      "total": 5.295,
+      "roll": 5.62232
+    }
+  }
+}
