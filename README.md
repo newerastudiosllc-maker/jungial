@@ -33,12 +33,19 @@ To exercise a longer dream that pauses in the middle and resumes through return:
 npm run dream:checkpoint
 npm run dream:checkpoint -- --checkpoint-save=saves/dream-session-checkpoint.json --final-save=saves/dream-session-resumed.json
 npm run dream:checkpoint -- --seed=808 --clock-start=2090-01-01T00:00:00.000Z --json
+npm run dream:checkpoint -- --trace=saves/dream-session-trace.json
 npm run dream:checkpoint -- --emulate-gni
 npm run dream:checkpoint -- --gni-response=data/mock_gni_directive.json
 npm run dream:checkpoint -- --gni-endpoint=https://example.local/gni --gni-token-env=GNI_API_KEY
 ```
 
 This writes a checkpoint SaveGame containing `DreamSessionCheckpointV1`, then reloads it and writes a final resumed SaveGame with one Journal of Mirrors entry, an ArchitectState update, and a `GniProcessingRequestV1` handoff. If a directive is ready, it is applied through the GNI Firebreak before Architect mutation; if not, the request is saved in `GniDirectiveQueueV1` for later processing. Player response objects may contain raw speech while the session is active, but this flow only persists redacted EchoTrace/session context.
+
+Use `--trace=saves/dream-session-trace.json` to write a standalone developer trace for the combined checkpoint and resumed dream. Inspect it with:
+
+```powershell
+npm run trace -- saves/dream-session-trace.json
+```
 
 To test the GNI handoff before the real provider exists:
 

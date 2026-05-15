@@ -1,11 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
 import { createDeterministicClock } from '../src/clock.js';
 import { loadGameState } from '../src/persistence.js';
+import { inspectTrace } from '../src/traceInspector.js';
 import {
   parseDreamSessionSaveFlowArgs,
   resumeDreamSessionCheckpointRun,
@@ -209,11 +210,86 @@ test('resumed dream sessions apply ready GNI directives after final return', asy
   }
 });
 
+test('dream session save flow records combined developer trace without raw response text', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-dream-session-trace-'));
+  const checkpointPath = join(dir, 'checkpoint.json');
+  const finalPath = join(dir, 'final.json');
+  const tracePath = join(dir, 'trace.json');
+
+  try {
+    await startDreamSessionCheckpointRun({
+      seed: 1001,
+      savePath: checkpointPath,
+      maxBeats: 5,
+      checkpointAfterBeats: 2,
+      responses: [
+        {
+          kind: 'approach',
+          gestureTags: ['approached'],
+          pressureAccepted: 0.4,
+          rawSpeech: 'do not trace this first private phrase'
+        },
+        { kind: 'speak', gestureTags: ['answered'], pressureAccepted: 0.46 }
+      ],
+      clock: createDeterministicClock({ startIso: '2100-01-01T00:00:00.000Z' })
+    });
+    const checkpointSave = await loadGameState(checkpointPath);
+
+    assert.equal(checkpointSave.trace.schema, 'JungialTraceV1');
+    assert.equal(checkpointSave.trace.entries.some((entry) => entry.type === 'dream.session.checkpoint.saved'), true);
+    assert.equal(checkpointSave.trace.entries.filter((entry) => entry.type === 'dream.session.beat.completed').length, 2);
+
+    const result = await resumeDreamSessionCheckpointRun({
+      savePath: checkpointPath,
+      outputPath: finalPath,
+      tracePath,
+      gniProvider: async () => null,
+      responses: [
+        { kind: 'wait', gestureTags: ['listened'], pressureAccepted: 0.3 },
+        {
+          kind: 'return_anchor',
+          gestureTags: ['touched_note'],
+          pressureAccepted: 0.2,
+          returnAnchorUsed: true,
+          rawSpeech: 'do not trace this second private phrase'
+        }
+      ],
+      clock: createDeterministicClock({ startIso: '2100-01-02T00:00:00.000Z' })
+    });
+    const finalSave = await loadGameState(finalPath);
+    const traceFile = JSON.parse(await readFile(tracePath, 'utf8'));
+    const traceTypes = finalSave.trace.entries.map((entry) => entry.type);
+    const serializedTrace = JSON.stringify(finalSave.trace);
+    const summary = inspectTrace(finalSave.trace);
+
+    assert.deepEqual(traceFile, finalSave.trace);
+    assert.deepEqual(result.trace, finalSave.trace);
+    assert.equal(traceTypes.includes('dream.session.started'), true);
+    assert.equal(traceTypes.includes('dream.session.resumed'), true);
+    assert.equal(traceTypes.includes('dream.session.completed'), true);
+    assert.equal(traceTypes.includes('dream.journey.selected'), true);
+    assert.equal(traceTypes.includes('journal.entry.written'), true);
+    assert.equal(traceTypes.includes('witness.bundle.created'), true);
+    assert.equal(traceTypes.includes('gni.request.created'), true);
+    assert.equal(traceTypes.includes('gni.request.queued'), true);
+    assert.equal(traceTypes.includes('dream.session.saved'), true);
+    assert.equal(finalSave.trace.entries.filter((entry) => entry.type === 'dream.session.beat.completed').length, 4);
+    assert.equal(summary.gniQueuedRequestCount, 1);
+    assert.match(summary.journeySummary, /->/);
+    assert.equal(serializedTrace.includes('do not trace this first private phrase'), false);
+    assert.equal(serializedTrace.includes('do not trace this second private phrase'), false);
+    assert.equal(serializedTrace.includes('rawSpeech'), false);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
 test('dream session checkpoint CLI args parse save paths and deterministic clock options', () => {
   const options = parseDreamSessionSaveFlowArgs([
     '--seed=909',
     '--checkpoint-save=saves/checkpoint.json',
     '--final-save=saves/final.json',
+    '--trace=saves/dream-session-trace.json',
     '--gni-response=data/mock_gni_directive.json',
     '--emulate-gni',
     '--gni-endpoint=https://gni.local/process',
@@ -228,6 +304,7 @@ test('dream session checkpoint CLI args parse save paths and deterministic clock
     seed: 909,
     checkpointSavePath: 'saves/checkpoint.json',
     finalSavePath: 'saves/final.json',
+    tracePath: 'saves/dream-session-trace.json',
     gniResponsePath: 'data/mock_gni_directive.json',
     emulateGni: true,
     gniEndpoint: 'https://gni.local/process',

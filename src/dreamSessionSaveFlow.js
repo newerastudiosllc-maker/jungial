@@ -14,6 +14,7 @@ import { toGniPassageContext } from './passageLattice.js';
 import { createJungialRuntime, createJungialRuntimeFromSave } from './runtime.js';
 import { createSessionCovenant } from './sessionCovenant.js';
 import { SymbolGrammar } from './symbolGrammar.js';
+import { TraceRecorder, writeTrace } from './trace.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -27,35 +28,57 @@ export async function startDreamSessionCheckpointRun({
   checkpointAfterBeats = DEFAULT_CHECKPOINT_AFTER_BEATS,
   responses = [],
   sessionCovenant = null,
+  trace = undefined,
+  tracePath = undefined,
   catalog = undefined,
   clock = undefined
 } = {}) {
   const runtime = createJungialRuntime({ seed, catalog, clock });
   const activeSessionCovenant = createSessionCovenant(sessionCovenant ?? {});
-  const transcript = prepareThreshold(runtime);
+  const traceRecorder = createDreamSessionTraceRecorder({ trace, clock });
+  const normalizedCheckpointAfterBeats = normalizeCheckpointBeatCount({ checkpointAfterBeats, maxBeats });
+  traceRecorder.record('dream.session.started', {
+    seed,
+    maxBeats,
+    checkpointAfterBeats: normalizedCheckpointAfterBeats
+  });
+  const transcript = prepareThreshold(runtime, { traceRecorder });
   const dreamSession = runDreamSessionFromRuntime({
     runtime,
     covenant: activeSessionCovenant,
     seed,
     maxBeats,
-    beatsToRun: normalizeCheckpointBeatCount({ checkpointAfterBeats, maxBeats }),
+    beatsToRun: normalizedCheckpointAfterBeats,
     responses
   });
+  recordDreamSessionBeats(traceRecorder, dreamSession, { fromBeatIndex: 1 });
   const checkpoint = createDreamSessionCheckpoint(dreamSession);
+  traceRecorder.record('dream.session.checkpoint.saved', {
+    savePath,
+    sessionId: checkpoint.sessionId,
+    completedBeats: checkpoint.completedBeats,
+    nextBeatIndex: checkpoint.nextBeatIndex
+  });
+  const traceSnapshot = traceRecorder.snapshot();
   const savePayload = createDreamSessionSavePayload({
     runtime,
     dreamSession,
     checkpoint,
-    sessionCovenant: activeSessionCovenant
+    sessionCovenant: activeSessionCovenant,
+    traceSnapshot
   });
 
   await saveGameState(savePath, savePayload, { clock });
+  if (tracePath) {
+    await writeTrace(tracePath, traceSnapshot);
+  }
   transcript.push(`Dream session checkpoint saved to ${savePath}.`);
 
   return {
     transcript,
     dreamSession,
     checkpoint,
+    trace: traceSnapshot,
     thresholdPresentation: savePayload.thresholdPresentation,
     sessionCovenant: activeSessionCovenant,
     savePath
@@ -73,6 +96,8 @@ export async function resumeDreamSessionCheckpointRun({
   gniResponse = null,
   gniProvider = null,
   emulateGni = false,
+  trace = undefined,
+  tracePath = undefined,
   catalog = undefined,
   clock = undefined
 } = {}) {
@@ -88,6 +113,17 @@ export async function resumeDreamSessionCheckpointRun({
     catalog,
     clock
   });
+  const traceRecorder = createDreamSessionTraceRecorder({
+    trace,
+    savedTrace: savedState.trace,
+    clock
+  });
+  traceRecorder.record('dream.session.resumed', {
+    savePath,
+    sessionId: checkpoint.sessionId,
+    completedBeats: checkpoint.completedBeats,
+    nextBeatIndex: checkpoint.nextBeatIndex
+  });
   const activeSessionCovenant = createSessionCovenant(sessionCovenant ?? savedState.sessionCovenant ?? {});
   const dreamSession = resumeDreamSessionFromRuntime({
     runtime,
@@ -99,10 +135,14 @@ export async function resumeDreamSessionCheckpointRun({
     dreamerMemoryContext
   });
   const resumedCheckpoint = createDreamSessionCheckpoint(dreamSession);
+  recordDreamSessionBeats(traceRecorder, dreamSession, { fromBeatIndex: checkpoint.nextBeatIndex });
   const shouldApplyReturnEffects = !checkpoint.isComplete && resumedCheckpoint.isComplete;
   const returnEffects = shouldApplyReturnEffects
     ? applyDreamReturnEffects({ runtime, dreamSession, sessionCovenant: activeSessionCovenant })
     : null;
+  if (returnEffects) {
+    recordDreamReturnEffects(traceRecorder, { dreamSession, returnEffects });
+  }
   const gniEffects = returnEffects
     ? await processDreamReturnGni({
         runtime,
@@ -110,9 +150,18 @@ export async function resumeDreamSessionCheckpointRun({
         gniResponse,
         gniProvider,
         emulateGni,
-        seed: dreamSession.seed
+        seed: dreamSession.seed,
+        traceRecorder
       })
     : null;
+  traceRecorder.record(resumedCheckpoint.isComplete ? 'dream.session.saved' : 'dream.session.checkpoint.saved', {
+    savePath: outputPath,
+    sessionId: resumedCheckpoint.sessionId,
+    completedBeats: resumedCheckpoint.completedBeats,
+    endedBecause: resumedCheckpoint.endedBecause,
+    isComplete: resumedCheckpoint.isComplete
+  });
+  const traceSnapshot = traceRecorder.snapshot();
   const savePayload = createDreamSessionSavePayload({
     runtime,
     dreamSession,
@@ -120,6 +169,7 @@ export async function resumeDreamSessionCheckpointRun({
     sessionCovenant: activeSessionCovenant,
     returnEffects,
     gniEffects,
+    traceSnapshot,
     previousState: savedState
   });
   const transcript = ['Dream session resumed from checkpoint.'];
@@ -140,6 +190,9 @@ export async function resumeDreamSessionCheckpointRun({
   }
 
   await saveGameState(outputPath, savePayload, { clock });
+  if (tracePath) {
+    await writeTrace(tracePath, traceSnapshot);
+  }
 
   return {
     transcript,
@@ -152,6 +205,7 @@ export async function resumeDreamSessionCheckpointRun({
     gniQueue: runtime.gniQueue.snapshot(),
     appliedGniDirective: gniEffects?.appliedGniDirective ?? null,
     directiveUpdate: gniEffects?.directiveUpdate ?? null,
+    trace: traceSnapshot,
     thresholdPresentation: savePayload.thresholdPresentation,
     sessionCovenant: activeSessionCovenant,
     savePath,
@@ -170,6 +224,7 @@ export async function runDreamSessionCheckpointDemo({
   gniResponse = null,
   gniProvider = null,
   emulateGni = false,
+  tracePath = undefined,
   clock = undefined,
   catalog = undefined
 } = {}) {
@@ -193,6 +248,7 @@ export async function runDreamSessionCheckpointDemo({
     gniResponse,
     gniProvider,
     emulateGni,
+    tracePath,
     catalog,
     clock,
     responses: [
@@ -225,6 +281,8 @@ export function parseDreamSessionSaveFlowArgs(args = []) {
       options.checkpointSavePath = arg.slice('--checkpoint-save='.length);
     } else if (arg.startsWith('--final-save=')) {
       options.finalSavePath = arg.slice('--final-save='.length);
+    } else if (arg.startsWith('--trace=')) {
+      options.tracePath = arg.slice('--trace='.length);
     } else if (arg.startsWith('--gni-response=')) {
       options.gniResponsePath = arg.slice('--gni-response='.length);
     } else if (arg === '--emulate-gni') {
@@ -260,15 +318,22 @@ export function createGniProviderFromDreamSessionOptions(options = {}) {
   });
 }
 
-function prepareThreshold(runtime) {
+function prepareThreshold(runtime, { traceRecorder = null } = {}) {
   const transcript = [];
 
   transcript.push('Threshold Chamber: silent, dim, confined.');
   transcript.push(`A small note waits: "${runtime.chamber.note}".`);
+  traceRecorder?.record('threshold.input', { kind: 'speech', text: 'the word' });
   applyPlayerInput({ source: 'system', kind: 'speech', text: 'the word' }, runtime);
   transcript.push('The Heartlight opens. Tools become visible.');
+  traceRecorder?.record('threshold.awakened', {
+    room: runtime.chamber.snapshot(),
+    vibeState: runtime.feeling.vibeState,
+    dominantArchetype: runtime.archetypes.dominantArchetype()
+  });
   applyPlayerInput({ source: 'system', kind: 'action', name: 'open_portal' }, runtime);
   transcript.push('The Key of Portals turns without sound.');
+  traceRecorder?.record('portal.opened', { room: runtime.chamber.snapshot() });
 
   return transcript;
 }
@@ -315,7 +380,8 @@ async function processDreamReturnGni({
   gniResponse,
   gniProvider,
   emulateGni,
-  seed
+  seed,
+  traceRecorder = null
 }) {
   const gniBridge = new GniBridge({ adapter: runtime.gni, provider: gniProvider });
   const gniBridgeResult = await gniBridge.processSessionBundle({
@@ -325,6 +391,35 @@ async function processDreamReturnGni({
     seed
   });
   const pendingGniRequest = gniBridgeResult.request;
+  if (pendingGniRequest) {
+    traceRecorder?.record('gni.request.created', {
+      provider: pendingGniRequest.provider,
+      endpoint: pendingGniRequest.endpoint,
+      contract: pendingGniRequest.contract,
+      sessionId: pendingGniRequest.payload.sessionId
+    });
+  }
+  if (gniBridgeResult.firebreakTrace?.changed) {
+    traceRecorder?.record('gni.firebreak.applied', {
+      source: gniBridgeResult.firebreakTrace.source,
+      suppressedCounts: gniBridgeResult.firebreakTrace.suppressedCounts,
+      clampCounts: gniBridgeResult.firebreakTrace.clampCounts,
+      boundaryTags: gniBridgeResult.firebreakTrace.boundaryTags
+    });
+  }
+  if (gniBridgeResult.source === 'emulator') {
+    traceRecorder?.record('gni.emulator.directive.created', {
+      directive: gniBridgeResult.directive
+    });
+  }
+  if (gniBridgeResult.source === 'provider' && gniBridgeResult.status === 'directive_ready') {
+    traceRecorder?.record('gni.provider.directive.created', {
+      directive: gniBridgeResult.directive
+    });
+  }
+  if (gniBridgeResult.status === 'provider_error') {
+    traceRecorder?.record('gni.provider.error', { errors: gniBridgeResult.errors });
+  }
   const appliedGniDirective = gniBridgeResult.directive;
   const queuedGniRequest = !appliedGniDirective && pendingGniRequest
     ? runtime.gniQueue.enqueue({
@@ -333,9 +428,22 @@ async function processDreamReturnGni({
         providerJob: gniBridgeResult.providerJob
       })
     : null;
+  if (queuedGniRequest) {
+    traceRecorder?.record('gni.request.queued', {
+      id: queuedGniRequest.id,
+      reason: queuedGniRequest.reason,
+      sessionId: pendingGniRequest.payload.sessionId
+    });
+  }
   const directiveUpdate = appliedGniDirective
     ? runtime.architect.applyDirective(appliedGniDirective)
     : null;
+  if (appliedGniDirective) {
+    traceRecorder?.record('gni.directive.applied', {
+      directive: appliedGniDirective,
+      update: directiveUpdate
+    });
+  }
 
   return {
     pendingGniRequest,
@@ -353,6 +461,7 @@ function createDreamSessionSavePayload({
   sessionCovenant,
   returnEffects = null,
   gniEffects = null,
+  traceSnapshot = null,
   previousState = {}
 }) {
   const lastBeat = dreamSession.beats.at(-1) ?? null;
@@ -392,8 +501,68 @@ function createDreamSessionSavePayload({
     gniBridgeResult: gniEffects?.gniBridgeResult ?? previousState.gniBridgeResult,
     appliedGniDirective: gniEffects ? gniEffects.appliedGniDirective : previousState.appliedGniDirective,
     directiveUpdate: gniEffects ? gniEffects.directiveUpdate : previousState.directiveUpdate,
+    trace: traceSnapshot ?? previousState.trace,
     gniQueue: runtime.gniQueue.snapshot()
   });
+}
+
+function recordDreamSessionBeats(traceRecorder, dreamSession, { fromBeatIndex }) {
+  for (const beat of dreamSession.beats.filter((entry) => entry.index >= fromBeatIndex)) {
+    traceRecorder.record('dream.session.beat.completed', {
+      sessionId: dreamSession.sessionId,
+      index: beat.index,
+      passageId: beat.passage?.id ?? null,
+      selectedDreamId: beat.selectedDream?.id ?? null,
+      selectedDreamName: beat.selectedDream?.name ?? null,
+      arcDecision: beat.arcDirective?.decision ?? null,
+      suggestedRole: beat.arcDirective?.suggestedRole ?? null,
+      returnAvailable: Boolean(beat.returnAvailable),
+      echoTrace: beat.echoTrace,
+      weatherId: beat.dreamWeather?.weatherId ?? null,
+      weatherPressure: beat.dreamWeather?.pressure ?? null
+    });
+  }
+}
+
+function recordDreamReturnEffects(traceRecorder, { dreamSession, returnEffects }) {
+  traceRecorder.record('dream.session.completed', {
+    sessionId: dreamSession.sessionId,
+    endedBecause: dreamSession.endedBecause,
+    completedBeats: dreamSession.completedBeats,
+    finalDreamId: dreamSession.finalSelectedDream?.id ?? null
+  });
+  traceRecorder.record('dream.journey.selected', {
+    summary: returnEffects.dreamJourney.summary,
+    symbolTrail: returnEffects.dreamJourney.symbolTrail,
+    beats: returnEffects.dreamJourney.beats
+  });
+  traceRecorder.record('journal.entry.written', {
+    entryId: returnEffects.entry.id,
+    symbols: returnEffects.entry.symbols,
+    dominantArchetype: returnEffects.entry.dominantArchetype,
+    vibeState: returnEffects.entry.vibeState
+  });
+  traceRecorder.record('witness.bundle.created', {
+    sessionId: returnEffects.sessionBundle.sessionId,
+    dominantArchetype: returnEffects.sessionBundle.dominantArchetype,
+    coherence: returnEffects.sessionBundle.coherence,
+    recentSymbols: returnEffects.sessionBundle.recentSymbols
+  });
+}
+
+function createDreamSessionTraceRecorder({ trace = null, savedTrace = null, clock = undefined } = {}) {
+  if (trace) {
+    return trace;
+  }
+
+  const recorder = new TraceRecorder({
+    clock: clock?.fork?.() ?? undefined,
+    runId: savedTrace?.runId
+  });
+  if (savedTrace?.schema === 'JungialTraceV1' && Array.isArray(savedTrace.entries)) {
+    recorder.entries = savedTrace.entries.map((entry) => structuredClone(entry));
+  }
+  return recorder;
 }
 
 function createDreamSessionJourney(dreamSession) {
