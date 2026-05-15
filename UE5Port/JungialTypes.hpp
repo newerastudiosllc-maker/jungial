@@ -71,3 +71,35 @@ struct FSaveSlotPlanV1
     JsonObject DreamerProfile;
     JsonObject DreamerMemoryContext;
 };
+
+enum class EJungialSessionArcPhase
+{
+    Opening,
+    Deepening,
+    Distorting,
+    Mirroring,
+    Softening,
+    Returning
+};
+
+enum class EJungialSessionArcDecision
+{
+    Deepen,
+    Distort,
+    Mirror,
+    Soften,
+    Return
+};
+
+struct FSessionArcV1
+{
+    EJungialSessionArcPhase Phase = EJungialSessionArcPhase::Opening;
+    int32 BeatCount = 0;
+    float Pressure = 0.0f;
+    float ReturnReadiness = 0.0f;
+    int32 ContinuationSeed = 0;
+    Array<String> RecentBeatRoles;
+    int32 BoundarySignalCount = 0;
+    EJungialSessionArcDecision LastDecision = EJungialSessionArcDecision::Deepen;
+    Map<String, float> WeightOverrides;
+};

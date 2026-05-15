@@ -56,6 +56,9 @@ const ALLOWED_WEATHER_TAGS = Object.freeze(new Set([
 ]));
 const DREAM_WEATHER_MOODS = Object.freeze(['stillness', 'hush', 'gravity', 'flicker', 'bloom', 'eclipse']);
 const DREAM_WEATHER_PRESSURES = Object.freeze(['low', 'medium', 'heavy', 'storm']);
+const SESSION_ARC_PHASES = Object.freeze(['opening', 'deepening', 'distorting', 'mirroring', 'softening', 'returning']);
+const SESSION_ARC_DECISIONS = Object.freeze(['deepen', 'distort', 'mirror', 'soften', 'return']);
+const SESSION_ARC_ROLES = Object.freeze(['entry', 'pressure', 'mirror', 'return']);
 
 export function validateSessionBundle(bundle) {
   const errors = [];
@@ -1205,6 +1208,55 @@ export function validateSaveSlotPlan(plan) {
   };
 }
 
+export function validateSessionArc(arc) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'phase',
+    'beatCount',
+    'pressure',
+    'returnReadiness',
+    'continuationSeed',
+    'recentBeatRoles',
+    'boundarySignalCount',
+    'lastDecision',
+    'weightOverrides'
+  ];
+
+  if (arc?.schema !== 'SessionArcV1') {
+    errors.push('schema must be SessionArcV1');
+  }
+  if (arc?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  errors.push(...validateKnownKeys(arc, allowedKeys, 'sessionArc'));
+  if (!SESSION_ARC_PHASES.includes(arc?.phase)) {
+    errors.push('phase is unsupported');
+  }
+  if (!isNonNegativeInteger(arc?.beatCount)) {
+    errors.push('beatCount must be a non-negative integer');
+  }
+  errors.push(...validateNumberBetween(arc?.pressure, 'pressure', 0, 1));
+  errors.push(...validateNumberBetween(arc?.returnReadiness, 'returnReadiness', 0, 1));
+  if (!isNonNegativeInteger(arc?.continuationSeed)) {
+    errors.push('continuationSeed must be a non-negative integer');
+  }
+  errors.push(...validateArcRoleList(arc?.recentBeatRoles, 'recentBeatRoles'));
+  if (!isNonNegativeInteger(arc?.boundarySignalCount)) {
+    errors.push('boundarySignalCount must be a non-negative integer');
+  }
+  if (!SESSION_ARC_DECISIONS.includes(arc?.lastDecision)) {
+    errors.push('lastDecision is unsupported');
+  }
+  errors.push(...validateOptionalNumberMap(arc?.weightOverrides, 'weightOverrides', { min: 0.05, max: 3 }));
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
 export function validateSaveGame(saveGame) {
   const errors = [];
 
@@ -1285,6 +1337,11 @@ export function validateSaveGame(saveGame) {
     saveGame.payload.saveSlot,
     'payload.saveSlot',
     validateSaveSlotPlan
+  ));
+  errors.push(...validateOptionalNestedContract(
+    saveGame.payload.sessionArc,
+    'payload.sessionArc',
+    validateSessionArc
   ));
   errors.push(...validateOptionalNestedContract(
     saveGame.payload.sessionCovenant,
@@ -1427,6 +1484,19 @@ function validateDreadAxisList(value, label) {
   value.forEach((item, index) => {
     if (isNonEmptyString(item) && !DREAD_BUDGET_AXES.includes(item)) {
       errors.push(`${label}[${index}] must be a known dread axis`);
+    }
+  });
+  return errors;
+}
+
+function validateArcRoleList(value, label) {
+  const errors = [];
+  if (!Array.isArray(value)) {
+    return [`${label} must be an array`];
+  }
+  value.forEach((entry, index) => {
+    if (!SESSION_ARC_ROLES.includes(entry)) {
+      errors.push(`${label}[${index}] must be entry, pressure, mirror, or return`);
     }
   });
   return errors;

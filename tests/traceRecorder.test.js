@@ -63,6 +63,7 @@ test('simulation trace explains dream journey and GNI handoff without in-world e
       'portal.opened',
       'passage.gathered',
       'echo.trace.created',
+      'session.arc.advanced',
       'dream.journey.selected',
       'dream.weather.created',
       'mask.selected',
@@ -75,6 +76,9 @@ test('simulation trace explains dream journey and GNI handoff without in-world e
       'simulation.saved'
     ]);
     const firebreakEntry = result.trace.entries.find((entry) => entry.type === 'gni.firebreak.applied');
+    const arcEntry = result.trace.entries.find((entry) => entry.type === 'session.arc.advanced');
+    assert.equal(arcEntry.payload.decision, result.sessionArc.lastDecision);
+    assert.equal(typeof arcEntry.payload.returnAvailable, 'boolean');
     assert.equal(firebreakEntry.payload.source, 'emulator');
     assert.equal(firebreakEntry.payload.clampCounts.dreamWeightDeltas, 1);
     assert.equal(result.trace.entries.find((entry) => entry.type === 'dream.journey.selected').payload.beats.length, 4);

@@ -17,6 +17,7 @@ const FIXTURE_FILES = Object.freeze([
   'echo_trace_v1.json',
   'dreamer_profile_v1.json',
   'dreamer_memory_context_v1.json',
+  'session_arc_v1.json',
   'dream_weather_v1.json',
   'weather_trace_v1.json',
   'threshold_presentation_v1.json',
@@ -72,6 +73,7 @@ export async function exportContractFixtures({
     slotId: 'fixture-slot',
     mode: 'continue'
   });
+  const sessionArc = run.sessionArc;
   const dreamWeather = run.dreamWeather;
   const weatherTrace = run.weatherTrace;
   const thresholdPresentation = run.thresholdPresentation;
@@ -115,6 +117,7 @@ export async function exportContractFixtures({
     'echo_trace_v1.json': echoTrace,
     'dreamer_profile_v1.json': dreamerProfile,
     'dreamer_memory_context_v1.json': dreamerMemoryContext,
+    'session_arc_v1.json': sessionArc,
     'dream_weather_v1.json': dreamWeather,
     'weather_trace_v1.json': weatherTrace,
     'threshold_presentation_v1.json': thresholdPresentation,

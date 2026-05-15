@@ -17,6 +17,7 @@ import {
   validatePassage,
   validateSaveGame,
   validateSaveSlotPlan,
+  validateSessionArc,
   validateSessionCovenant,
   validateSessionBundle,
   validateThresholdPresentation,
@@ -69,6 +70,8 @@ export function validateContractDocument(document) {
       return validateSaveGame(document);
     case 'SaveSlotPlanV1':
       return validateSaveSlotPlan(document);
+    case 'SessionArcV1':
+      return validateSessionArc(document);
     default:
       return {
         valid: false,

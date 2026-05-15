@@ -14,6 +14,7 @@ import { GniHttpProvider } from './gniHttpProvider.js';
 import { buildThresholdPresentation } from './presentation.js';
 import { DreamerProfile } from './dreamerProfile.js';
 import { prepareSaveSlot } from './saveSlotManager.js';
+import { advanceSessionArc } from './sessionArc.js';
 import { createSessionCovenant } from './sessionCovenant.js';
 import { createEchoTrace, selectPassage, toGniPassageContext } from './passageLattice.js';
 import { createDreamWeather, createWeatherTrace, toGniWeatherContext } from './dreamWeather.js';
@@ -35,6 +36,7 @@ export async function runSimulation({
   saveSlotId = 'default',
   saveMode = 'continue',
   incarnationIndex = null,
+  sessionArc = null,
   sessionCovenant = null,
   passageResponse = null,
   recentEchoTraces = []
@@ -144,11 +146,33 @@ export async function runSimulation({
   });
   traceRecorder.record('echo.trace.created', echoTrace);
 
+  const sessionArcAdvance = advanceSessionArc({
+    previousArc: sessionArc,
+    covenant: activeSessionCovenant,
+    echoTrace,
+    dreamWeather: weatherPreview,
+    dreamerMemoryContext,
+    seed: effectiveSeed
+  });
+  const activeSessionArc = sessionArcAdvance.arc;
+  const sessionArcDirective = sessionArcAdvance.directive;
+  traceRecorder.record('session.arc.advanced', {
+    phase: activeSessionArc.phase,
+    beatCount: activeSessionArc.beatCount,
+    pressure: activeSessionArc.pressure,
+    returnReadiness: activeSessionArc.returnReadiness,
+    decision: sessionArcDirective.decision,
+    suggestedRole: sessionArcDirective.suggestedRole,
+    returnAvailable: sessionArcDirective.returnAvailable,
+    weightOverrides: sessionArcDirective.weightOverrides
+  });
+
   const dreamJourney = selectDreamJourney({
     dreamflow,
     archetypeState: archetypes,
     feelingState: feeling,
-    roomConfig: chamber.snapshot()
+    roomConfig: chamber.snapshot(),
+    weightOverrides: sessionArcDirective.weightOverrides
   });
   const firstBeat = dreamJourney.beats[0];
   const selectedDream = {
@@ -327,6 +351,7 @@ export async function runSimulation({
     symbolGrammar: symbolGrammar.snapshot(),
     thresholdPresentation,
     trace: traceSnapshot,
+    sessionArc: activeSessionArc,
     lastSessionBundle: bundle,
     pendingGniRequest: gniRequest,
     gniQueue: gniQueueSnapshot,
@@ -359,6 +384,8 @@ export async function runSimulation({
     appliedGniDirective,
     thresholdPresentation,
     trace: traceSnapshot,
+    sessionArc: activeSessionArc,
+    sessionArcDirective,
     sessionCovenant: activeSessionCovenant,
     activePassage,
     echoTrace,

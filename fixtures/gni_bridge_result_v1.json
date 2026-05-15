@@ -84,9 +84,9 @@
           "vibe": 1.005,
           "room": 0.25,
           "portal": 0.35,
-          "directorMultiplier": 1,
-          "total": 5.295,
-          "roll": 8.64349
+          "directorMultiplier": 1.099,
+          "total": 5.819,
+          "roll": 9.33862
         }
       },
       "archetypeVector": {

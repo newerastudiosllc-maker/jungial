@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/session_arc.schema.json",
+  "title": "SessionArcV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "schemaVersion",
+    "phase",
+    "beatCount",
+    "pressure",
+    "returnReadiness",
+    "continuationSeed",
+    "recentBeatRoles",
+    "boundarySignalCount",
+    "lastDecision",
+    "weightOverrides"
+  ],
+  "properties": {
+    "schema": { "const": "SessionArcV1" },
+    "schemaVersion": { "const": 1 },
+    "phase": { "enum": ["opening", "deepening", "distorting", "mirroring", "softening", "returning"] },
+    "beatCount": { "type": "integer", "minimum": 0 },
+    "pressure": { "type": "number", "minimum": 0, "maximum": 1 },
+    "returnReadiness": { "type": "number", "minimum": 0, "maximum": 1 },
+    "continuationSeed": { "type": "integer", "minimum": 0 },
+    "recentBeatRoles": {
+      "type": "array",
+      "items": { "enum": ["entry", "pressure", "mirror", "return"] }
+    },
+    "boundarySignalCount": { "type": "integer", "minimum": 0 },
+    "lastDecision": { "enum": ["deepen", "distort", "mirror", "soften", "return"] },
+    "weightOverrides": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0.05,
+        "maximum": 3
+      }
+    }
+  },
+  "additionalProperties": false
+}

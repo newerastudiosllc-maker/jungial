@@ -22,6 +22,7 @@ import {
   validatePassage,
   validateSaveGame,
   validateSaveSlotPlan,
+  validateSessionArc,
   validateSessionCovenant,
   validateSessionBundle,
   validateThresholdPresentation,
@@ -882,6 +883,61 @@ test('SaveSlotPlan validation accepts slot mode and redacted memory context', ()
   });
 
   assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('SessionArc validation accepts hidden pacing state', () => {
+  const result = validateSessionArc({
+    schema: 'SessionArcV1',
+    schemaVersion: 1,
+    phase: 'deepening',
+    beatCount: 3,
+    pressure: 0.42,
+    returnReadiness: 0.3,
+    continuationSeed: 12345,
+    recentBeatRoles: ['entry', 'pressure', 'mirror'],
+    boundarySignalCount: 0,
+    lastDecision: 'deepen',
+    weightOverrides: {
+      space_black_hole: 1.24
+    }
+  });
+
+  assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('save game validation checks optional SessionArc payload', () => {
+  const result = validateSaveGame({
+    ...validSaveGame(),
+    payload: {
+      ...validSaveGame().payload,
+      sessionArc: {
+        schema: 'SessionArcV1',
+        schemaVersion: 1,
+        phase: 'trapped',
+        beatCount: -1,
+        pressure: 2,
+        returnReadiness: -0.2,
+        continuationSeed: -1,
+        recentBeatRoles: ['entry', 'lost'],
+        boundarySignalCount: -2,
+        lastDecision: 'explain',
+        weightOverrides: { garden: -1 }
+      }
+    }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'payload.sessionArc.phase is unsupported',
+    'payload.sessionArc.beatCount must be a non-negative integer',
+    'payload.sessionArc.pressure must be between 0 and 1',
+    'payload.sessionArc.returnReadiness must be between 0 and 1',
+    'payload.sessionArc.continuationSeed must be a non-negative integer',
+    'payload.sessionArc.recentBeatRoles[1] must be entry, pressure, mirror, or return',
+    'payload.sessionArc.boundarySignalCount must be a non-negative integer',
+    'payload.sessionArc.lastDecision is unsupported',
+    'payload.sessionArc.weightOverrides.garden must be between 0.05 and 3'
+  ]);
 });
 
 test('save game validation checks optional SaveSlotPlan payload', () => {

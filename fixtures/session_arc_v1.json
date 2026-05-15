@@ -1,0 +1,18 @@
+{
+  "schema": "SessionArcV1",
+  "schemaVersion": 1,
+  "phase": "deepening",
+  "beatCount": 1,
+  "pressure": 0.155,
+  "returnReadiness": 0.025,
+  "continuationSeed": 976368314,
+  "recentBeatRoles": [
+    "pressure"
+  ],
+  "boundarySignalCount": 0,
+  "lastDecision": "deepen",
+  "weightOverrides": {
+    "space_black_hole": 1.198,
+    "white_void": 1.099
+  }
+}

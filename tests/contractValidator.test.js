@@ -163,6 +163,19 @@ test('contract validator routes known Jungial contract schemas', () => {
       pacingDelta: 1
     }
   });
+  const sessionArcResult = validateContractDocument({
+    schema: 'SessionArcV1',
+    schemaVersion: 1,
+    phase: 'mirroring',
+    beatCount: 2,
+    pressure: 0.4,
+    returnReadiness: 0.2,
+    continuationSeed: 123,
+    recentBeatRoles: ['pressure', 'mirror'],
+    boundarySignalCount: 0,
+    lastDecision: 'mirror',
+    weightOverrides: { mirror_hall: 1.2 }
+  });
   const thresholdPresentationResult = validateContractDocument(buildThresholdPresentation({
     chamber: {
       awakened: true,
@@ -186,6 +199,7 @@ test('contract validator routes known Jungial contract schemas', () => {
   assert.deepEqual(passageResult, { valid: true, errors: [] });
   assert.deepEqual(echoTraceResult, { valid: true, errors: [] });
   assert.deepEqual(firebreakTraceResult, { valid: true, errors: [] });
+  assert.deepEqual(sessionArcResult, { valid: true, errors: [] });
   assert.deepEqual(thresholdPresentationResult, { valid: true, errors: [] });
 });
 
@@ -240,6 +254,7 @@ test('contract validator validates generated Dream Weather and summary fixture f
       join(dir, 'threshold_presentation_v1.json'),
       join(dir, 'dream_weather_v1.json'),
       join(dir, 'weather_trace_v1.json'),
+      join(dir, 'session_arc_v1.json'),
       join(dir, 'gni_firebreak_trace_v1.json'),
       join(dir, 'trace_summary_v1.json'),
       join(dir, 'manifest.json')
@@ -250,11 +265,12 @@ test('contract validator validates generated Dream Weather and summary fixture f
       'ThresholdPresentationV1',
       'DreamWeatherV1',
       'WeatherTraceV1',
+      'SessionArcV1',
       'GniFirebreakTraceV1',
       'JungialTraceSummaryV1',
       'JungialContractFixtureManifestV1'
     ]);
-    assert.deepEqual(report.files.map((file) => file.valid), [true, true, true, true, true, true]);
+    assert.deepEqual(report.files.map((file) => file.valid), [true, true, true, true, true, true, true]);
   } finally {
     await rm(dir, { recursive: true, force: true });
   }

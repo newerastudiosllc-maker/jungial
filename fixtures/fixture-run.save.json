@@ -244,9 +244,9 @@
             "vibe": 1.005,
             "room": 0.25,
             "portal": 0.35,
-            "directorMultiplier": 1,
-            "total": 5.295,
-            "roll": 8.64349
+            "directorMultiplier": 1.099,
+            "total": 5.819,
+            "roll": 9.33862
           }
         },
         {
@@ -264,9 +264,9 @@
             "vibe": -0.038,
             "room": 0.25,
             "portal": 0.35,
-            "directorMultiplier": 1,
-            "total": 3.887,
-            "roll": 12.15426
+            "directorMultiplier": 1.198,
+            "total": 4.657,
+            "roll": 13.13174
           }
         },
         {
@@ -284,9 +284,9 @@
             "vibe": -0.038,
             "room": 0.25,
             "portal": 0.35,
-            "directorMultiplier": 1,
-            "total": 3.887,
-            "roll": 13.48119
+            "directorMultiplier": 1.198,
+            "total": 4.657,
+            "roll": 14.56538
           }
         },
         {
@@ -304,9 +304,9 @@
             "vibe": 1.005,
             "room": 0.25,
             "portal": 0.35,
-            "directorMultiplier": 1,
-            "total": 5.295,
-            "roll": 6.91199
+            "directorMultiplier": 1.099,
+            "total": 5.819,
+            "roll": 7.46787
           }
         }
       ],
@@ -606,6 +606,24 @@
         {
           "index": 7,
           "at": "2060-01-01T00:00:06.000Z",
+          "type": "session.arc.advanced",
+          "payload": {
+            "phase": "deepening",
+            "beatCount": 1,
+            "pressure": 0.155,
+            "returnReadiness": 0.025,
+            "decision": "deepen",
+            "suggestedRole": "pressure",
+            "returnAvailable": false,
+            "weightOverrides": {
+              "space_black_hole": 1.198,
+              "white_void": 1.099
+            }
+          }
+        },
+        {
+          "index": 8,
+          "at": "2060-01-01T00:00:07.000Z",
           "type": "dream.journey.selected",
           "payload": {
             "summary": "entry:Boundless White Void -> pressure:Space / Black Hole -> mirror:Space / Black Hole -> return:Boundless White Void",
@@ -633,9 +651,9 @@
                   "vibe": 1.005,
                   "room": 0.25,
                   "portal": 0.35,
-                  "directorMultiplier": 1,
-                  "total": 5.295,
-                  "roll": 8.64349
+                  "directorMultiplier": 1.099,
+                  "total": 5.819,
+                  "roll": 9.33862
                 }
               },
               {
@@ -653,9 +671,9 @@
                   "vibe": -0.038,
                   "room": 0.25,
                   "portal": 0.35,
-                  "directorMultiplier": 1,
-                  "total": 3.887,
-                  "roll": 12.15426
+                  "directorMultiplier": 1.198,
+                  "total": 4.657,
+                  "roll": 13.13174
                 }
               },
               {
@@ -673,9 +691,9 @@
                   "vibe": -0.038,
                   "room": 0.25,
                   "portal": 0.35,
-                  "directorMultiplier": 1,
-                  "total": 3.887,
-                  "roll": 13.48119
+                  "directorMultiplier": 1.198,
+                  "total": 4.657,
+                  "roll": 14.56538
                 }
               },
               {
@@ -693,17 +711,17 @@
                   "vibe": 1.005,
                   "room": 0.25,
                   "portal": 0.35,
-                  "directorMultiplier": 1,
-                  "total": 5.295,
-                  "roll": 6.91199
+                  "directorMultiplier": 1.099,
+                  "total": 5.819,
+                  "roll": 7.46787
                 }
               }
             ]
           }
         },
         {
-          "index": 8,
-          "at": "2060-01-01T00:00:07.000Z",
+          "index": 9,
+          "at": "2060-01-01T00:00:08.000Z",
           "type": "dream.weather.created",
           "payload": {
             "weatherId": "weather-777",
@@ -726,8 +744,8 @@
           }
         },
         {
-          "index": 9,
-          "at": "2060-01-01T00:00:08.000Z",
+          "index": 10,
+          "at": "2060-01-01T00:00:09.000Z",
           "type": "mask.selected",
           "payload": {
             "maskId": "double",
@@ -742,8 +760,8 @@
           }
         },
         {
-          "index": 10,
-          "at": "2060-01-01T00:00:09.000Z",
+          "index": 11,
+          "at": "2060-01-01T00:00:10.000Z",
           "type": "journal.entry.written",
           "payload": {
             "entryId": "journal_001",
@@ -760,8 +778,8 @@
           }
         },
         {
-          "index": 11,
-          "at": "2060-01-01T00:00:10.000Z",
+          "index": 12,
+          "at": "2060-01-01T00:00:11.000Z",
           "type": "witness.bundle.created",
           "payload": {
             "sessionId": "session_0001",
@@ -777,8 +795,8 @@
           }
         },
         {
-          "index": 12,
-          "at": "2060-01-01T00:00:11.000Z",
+          "index": 13,
+          "at": "2060-01-01T00:00:12.000Z",
           "type": "gni.request.created",
           "payload": {
             "provider": "GNI",
@@ -797,8 +815,8 @@
           }
         },
         {
-          "index": 13,
-          "at": "2060-01-01T00:00:12.000Z",
+          "index": 14,
+          "at": "2060-01-01T00:00:13.000Z",
           "type": "gni.firebreak.applied",
           "payload": {
             "source": "emulator",
@@ -820,8 +838,8 @@
           }
         },
         {
-          "index": 14,
-          "at": "2060-01-01T00:00:13.000Z",
+          "index": 15,
+          "at": "2060-01-01T00:00:14.000Z",
           "type": "gni.emulator.directive.created",
           "payload": {
             "directive": {
@@ -845,8 +863,8 @@
           }
         },
         {
-          "index": 15,
-          "at": "2060-01-01T00:00:14.000Z",
+          "index": 16,
+          "at": "2060-01-01T00:00:15.000Z",
           "type": "gni.directive.applied",
           "payload": {
             "directive": {
@@ -890,8 +908,8 @@
           }
         },
         {
-          "index": 16,
-          "at": "2060-01-01T00:00:15.000Z",
+          "index": 17,
+          "at": "2060-01-01T00:00:16.000Z",
           "type": "simulation.saved",
           "payload": {
             "savePath": "fixtures\\fixture-run.save.json",
@@ -899,6 +917,24 @@
           }
         }
       ]
+    },
+    "sessionArc": {
+      "schema": "SessionArcV1",
+      "schemaVersion": 1,
+      "phase": "deepening",
+      "beatCount": 1,
+      "pressure": 0.155,
+      "returnReadiness": 0.025,
+      "continuationSeed": 976368314,
+      "recentBeatRoles": [
+        "pressure"
+      ],
+      "boundarySignalCount": 0,
+      "lastDecision": "deepen",
+      "weightOverrides": {
+        "space_black_hole": 1.198,
+        "white_void": 1.099
+      }
     },
     "lastSessionBundle": {
       "schema": "SessionBundleV1",
@@ -966,9 +1002,9 @@
           "vibe": 1.005,
           "room": 0.25,
           "portal": 0.35,
-          "directorMultiplier": 1,
-          "total": 5.295,
-          "roll": 8.64349
+          "directorMultiplier": 1.099,
+          "total": 5.819,
+          "roll": 9.33862
         }
       },
       "archetypeVector": {
@@ -1126,9 +1162,9 @@
             "vibe": 1.005,
             "room": 0.25,
             "portal": 0.35,
-            "directorMultiplier": 1,
-            "total": 5.295,
-            "roll": 8.64349
+            "directorMultiplier": 1.099,
+            "total": 5.819,
+            "roll": 9.33862
           }
         },
         "archetypeVector": {
@@ -1296,9 +1332,9 @@
               "vibe": 1.005,
               "room": 0.25,
               "portal": 0.35,
-              "directorMultiplier": 1,
-              "total": 5.295,
-              "roll": 8.64349
+              "directorMultiplier": 1.099,
+              "total": 5.819,
+              "roll": 9.33862
             }
           },
           "archetypeVector": {

@@ -9,6 +9,7 @@
     "echo_trace_v1.json",
     "dreamer_profile_v1.json",
     "dreamer_memory_context_v1.json",
+    "session_arc_v1.json",
     "dream_weather_v1.json",
     "weather_trace_v1.json",
     "threshold_presentation_v1.json",
@@ -23,5 +24,5 @@
     "fixture-pending-run.save.json",
     "trace_summary_v1.json"
   ],
-  "hash": "4ee5de86d35b2c800f19b66d39c51bc8dbd7c2643f6cb52a746244da6f0918b1"
+  "hash": "938ca0ea1bfce0f7914dd7c09439b41ddb1a922d7b3ece296d62bffab2b22ccd"
 }

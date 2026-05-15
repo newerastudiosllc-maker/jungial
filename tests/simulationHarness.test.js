@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 
 import { createGniProviderFromOptions, parseSimulationArgs, runSimulation } from '../src/simulation.js';
 import { loadGameState } from '../src/persistence.js';
+import { createDeterministicClock } from '../src/clock.js';
 
 test('simulation can apply a mocked GNI directive and persist the result', async () => {
   const dir = await mkdtemp(join(tmpdir(), 'jungial-sim-'));
@@ -349,6 +350,40 @@ test('simulation records a developer trace when GNI Firebreak suppresses output'
     assert.equal(firebreakEntry.payload.clampCounts.pacingDelta, 1);
     assert.equal(JSON.stringify(firebreakEntry).includes('pursuit"'), true);
     assert.equal(JSON.stringify(firebreakEntry).includes('raw'), false);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('simulation saves hidden Session Arc state without exposing it in-world', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-session-arc-'));
+  const savePath = join(dir, 'session.json');
+
+  try {
+    const result = await runSimulation({
+      seed: 777,
+      savePath,
+      sessionCovenant: {
+        intensityCeiling: 0.7,
+        toneTags: ['strange']
+      },
+      passageResponse: {
+        kind: 'withdraw',
+        boundarySignals: ['long_pause'],
+        pressureAccepted: 0.12,
+        rawSpeech: 'this should not become narration'
+      },
+      clock: createDeterministicClock({ startIso: '2091-01-01T00:00:00.000Z' })
+    });
+    const saved = await loadGameState(savePath);
+    const arcEntry = result.trace.entries.find((entry) => entry.type === 'session.arc.advanced');
+
+    assert.equal(saved.sessionArc.schema, 'SessionArcV1');
+    assert.equal(saved.sessionArc.lastDecision, 'soften');
+    assert.equal(arcEntry.payload.decision, 'soften');
+    assert.equal(arcEntry.payload.returnAvailable, true);
+    assert.equal(JSON.stringify(result.transcript).includes('SessionArc'), false);
+    assert.equal(JSON.stringify(saved).includes('this should not become narration'), false);
   } finally {
     await rm(dir, { recursive: true, force: true });
   }

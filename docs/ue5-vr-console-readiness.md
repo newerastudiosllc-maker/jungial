@@ -8,6 +8,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 
 - `UJungialRuntimeSubsystem`: validates DataAssets and wires services.
 - `UJungialSaveSlotSubsystem`: prepares `SaveSlotPlanV1` for fresh, continue, and new incarnation starts before runtime bootstrap.
+- `UJungialSessionArcDirector`: advances hidden pressure, return readiness, and beat-role pacing before Dreamflow selection.
 - `UArchetypeResonanceComponent`: tracks local archetype vector and event history.
 - `UFeelingEngineComponent`: maps feeling axes to lighting, fog, post-process, audio, and movement parameters.
 - `AThresholdChamberActor`: owns chamber objects, Heartlight, note, portal, and tool-sigil actors.
@@ -54,6 +55,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - Atmosphere changes should be parameter curves, not one-off hard-coded scene edits.
 - Renderer, audio, UI, and haptic layers should consume presentation packets rather than raw gameplay objects.
 - `DreamAtmospherePresentationV1` should be the handoff for weather-shaped lighting, fog, audio, haptics, movement, and comfort cues; UE actors should not read `DreadBudgetV1` directly.
+- `SessionArcV1` should remain a hidden director packet; renderer/audio/haptics should receive only presentation-safe consequences.
 - Speech events should be captured as intent/symbol events so platforms without microphone permission still work.
 - Console and VR builds should send the same symbolic intents as speech builds instead of branching chamber logic by platform.
 
