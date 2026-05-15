@@ -72,6 +72,36 @@ struct FSaveSlotPlanV1
     JsonObject DreamerMemoryContext;
 };
 
+enum class EJungialRuntimeReadinessStatus
+{
+    Ready,
+    Degraded,
+    Blocked
+};
+
+struct FRuntimeReadinessCheckV1
+{
+    String Id; // Examples: content.catalog, gni.provider, renderer.handoff.
+    EJungialRuntimeReadinessStatus Status = EJungialRuntimeReadinessStatus::Ready;
+    String Severity; // required or optional
+    String Summary;
+    JsonObject Details;
+    Array<String> Errors;
+};
+
+struct FRuntimeReadinessV1
+{
+    EJungialRuntimeReadinessStatus Status = EJungialRuntimeReadinessStatus::Ready;
+    bool bCanStartSession = true;
+    int32 BlockedCount = 0;
+    int32 DegradedCount = 0;
+    Array<String> PlatformTargets;
+    Map<String, bool> Capabilities;
+    Array<String> Contracts;
+    Array<FRuntimeReadinessCheckV1> Checks;
+    String PlayerFacingText; // Must stay empty. This is an internal preflight report.
+};
+
 enum class EJungialSessionArcPhase
 {
     Opening,

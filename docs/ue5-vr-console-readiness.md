@@ -7,6 +7,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 ## Proposed UE5 Mapping
 
 - `UJungialRuntimeSubsystem`: validates DataAssets and wires services.
+- `FRuntimeReadinessV1`: startup preflight report for required blockers, optional degradations, platform targets, and contract coverage.
 - `UJungialSaveSlotSubsystem`: prepares `SaveSlotPlanV1` for fresh, continue, and new incarnation starts before runtime bootstrap.
 - `UJungialSessionArcDirector`: advances hidden pressure, return readiness, and beat-role pacing before Dreamflow selection.
 - `UJungialDreamSessionRunner`: orchestrates multi-beat dream sessions from Passage, EchoTrace, SessionArc, DreamJourney, and DreamWeather packets.
@@ -48,6 +49,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - GNI/GNI-emulator outputs must pass through the Firebreak before touching gameplay state.
 - GNI contract fixtures should pass strict validation before provider changes are accepted.
 - Content validation must run before packaged builds and before accepting AI-authored content.
+- `RuntimeReadinessV1` should run before a playable session starts so missing GNI can degrade safely while broken content blocks startup.
 - Dream modules should reference known lexicon symbols rather than ad hoc strings.
 
 ## VR/Console Constraints

@@ -15,6 +15,7 @@ npm test
 npm run simulate
 npm run dream:checkpoint
 npm run validate
+npm run readiness
 npm run ready
 npm run campaign
 npm run scenarios
@@ -222,6 +223,7 @@ The current contract schemas live in `data/schemas/`:
 - `input_intent.schema.json`
 - `threshold_presentation.schema.json`
 - `session_frame.schema.json`
+- `runtime_readiness.schema.json`
 - `session_bundle.schema.json`
 - `session_covenant.schema.json`
 - `passage.schema.json`
@@ -244,6 +246,19 @@ The current contract schemas live in `data/schemas/`:
 - `gni_contract_check_report.schema.json`
 - `gni_directive_queue.schema.json`
 - `gni_queue_process_result.schema.json`
+
+## Runtime Readiness
+
+`src/runtimeReadiness.js` builds `RuntimeReadinessV1`, an internal preflight report for the prototype and future UE5/VR/console boot path. It marks required blockers, optional degradations, known platform targets, active contracts, and core capabilities before a session starts. Missing GNI degrades the report but does not block the chamber; invalid content blocks startup.
+
+Run it with:
+
+```powershell
+npm run readiness
+npm run readiness -- --json --gni-endpoint=https://example.local/gni --targets=node_prototype,ue5,vr,console
+```
+
+This report is not player-facing narration. It is for build gates, QA, tooling, and production startup checks.
 
 ## Versioning And Replay
 
@@ -313,7 +328,7 @@ Export GNI contract fixtures:
 npm run fixtures
 ```
 
-This writes `fixtures/session_bundle_v1.json`, `fixtures/session_covenant_v1.json`, `fixtures/passage_v1.json`, `fixtures/echo_trace_v1.json`, `fixtures/first_listening_v1.json`, `fixtures/experience_directive_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/session_arc_v1.json`, `fixtures/dream_session_v1.json`, `fixtures/dream_session_checkpoint_v1.json`, `fixtures/dream_weather_v1.json`, `fixtures/weather_trace_v1.json`, `fixtures/threshold_presentation_v1.json`, `fixtures/session_frame_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_firebreak_trace_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_contract_check_report_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
+This writes `fixtures/session_bundle_v1.json`, `fixtures/session_covenant_v1.json`, `fixtures/passage_v1.json`, `fixtures/echo_trace_v1.json`, `fixtures/first_listening_v1.json`, `fixtures/experience_directive_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/session_arc_v1.json`, `fixtures/dream_session_v1.json`, `fixtures/dream_session_checkpoint_v1.json`, `fixtures/dream_weather_v1.json`, `fixtures/weather_trace_v1.json`, `fixtures/threshold_presentation_v1.json`, `fixtures/session_frame_v1.json`, `fixtures/runtime_readiness_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_firebreak_trace_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_contract_check_report_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
 
 The provider-safe fixture surface is `gni_request_v1.json` and its nested `SessionBundleV1`. Full SaveGame fixtures are internal examples for resume, migration, and QA flows; they may include local or session state that should not be treated as provider input.
 
@@ -352,6 +367,7 @@ For longer play, `src/dreamSession.js` can chain many hidden beats after the por
 - `GniAdapter` -> `IJungialAiProvider` implementation
 - `GniDirectiveQueue` -> SaveGame-backed async GNI request queue
 - `SessionFrameV1` -> renderer/audio/haptics handoff packet for UE5, VR, console, and browser prototypes
+- `RuntimeReadinessV1` -> internal startup preflight for build gates, QA, and platform boot checks
 - `JournalOfMirrors` -> SaveGame-backed library model
 - `MaskRegistry` -> emergent presence spawner
 

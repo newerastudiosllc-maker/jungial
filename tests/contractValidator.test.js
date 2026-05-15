@@ -16,6 +16,7 @@ import { createDreamSessionCheckpoint, runDreamSessionFromRuntime } from '../src
 import { runFirstListeningSequence } from '../src/firstListening.js';
 import { createExperienceDirective } from '../src/experienceDirector.js';
 import { buildSessionFrame } from '../src/sessionFrame.js';
+import { createRuntimeReadinessReport } from '../src/runtimeReadiness.js';
 
 test('contract validator routes known Jungial contract schemas', () => {
   const directiveResult = validateContractDocument({
@@ -336,6 +337,14 @@ test('contract validator routes SessionFrameV1 documents', () => {
   assert.deepEqual(result, { valid: true, errors: [] });
 });
 
+test('contract validator routes RuntimeReadinessV1 documents', () => {
+  const result = validateContractDocument(createRuntimeReadinessReport({
+    gniEndpoint: 'gni://local-dev-placeholder'
+  }));
+
+  assert.deepEqual(result, { valid: true, errors: [] });
+});
+
 test('contract validator validates generated Dream Weather and summary fixture files', async () => {
   const dir = await mkdtemp(join(tmpdir(), 'jungial-weather-contracts-'));
 
@@ -353,6 +362,7 @@ test('contract validator validates generated Dream Weather and summary fixture f
       join(dir, 'first_listening_v1.json'),
       join(dir, 'experience_directive_v1.json'),
       join(dir, 'session_frame_v1.json'),
+      join(dir, 'runtime_readiness_v1.json'),
       join(dir, 'dream_session_v1.json'),
       join(dir, 'dream_session_checkpoint_v1.json'),
       join(dir, 'session_arc_v1.json'),
@@ -369,6 +379,7 @@ test('contract validator validates generated Dream Weather and summary fixture f
       'FirstListeningRunV1',
       'ExperienceDirectiveV1',
       'SessionFrameV1',
+      'RuntimeReadinessV1',
       'DreamSessionV1',
       'DreamSessionCheckpointV1',
       'SessionArcV1',
@@ -376,7 +387,7 @@ test('contract validator validates generated Dream Weather and summary fixture f
       'JungialTraceSummaryV1',
       'JungialContractFixtureManifestV1'
     ]);
-    assert.deepEqual(report.files.map((file) => file.valid), [true, true, true, true, true, true, true, true, true, true, true, true]);
+    assert.deepEqual(report.files.map((file) => file.valid), [true, true, true, true, true, true, true, true, true, true, true, true, true]);
   } finally {
     await rm(dir, { recursive: true, force: true });
   }

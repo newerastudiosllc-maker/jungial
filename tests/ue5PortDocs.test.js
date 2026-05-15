@@ -62,3 +62,12 @@ test('UE5 presentation pseudocode documents renderer session frames', async () =
   assert.match(text, /FExperienceDirectiveV1 ExperienceDirective/);
   assert.match(text, /PlayerFacingText must stay empty/);
 });
+
+test('UE5 core type pseudocode documents runtime readiness preflight', async () => {
+  const text = await readFile('UE5Port/JungialTypes.hpp', 'utf8');
+
+  assert.match(text, /struct FRuntimeReadinessV1/);
+  assert.match(text, /CanStartSession/);
+  assert.match(text, /content\.catalog/);
+  assert.match(text, /gni\.provider/);
+});

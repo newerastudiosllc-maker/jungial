@@ -60,6 +60,20 @@ const SESSION_ARC_PHASES = Object.freeze(['opening', 'deepening', 'distorting', 
 const SESSION_ARC_DECISIONS = Object.freeze(['deepen', 'distort', 'mirror', 'soften', 'return']);
 const SESSION_ARC_ROLES = Object.freeze(['entry', 'pressure', 'mirror', 'return']);
 const DREAM_SESSION_END_REASONS = Object.freeze(['max_beats', 'checkpoint', 'return_anchor', 'return_available']);
+const RUNTIME_READINESS_STATUSES = Object.freeze(['ready', 'degraded', 'blocked']);
+const RUNTIME_READINESS_SEVERITIES = Object.freeze(['required', 'optional']);
+const RUNTIME_READINESS_CAPABILITIES = Object.freeze([
+  'thresholdChamber',
+  'firstListening',
+  'dreamSession',
+  'dreamSessionCheckpoint',
+  'dreamWeather',
+  'experienceDirector',
+  'sessionFrame',
+  'saveResume',
+  'asyncGniQueue',
+  'gniFirebreak'
+]);
 const DREAM_JOURNEY_WEIGHT_KEYS = Object.freeze([
   'base',
   'archetype',
@@ -377,6 +391,61 @@ export function validateSessionFrame(frame) {
   errors.push(...validateSessionFrameRendererHints(frame?.rendererHints));
   errors.push(...validateSessionFrameDebug(frame?.debug));
   if (frame?.playerFacingText !== null) {
+    errors.push('playerFacingText must be null');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function validateRuntimeReadiness(report) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'status',
+    'canStartSession',
+    'blockedCount',
+    'degradedCount',
+    'platformTargets',
+    'capabilities',
+    'contracts',
+    'checks',
+    'playerFacingText'
+  ];
+
+  if (report?.schema !== 'RuntimeReadinessV1') {
+    errors.push('schema must be RuntimeReadinessV1');
+  }
+  if (report?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  errors.push(...validateKnownKeys(report, allowedKeys, 'runtimeReadiness'));
+  if (!RUNTIME_READINESS_STATUSES.includes(report?.status)) {
+    errors.push(`status must be one of ${RUNTIME_READINESS_STATUSES.join(', ')}`);
+  }
+  if (typeof report?.canStartSession !== 'boolean') {
+    errors.push('canStartSession must be a boolean');
+  }
+  if (!isNonNegativeInteger(report?.blockedCount)) {
+    errors.push('blockedCount must be a non-negative integer');
+  }
+  if (!isNonNegativeInteger(report?.degradedCount)) {
+    errors.push('degradedCount must be a non-negative integer');
+  }
+  errors.push(...validateStringList(report?.platformTargets, 'platformTargets'));
+  errors.push(...validateStringList(report?.contracts, 'contracts'));
+  errors.push(...validateRuntimeReadinessCapabilities(report?.capabilities));
+  if (!Array.isArray(report?.checks)) {
+    errors.push('checks must be an array');
+  } else {
+    report.checks.forEach((check, index) => {
+      errors.push(...validateRuntimeReadinessCheck(check, `checks[${index}]`));
+    });
+  }
+  if (report?.playerFacingText !== null) {
     errors.push('playerFacingText must be null');
   }
 
@@ -2362,6 +2431,46 @@ function validateSessionFrameDebug(value) {
   if (!isNullableString(value.lastEventType)) {
     errors.push('debug.lastEventType must be a string or null');
   }
+  return errors;
+}
+
+function validateRuntimeReadinessCapabilities(value) {
+  const errors = [];
+  if (!isObject(value)) {
+    return ['capabilities must be an object'];
+  }
+  errors.push(...validateKnownKeys(value, RUNTIME_READINESS_CAPABILITIES, 'capabilities'));
+  for (const key of RUNTIME_READINESS_CAPABILITIES) {
+    if (typeof value[key] !== 'boolean') {
+      errors.push(`capabilities.${key} must be a boolean`);
+    }
+  }
+  return errors;
+}
+
+function validateRuntimeReadinessCheck(check, label) {
+  const errors = [];
+  const allowedKeys = ['id', 'status', 'severity', 'summary', 'details', 'errors'];
+  if (!isObject(check)) {
+    return [`${label} must be an object`];
+  }
+  errors.push(...validateKnownKeys(check, allowedKeys, label));
+  if (!isNonEmptyString(check.id)) {
+    errors.push(`${label}.id is required`);
+  }
+  if (!RUNTIME_READINESS_STATUSES.includes(check.status)) {
+    errors.push(`${label}.status must be one of ${RUNTIME_READINESS_STATUSES.join(', ')}`);
+  }
+  if (!RUNTIME_READINESS_SEVERITIES.includes(check.severity)) {
+    errors.push(`${label}.severity must be one of ${RUNTIME_READINESS_SEVERITIES.join(', ')}`);
+  }
+  if (!isNonEmptyString(check.summary)) {
+    errors.push(`${label}.summary is required`);
+  }
+  if (!isObject(check.details)) {
+    errors.push(`${label}.details must be an object`);
+  }
+  errors.push(...validateStringList(check.errors, `${label}.errors`));
   return errors;
 }
 

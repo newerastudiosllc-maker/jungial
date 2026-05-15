@@ -1,0 +1,136 @@
+{
+  "schema": "RuntimeReadinessV1",
+  "schemaVersion": 1,
+  "status": "degraded",
+  "canStartSession": true,
+  "blockedCount": 0,
+  "degradedCount": 1,
+  "platformTargets": [
+    "node_prototype",
+    "ue5",
+    "vr",
+    "console"
+  ],
+  "capabilities": {
+    "thresholdChamber": true,
+    "firstListening": true,
+    "dreamSession": true,
+    "dreamSessionCheckpoint": true,
+    "dreamWeather": true,
+    "experienceDirector": true,
+    "sessionFrame": true,
+    "saveResume": true,
+    "asyncGniQueue": true,
+    "gniFirebreak": true
+  },
+  "contracts": [
+    "SessionBundleV1",
+    "GniProcessingRequestV1",
+    "JungialDirectiveV1",
+    "GniBridgeResultV1",
+    "GniDirectiveQueueV1",
+    "SessionCovenantV1",
+    "FirstListeningRunV1",
+    "PassageV1",
+    "EchoTraceV1",
+    "DreamWeatherV1",
+    "WeatherTraceV1",
+    "ExperienceDirectiveV1",
+    "ThresholdPresentationV1",
+    "SessionFrameV1",
+    "DreamSessionV1",
+    "DreamSessionCheckpointV1",
+    "DreamerProfileV1",
+    "DreamerMemoryContextV1",
+    "JungialSaveGame"
+  ],
+  "checks": [
+    {
+      "id": "content.catalog",
+      "status": "ready",
+      "severity": "required",
+      "summary": "Content catalog can bootstrap the chamber, dreamflow, masks, and Passage lattice.",
+      "details": {
+        "archetypes": 13,
+        "symbols": 31,
+        "toolSigils": 4,
+        "dreamModules": 5,
+        "masks": 5,
+        "passages": 5,
+        "errors": []
+      },
+      "errors": []
+    },
+    {
+      "id": "contract.surface",
+      "status": "ready",
+      "severity": "required",
+      "summary": "Versioned contract documents are available for runtime, GNI, saves, and renderer handoff.",
+      "details": {
+        "contracts": 19
+      },
+      "errors": []
+    },
+    {
+      "id": "renderer.handoff",
+      "status": "ready",
+      "severity": "required",
+      "summary": "SessionFrameV1 is available for renderer, audio, haptics, and comfort systems.",
+      "details": {
+        "contract": "SessionFrameV1"
+      },
+      "errors": []
+    },
+    {
+      "id": "save.resume",
+      "status": "ready",
+      "severity": "required",
+      "summary": "Versioned SaveGame and dream checkpoint contracts are available for suspend and resume.",
+      "details": {
+        "saveSchema": "JungialSaveGame",
+        "checkpointSchema": "DreamSessionCheckpointV1"
+      },
+      "errors": []
+    },
+    {
+      "id": "async.gni.queue",
+      "status": "ready",
+      "severity": "required",
+      "summary": "Pending GNI work can be persisted and resolved after gameplay continues.",
+      "details": {
+        "contract": "GniDirectiveQueueV1"
+      },
+      "errors": []
+    },
+    {
+      "id": "gni.provider",
+      "status": "degraded",
+      "severity": "optional",
+      "summary": "GNI provider is not configured; local emulator, fixtures, or queue persistence can carry prototype play.",
+      "details": {
+        "mode": "placeholder",
+        "endpointConfigured": true,
+        "asyncQueueAvailable": true
+      },
+      "errors": []
+    },
+    {
+      "id": "platform.targets",
+      "status": "ready",
+      "severity": "optional",
+      "summary": "Requested platform targets map to known prototype and port lanes.",
+      "details": {
+        "supportedTargets": [
+          "node_prototype",
+          "ue5",
+          "vr",
+          "console",
+          "browser"
+        ],
+        "unsupportedTargets": []
+      },
+      "errors": []
+    }
+  ],
+  "playerFacingText": null
+}

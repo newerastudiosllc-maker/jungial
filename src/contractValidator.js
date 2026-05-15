@@ -21,6 +21,7 @@ import {
   validatePassage,
   validateSaveGame,
   validateSaveSlotPlan,
+  validateRuntimeReadiness,
   validateSessionArc,
   validateSessionCovenant,
   validateSessionBundle,
@@ -63,6 +64,8 @@ export function validateContractDocument(document) {
       return validateExperienceDirective(document);
     case 'SessionFrameV1':
       return validateSessionFrame(document);
+    case 'RuntimeReadinessV1':
+      return validateRuntimeReadiness(document);
     case 'ThresholdPresentationV1':
       return validateThresholdPresentation(document);
     case 'GniBridgeResultV1':

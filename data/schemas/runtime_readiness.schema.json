@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/runtime_readiness.schema.json",
+  "title": "RuntimeReadinessV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "schemaVersion",
+    "status",
+    "canStartSession",
+    "blockedCount",
+    "degradedCount",
+    "platformTargets",
+    "capabilities",
+    "contracts",
+    "checks",
+    "playerFacingText"
+  ],
+  "properties": {
+    "schema": { "const": "RuntimeReadinessV1" },
+    "schemaVersion": { "const": 1 },
+    "status": { "enum": ["ready", "degraded", "blocked"] },
+    "canStartSession": { "type": "boolean" },
+    "blockedCount": { "type": "integer", "minimum": 0 },
+    "degradedCount": { "type": "integer", "minimum": 0 },
+    "platformTargets": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "capabilities": {
+      "type": "object",
+      "required": [
+        "thresholdChamber",
+        "firstListening",
+        "dreamSession",
+        "dreamSessionCheckpoint",
+        "dreamWeather",
+        "experienceDirector",
+        "sessionFrame",
+        "saveResume",
+        "asyncGniQueue",
+        "gniFirebreak"
+      ],
+      "properties": {
+        "thresholdChamber": { "type": "boolean" },
+        "firstListening": { "type": "boolean" },
+        "dreamSession": { "type": "boolean" },
+        "dreamSessionCheckpoint": { "type": "boolean" },
+        "dreamWeather": { "type": "boolean" },
+        "experienceDirector": { "type": "boolean" },
+        "sessionFrame": { "type": "boolean" },
+        "saveResume": { "type": "boolean" },
+        "asyncGniQueue": { "type": "boolean" },
+        "gniFirebreak": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "contracts": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "checks": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/readinessCheck" }
+    },
+    "playerFacingText": { "type": "null" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "readinessCheck": {
+      "type": "object",
+      "required": ["id", "status", "severity", "summary", "details", "errors"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["ready", "degraded", "blocked"] },
+        "severity": { "enum": ["required", "optional"] },
+        "summary": { "type": "string", "minLength": 1 },
+        "details": { "type": "object" },
+        "errors": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

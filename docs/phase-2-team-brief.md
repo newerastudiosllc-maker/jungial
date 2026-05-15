@@ -30,6 +30,7 @@ The repo already contains engine-agnostic Node.js systems, JSON contracts, and U
 - Dream Session checkpoints
 - Dreamer Profile memory
 - GNI bridge, queue, emulator, and Firebreak
+- Runtime readiness preflight
 - Developer trace output
 - Scenario and contract validation
 
@@ -150,6 +151,7 @@ For the next 30 to 45 days, prioritize:
 - GNI never owns mutable gameplay state.
 - AI output is advisory and must pass through Firebreak.
 - Content must pass validation before entering the runtime catalog.
+- Runtime readiness must block broken content and degrade optional provider gaps before a session starts.
 - Procedural changes must pass replay/scenario checks.
 - Safety review happens before public claims or broader playtests.
 

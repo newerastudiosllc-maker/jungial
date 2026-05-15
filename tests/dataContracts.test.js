@@ -27,6 +27,7 @@ import {
   validatePassage,
   validateSaveGame,
   validateSaveSlotPlan,
+  validateRuntimeReadiness,
   validateSessionArc,
   validateSessionCovenant,
   validateSessionFrame,
@@ -44,6 +45,7 @@ import {
   toGniWeatherContext
 } from '../src/dreamWeather.js';
 import { buildThresholdPresentation } from '../src/presentation.js';
+import { createRuntimeReadinessReport } from '../src/runtimeReadiness.js';
 import { createDeterministicClock } from '../src/clock.js';
 import { applyPlayerInput } from '../src/input.js';
 import { createJungialRuntime } from '../src/runtime.js';
@@ -110,6 +112,16 @@ test('Session Frame schema documents renderer handoff packets', async () => {
   assert.deepEqual(schema.properties.frameKind.enum, ['threshold_silent', 'threshold_awake', 'threshold_portal', 'dream', 'return']);
   assert.equal(schema.additionalProperties, false);
   assert.equal(schema.properties.rawSpeech, undefined);
+});
+
+test('Runtime Readiness schema documents internal preflight reports', async () => {
+  const schema = await readJson('data/schemas/runtime_readiness.schema.json');
+
+  assert.equal(schema.title, 'RuntimeReadinessV1');
+  assert.deepEqual(schema.properties.schema, { const: 'RuntimeReadinessV1' });
+  assert.deepEqual(schema.properties.status.enum, ['ready', 'degraded', 'blocked']);
+  assert.equal(schema.additionalProperties, false);
+  assert.equal(schema.properties.playerFacingText.type, 'null');
 });
 
 test('session bundle validation reports missing GNI handoff fields', () => {
@@ -679,6 +691,49 @@ test('Session Frame validation rejects raw fields and unbounded renderer values'
   assert.equal(result.errors.includes('comfort.intensityCeiling must be between 0 and 1'), true);
   assert.equal(result.errors.includes('rendererHints.pressureTarget must be between 0 and 1'), true);
   assert.equal(result.errors.includes('playerFacingText must be null'), true);
+});
+
+test('Runtime Readiness validation accepts internal startup reports', () => {
+  const result = validateRuntimeReadiness(createRuntimeReadinessReport({
+    catalog: loadBundledContentCatalog(),
+    gniEndpoint: 'gni://local-dev-placeholder'
+  }));
+
+  assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('Runtime Readiness validation rejects malformed internal startup reports', () => {
+  const validCapabilities = createRuntimeReadinessReport().capabilities;
+  const result = validateRuntimeReadiness({
+    schema: 'RuntimeReadinessV1',
+    schemaVersion: 1,
+    status: 'ready',
+    canStartSession: true,
+    blockedCount: 0,
+    degradedCount: 0,
+    platformTargets: ['node_prototype', ''],
+    capabilities: { ...validCapabilities, unknown: true },
+    contracts: ['SessionFrameV1', ''],
+    checks: [{
+      id: 'gni.provider',
+      status: 'degraded',
+      severity: 'optional',
+      summary: 'GNI waits.',
+      details: {},
+      errors: []
+    }],
+    privateNotes: 'do not store',
+    playerFacingText: 'Ready'
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'runtimeReadiness.privateNotes is not allowed',
+    'platformTargets[1] must be a non-empty string',
+    'contracts[1] must be a non-empty string',
+    'capabilities.unknown is not allowed',
+    'playerFacingText must be null'
+  ]);
 });
 
 test('session bundle validation checks optional covenant and Passage context', () => {
