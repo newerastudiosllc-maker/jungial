@@ -310,15 +310,17 @@ See `docs/dreamer-memory-and-safety.md` for the product/architecture guardrails:
 
 `SessionShapeSelectionV1` is the internal preset handoff for broad session tone. Current shapes are `quiet_lantern`, `strange_threshold`, `dark_mirror`, and `nightmare_veil`; each resolves to a bounded `SessionCovenantV1`. Overrides can lower intensity or add boundaries, but they do not store raw speech or player-facing rationale.
 
-`SessionContentGateV1` is the final internal audit over the selected Passage, Dream Weather, DreamJourney, and Mask. It records whether the current content stays inside the covenant, which tags were suppressed, and replacement hints for future UE5/GNI routing. It stays out of in-world narration and never stores raw player speech.
+`SessionContentGateV1` is the final internal audit over the selected Passage, Dream Weather, DreamJourney, and Mask. It records whether the current content stays inside the covenant, which tags were suppressed, and replacement hints for UE5/GNI routing. It stays out of in-world narration and never stores raw player speech.
 
 `SessionContentReplacementPlanV1` is the quiet reroute packet created from the content gate. If the gate allows the content, the plan is `not_needed`; if the gate blocks it, the plan carries a covenant-safe replacement Passage, Dream Weather packet, avoid tags, and route records. The player only experiences the changed dream surface.
+
+`src/sessionContentSurface.js` is the reusable resolver that runs the gate, creates the replacement plan, and returns the final Passage/Dream Weather surface for storage, presentation, and future GNI context. This gives long dream sessions the same contract shape as the one-shot prototype loop without exposing reroute behavior in-world.
 
 The system can become strange, dark, or horrific when the covenant allows it, while exact Passage repeats and boundary violations are filtered before GNI or Dreamflow can use them.
 
 `SessionArcV1` is the hidden pacing layer for immersive long sessions. It tracks pressure, return readiness, recent beat roles, and the current arc decision so Dreamflow can deepen, distort, mirror, soften, or return without showing the machinery to the player.
 
-`DreamSessionV1` is the continuous dream runner result. Each hidden beat gathers a Passage, records a redacted EchoTrace, advances Session Arc, selects a DreamJourney, and resolves Dream Weather. It can keep moving until a return anchor is used, return becomes available, the beat limit is reached, or a checkpoint is requested. Raw player wording is not stored in the session.
+`DreamSessionV1` is the continuous dream runner result. Each hidden beat gathers a Passage, records a redacted EchoTrace, advances Session Arc, selects a DreamJourney, resolves Dream Weather, and stores the internal content gate plus replacement plan used for that beat. It can keep moving until a return anchor is used, return becomes available, the beat limit is reached, or a checkpoint is requested. Raw player wording is not stored in the session.
 
 `DreamSessionCheckpointV1` is the pause/resume packet for long sessions. It stores completed hidden beats, the final arc, recent redacted EchoTraces, and `DreamflowRuntimeStateV1` so a suspended dream can resume onto the same procedural path as uninterrupted play.
 
@@ -363,7 +365,7 @@ npm run contracts
 11. ArchitectState updates long-range weights.
 12. Save JSON is written.
 
-For longer play, `src/dreamSession.js` can chain many hidden beats after the portal opens. That runner is the foundation for an intense, evolving dream that keeps responding until the player returns or the caller stops the loop.
+For longer play, `src/dreamSession.js` can chain many hidden beats after the portal opens. Every beat now resolves through the same hidden content surface gate/replacement path, so intense sessions can keep evolving while unsafe or mismatched material is rerouted before persistence or presentation. That runner is the foundation for a long dream that keeps responding until the player returns or the caller stops the loop.
 
 ## UE5 Port Map
 
@@ -379,7 +381,8 @@ For longer play, `src/dreamSession.js` can chain many hidden beats after the por
 - `GniAdapter` -> `IJungialAiProvider` implementation
 - `GniDirectiveQueue` -> SaveGame-backed async GNI request queue
 - `SessionShapeSelectionV1` -> preset-to-covenant handoff for gentle through horrific starts
-- `SessionContentGateV1` -> `UJungialContentGateSubsystem` audit before save, renderer handoff, and future replacement routing
+- `resolveSessionContentSurface` -> `UJungialContentSurfaceResolver` shared gate/replacement boundary before save, renderer handoff, and GNI context
+- `SessionContentGateV1` -> `UJungialContentGateSubsystem` audit before save, renderer handoff, and replacement routing
 - `SessionContentReplacementPlanV1` -> `UJungialContentReplacementRouter` fallback packet for safe Passage/Weather substitution
 - `SessionFrameV1` -> renderer/audio/haptics handoff packet for UE5, VR, console, and browser prototypes
 - `RuntimeReadinessV1` -> internal startup preflight for build gates, QA, and platform boot checks

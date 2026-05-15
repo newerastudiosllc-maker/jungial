@@ -2013,6 +2013,8 @@ function validateDreamSessionBeat(beat, index) {
     'dreamJourney',
     'dreamWeather',
     'weatherTrace',
+    'contentGate',
+    'contentReplacementPlan',
     'returnAvailable'
   ];
 
@@ -2061,6 +2063,18 @@ function validateDreamSessionBeat(beat, index) {
   const traceValidation = validateWeatherTrace(beat?.weatherTrace);
   if (!traceValidation.valid) {
     errors.push(...prefixNestedErrors(traceValidation.errors, `${label}.weatherTrace`, 'weatherTrace'));
+  }
+  const gateValidation = validateSessionContentGate(beat?.contentGate);
+  if (!gateValidation.valid) {
+    errors.push(...prefixNestedErrors(gateValidation.errors, `${label}.contentGate`, 'sessionContentGate'));
+  }
+  const replacementValidation = validateSessionContentReplacementPlan(beat?.contentReplacementPlan);
+  if (!replacementValidation.valid) {
+    errors.push(...prefixNestedErrors(
+      replacementValidation.errors,
+      `${label}.contentReplacementPlan`,
+      'sessionContentReplacementPlan'
+    ));
   }
 
   return {

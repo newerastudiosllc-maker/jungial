@@ -154,7 +154,7 @@ For the next 30 to 45 days, prioritize:
 - GNI never owns mutable gameplay state.
 - AI output is advisory and must pass through Firebreak.
 - Session shape choices must resolve into bounded covenants before gameplay, renderer, or GNI systems consume them.
-- Selected dream content must pass the hidden content gate before save, renderer handoff, or future replacement routing.
+- Selected dream content must pass the hidden content surface resolver before save, renderer handoff, or GNI context.
 - Replacement routing must stay internal and make safer content feel emergent, not corrected.
 - Content must pass validation before entering the runtime catalog.
 - Runtime readiness must block broken content and degrade optional provider gaps before a session starts.

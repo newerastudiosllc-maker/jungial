@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { createDeterministicClock } from '../src/clock.js';
+import { validateDreamSession } from '../src/contracts.js';
 import { applyPlayerInput } from '../src/input.js';
 import { createJungialRuntime } from '../src/runtime.js';
 import { createSessionCovenant } from '../src/sessionCovenant.js';
@@ -56,8 +57,13 @@ test('continuous dream sessions advance multiple hidden beats', () => {
     assert.equal(beat.dreamJourney.schema, 'DreamJourneyV1');
     assert.equal(beat.dreamWeather.schema, 'DreamWeatherV1');
     assert.equal(beat.weatherTrace.schema, 'WeatherTraceV1');
+    assert.equal(beat.contentGate.schema, 'SessionContentGateV1');
+    assert.equal(beat.contentGate.playerFacingText, null);
+    assert.equal(beat.contentReplacementPlan.schema, 'SessionContentReplacementPlanV1');
+    assert.equal(beat.contentReplacementPlan.playerFacingText, null);
     assert.equal(typeof beat.returnAvailable, 'boolean');
   }
+  assert.deepEqual(validateDreamSession(session), { valid: true, errors: [] });
 });
 
 test('continuous dream sessions stop on a return anchor without retaining raw response text', () => {

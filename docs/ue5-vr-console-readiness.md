@@ -13,6 +13,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - `UJungialSessionArcDirector`: advances hidden pressure, return readiness, and beat-role pacing before Dreamflow selection.
 - `UJungialDreamSessionRunner`: orchestrates multi-beat dream sessions from Passage, EchoTrace, SessionArc, DreamJourney, and DreamWeather packets.
 - `FDreamSessionCheckpointV1`: SaveGame payload for suspended long dreams, including Dreamflow RNG state.
+- `UJungialContentSurfaceResolver`: reusable boundary that runs content gate checks, applies replacement plans, and returns the final Passage/DreamWeather surface for beats.
 - `UJungialContentGateSubsystem`: audits selected Passage, DreamWeather, DreamJourney, and Mask packets against the active `SessionCovenantV1`.
 - `UJungialContentReplacementRouter`: consumes blocked gate reports and emits `SessionContentReplacementPlanV1` with safe substitute Passage/Weather packets.
 - `UArchetypeResonanceComponent`: tracks local archetype vector and event history.
@@ -51,7 +52,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - HTTP `202`/`204` responses from GNI should be treated as pending async work and routed into the SaveGame-backed queue; `202` responses may carry provider job metadata for later polling.
 - GNI/GNI-emulator outputs must pass through the Firebreak before touching gameplay state.
 - GNI contract fixtures should pass strict validation before provider changes are accepted.
-- Selected content should pass `SessionContentGateV1` checks before save, renderer handoff, or replacement routing.
+- Selected content should pass through the content surface resolver before save, renderer handoff, or GNI context.
 - `SessionContentReplacementPlanV1` should be deterministic from gate report, covenant, catalog, and seed so QA can replay reroutes.
 - Content validation must run before packaged builds and before accepting AI-authored content.
 - `RuntimeReadinessV1` should run before a playable session starts so missing GNI can degrade safely while broken content blocks startup.
@@ -68,7 +69,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - Renderer, audio, UI, and haptic layers should consume presentation packets rather than raw gameplay objects.
 - `DreamAtmospherePresentationV1` should be the handoff for weather-shaped lighting, fog, audio, haptics, movement, and comfort cues; UE actors should not read `DreadBudgetV1` directly.
 - `SessionArcV1` should remain a hidden director packet; renderer/audio/haptics should receive only presentation-safe consequences.
-- `DreamSessionV1` should remain a hidden orchestration packet; individual beats can feed level streaming, presentation, and GNI context without exposing the runner to the player.
+- `DreamSessionV1` should remain a hidden orchestration packet; individual beats carry their `SessionContentGateV1` and `SessionContentReplacementPlanV1` so level streaming, presentation, and GNI context all use the same resolved surface without exposing the runner to the player.
 - `DreamflowRuntimeStateV1` should be stored only in SaveGame/developer traces, never surfaced as UI or player-facing language.
 - `SessionContentGateV1` should stay internal to tooling, traces, and replacement routing; UE widgets and world actors should not expose blocked reasons to the player.
 - `SessionContentReplacementPlanV1` should be applied before presentation mapping, so unsafe content never needs to be hidden by UI after it appears.

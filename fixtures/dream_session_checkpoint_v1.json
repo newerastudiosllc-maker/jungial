@@ -267,6 +267,77 @@
         "suppressedTags": [],
         "strongestDreadAxis": "watching"
       },
+      "contentGate": {
+        "schema": "SessionContentGateV1",
+        "schemaVersion": 1,
+        "gateId": "content-gate-05fde642a214",
+        "allowed": true,
+        "sessionShapeId": null,
+        "intensityCeiling": 0.44,
+        "checked": {
+          "passageId": "candle_refuses_dark",
+          "dreamWeatherId": "weather-1b3iese",
+          "dreamJourneySummary": "entry:Boundless White Void -> pressure:Space / Black Hole -> mirror:Space / Black Hole -> return:Boundless White Void",
+          "maskId": null
+        },
+        "suppressedTags": [],
+        "warnings": [
+          "passage.pressureTags.hope outside allowedPressureTags",
+          "passage.pressureTags.refusal outside allowedPressureTags"
+        ],
+        "blockedReasons": [],
+        "replacementHints": {
+          "preferredToneTags": [
+            "curious",
+            "deep"
+          ],
+          "allowedPressureTags": [
+            "threshold",
+            "word",
+            "lamp",
+            "breath"
+          ],
+          "passageIntensityBand": "gentle",
+          "weatherPressure": "medium",
+          "returnAnchorKind": "image",
+          "groundingPreference": "quiet_room"
+        },
+        "playerFacingText": null
+      },
+      "contentReplacementPlan": {
+        "schema": "SessionContentReplacementPlanV1",
+        "schemaVersion": 1,
+        "planId": "replacement-plan-216d0f49d316",
+        "sourceGateId": "content-gate-05fde642a214",
+        "status": "not_needed",
+        "avoidTags": [
+          "real_world_self_harm"
+        ],
+        "blockedReasons": [],
+        "replacementHints": {
+          "preferredToneTags": [
+            "curious",
+            "deep"
+          ],
+          "allowedPressureTags": [
+            "threshold",
+            "word",
+            "lamp",
+            "breath"
+          ],
+          "passageIntensityBand": "gentle",
+          "weatherPressure": "medium",
+          "returnAnchorKind": "image",
+          "groundingPreference": "quiet_room"
+        },
+        "replacement": {
+          "passage": null,
+          "dreamWeather": null,
+          "maskId": null
+        },
+        "routes": [],
+        "playerFacingText": null
+      },
       "returnAvailable": false
     },
     {
@@ -533,6 +604,77 @@
         "suppressedTags": [],
         "strongestDreadAxis": "loss"
       },
+      "contentGate": {
+        "schema": "SessionContentGateV1",
+        "schemaVersion": 1,
+        "gateId": "content-gate-d536a910be2f",
+        "allowed": true,
+        "sessionShapeId": null,
+        "intensityCeiling": 0.44,
+        "checked": {
+          "passageId": "candle_refuses_dark",
+          "dreamWeatherId": "weather-1c7low1",
+          "dreamJourneySummary": "entry:Garden -> pressure:Boundless White Void -> mirror:Garden -> return:Boundless White Void",
+          "maskId": null
+        },
+        "suppressedTags": [],
+        "warnings": [
+          "passage.pressureTags.hope outside allowedPressureTags",
+          "passage.pressureTags.refusal outside allowedPressureTags"
+        ],
+        "blockedReasons": [],
+        "replacementHints": {
+          "preferredToneTags": [
+            "curious",
+            "deep"
+          ],
+          "allowedPressureTags": [
+            "threshold",
+            "word",
+            "lamp",
+            "breath"
+          ],
+          "passageIntensityBand": "gentle",
+          "weatherPressure": "medium",
+          "returnAnchorKind": "image",
+          "groundingPreference": "quiet_room"
+        },
+        "playerFacingText": null
+      },
+      "contentReplacementPlan": {
+        "schema": "SessionContentReplacementPlanV1",
+        "schemaVersion": 1,
+        "planId": "replacement-plan-0ab08e3b9db3",
+        "sourceGateId": "content-gate-d536a910be2f",
+        "status": "not_needed",
+        "avoidTags": [
+          "real_world_self_harm"
+        ],
+        "blockedReasons": [],
+        "replacementHints": {
+          "preferredToneTags": [
+            "curious",
+            "deep"
+          ],
+          "allowedPressureTags": [
+            "threshold",
+            "word",
+            "lamp",
+            "breath"
+          ],
+          "passageIntensityBand": "gentle",
+          "weatherPressure": "medium",
+          "returnAnchorKind": "image",
+          "groundingPreference": "quiet_room"
+        },
+        "replacement": {
+          "passage": null,
+          "dreamWeather": null,
+          "maskId": null
+        },
+        "routes": [],
+        "playerFacingText": null
+      },
       "returnAvailable": false
     },
     {
@@ -794,6 +936,77 @@
         ],
         "suppressedTags": [],
         "strongestDreadAxis": "claustrophobia"
+      },
+      "contentGate": {
+        "schema": "SessionContentGateV1",
+        "schemaVersion": 1,
+        "gateId": "content-gate-1781ad229c73",
+        "allowed": true,
+        "sessionShapeId": null,
+        "intensityCeiling": 0.44,
+        "checked": {
+          "passageId": "candle_refuses_dark",
+          "dreamWeatherId": "weather-50479c",
+          "dreamJourneySummary": "entry:Space / Black Hole -> pressure:Garden -> mirror:Boundless White Void -> return:Space / Black Hole",
+          "maskId": null
+        },
+        "suppressedTags": [],
+        "warnings": [
+          "passage.pressureTags.hope outside allowedPressureTags",
+          "passage.pressureTags.refusal outside allowedPressureTags"
+        ],
+        "blockedReasons": [],
+        "replacementHints": {
+          "preferredToneTags": [
+            "curious",
+            "deep"
+          ],
+          "allowedPressureTags": [
+            "threshold",
+            "word",
+            "lamp",
+            "breath"
+          ],
+          "passageIntensityBand": "gentle",
+          "weatherPressure": "medium",
+          "returnAnchorKind": "image",
+          "groundingPreference": "quiet_room"
+        },
+        "playerFacingText": null
+      },
+      "contentReplacementPlan": {
+        "schema": "SessionContentReplacementPlanV1",
+        "schemaVersion": 1,
+        "planId": "replacement-plan-138c895d149f",
+        "sourceGateId": "content-gate-1781ad229c73",
+        "status": "not_needed",
+        "avoidTags": [
+          "real_world_self_harm"
+        ],
+        "blockedReasons": [],
+        "replacementHints": {
+          "preferredToneTags": [
+            "curious",
+            "deep"
+          ],
+          "allowedPressureTags": [
+            "threshold",
+            "word",
+            "lamp",
+            "breath"
+          ],
+          "passageIntensityBand": "gentle",
+          "weatherPressure": "medium",
+          "returnAnchorKind": "image",
+          "groundingPreference": "quiet_room"
+        },
+        "replacement": {
+          "passage": null,
+          "dreamWeather": null,
+          "maskId": null
+        },
+        "routes": [],
+        "playerFacingText": null
       },
       "returnAvailable": false
     }

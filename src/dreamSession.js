@@ -2,6 +2,7 @@ import { createDreamWeather, createWeatherTrace } from './dreamWeather.js';
 import { selectDreamJourney } from './dreamJourney.js';
 import { createEchoTrace, selectPassage } from './passageLattice.js';
 import { advanceSessionArc, createSessionArc } from './sessionArc.js';
+import { resolveSessionContentSurface } from './sessionContentSurface.js';
 import { createSessionCovenant } from './sessionCovenant.js';
 import { stableHash } from './stableHash.js';
 
@@ -81,15 +82,15 @@ export function runDreamSession({
       dreamWeather: weatherPreview
     });
     const response = selectResponseForBeat(responses, localIndex);
-    const echoTrace = createEchoTrace({
+    const candidateEchoTrace = createEchoTrace({
       passage: passageSelection.passage,
       response,
       dreamflowDeltas: response.dreamflowDeltas
     });
-    const arcAdvance = advanceSessionArc({
+    const candidateArcAdvance = advanceSessionArc({
       previousArc: currentArc,
       covenant: activeCovenant,
-      echoTrace,
+      echoTrace: candidateEchoTrace,
       dreamWeather: weatherPreview,
       dreamerMemoryContext,
       seed: `${beatSeed}:arc`
@@ -99,10 +100,10 @@ export function runDreamSession({
       archetypeState,
       feelingState,
       roomConfig,
-      weightOverrides: arcAdvance.directive.weightOverrides
+      weightOverrides: candidateArcAdvance.directive.weightOverrides
     });
-    const selectedDream = selectDreamFromJourney(dreamJourney, arcAdvance.directive.suggestedRole);
-    const currentEchoTraces = [...echoWindow, echoTrace];
+    const selectedDream = selectDreamFromJourney(dreamJourney, candidateArcAdvance.directive.suggestedRole);
+    const currentEchoTraces = [...echoWindow, candidateEchoTrace];
     const weatherSourceTags = uniqueTags([
       ...(selectedDream.symbolicTags ?? []),
       ...(passageSelection.passage.motifs ?? []),
@@ -119,23 +120,59 @@ export function runDreamSession({
       weatherTags: weatherSourceTags,
       seed: `${beatSeed}:weather`
     });
+    const contentSurface = resolveSessionContentSurface({
+      sessionCovenant: activeCovenant,
+      candidatePassage: passageSelection.passage,
+      candidateDreamWeather: dreamWeather,
+      dreamJourney,
+      passages,
+      recentEchoTraces: echoWindow,
+      dreamerMemoryContext,
+      architectState,
+      seed: `${beatSeed}:surface`
+    });
+    const echoTrace = contentSurface.contentReplacementPlan.status === 'replacement_required'
+      ? createEchoTrace({
+        passage: contentSurface.passage,
+        response,
+        dreamflowDeltas: response.dreamflowDeltas
+      })
+      : candidateEchoTrace;
+    const arcAdvance = contentSurface.contentReplacementPlan.status === 'replacement_required'
+      ? advanceSessionArc({
+        previousArc: currentArc,
+        covenant: activeCovenant,
+        echoTrace,
+        dreamWeather: contentSurface.dreamWeather,
+        dreamerMemoryContext,
+        seed: `${beatSeed}:arc:replacement`
+      })
+      : candidateArcAdvance;
+    const finalWeatherSourceTags = uniqueTags([
+      ...(selectedDream.symbolicTags ?? []),
+      ...(contentSurface.passage.motifs ?? []),
+      ...(contentSurface.passage.pressureTags ?? [])
+    ]);
     const weatherTrace = createWeatherTrace({
-      weather: dreamWeather,
-      sourceTags: weatherSourceTags,
+      weather: contentSurface.dreamWeather,
+      sourceTags: finalWeatherSourceTags,
+      suppressedTags: contentSurface.contentGate.suppressedTags,
       seed: `${beatSeed}:weather`
     });
     const beat = {
       schema: 'DreamSessionBeatV1',
       schemaVersion: 1,
       index: beatNumber,
-      passage: passageSelection.passage,
+      passage: contentSurface.passage,
       echoTrace,
       sessionArc: arcAdvance.arc,
       arcDirective: arcAdvance.directive,
       selectedDream,
       dreamJourney,
-      dreamWeather,
+      dreamWeather: contentSurface.dreamWeather,
       weatherTrace,
+      contentGate: contentSurface.contentGate,
+      contentReplacementPlan: contentSurface.contentReplacementPlan,
       returnAvailable: arcAdvance.directive.returnAvailable
     };
 

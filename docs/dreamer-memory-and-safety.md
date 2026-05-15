@@ -37,6 +37,8 @@ It intentionally avoids raw speech, raw room text, transcripts, and arbitrary no
 
 `SessionContentReplacementPlanV1` is the hidden follow-up route. It can carry a safer Passage and Dream Weather packet when the gate blocks content, but it should still feel like dream continuity to the player rather than a rule correction.
 
+Continuous `DreamSessionV1` beats should use the shared content surface resolver so the stored beat, checkpoint, renderer handoff, and eventual GNI context all see the same final Passage and Dream Weather. The gate report and replacement plan remain internal evidence, not world language.
+
 ## Save Modes
 
 Use these modes as the product language and system shape:
@@ -108,7 +110,7 @@ Production safety should include:
 - A grounded exit/return path from intense sessions.
 - Session length awareness and gentle stopping points.
 - Clear separation between world voice and support resources.
-- Hidden content-gate checks before save, renderer handoff, or future replacement routing.
+- Hidden content-gate checks before save, renderer handoff, or replacement routing.
 - Replacement routes should swap content silently and preserve mystery; blocked reasons stay internal.
 - Human review before any medical, therapeutic, or clinical claim.
 

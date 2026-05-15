@@ -261,6 +261,8 @@ struct FDreamSessionBeatV1
     JsonObject DreamJourney;
     JsonObject DreamWeather;
     JsonObject WeatherTrace;
+    JsonObject ContentGate; // SessionContentGateV1, internal only.
+    JsonObject ContentReplacementPlan; // SessionContentReplacementPlanV1, internal only.
     bool bReturnAvailable = false;
 };
 
