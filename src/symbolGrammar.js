@@ -39,6 +39,8 @@ export class SymbolGrammar {
       .sort();
 
     return {
+      schema: 'SymbolGrammarSnapshotV1',
+      schemaVersion: 1,
       recurrence: { ...this.recurrence },
       symbolicTension: contradictions.length + echoes.length * 0.5,
       contradictions,

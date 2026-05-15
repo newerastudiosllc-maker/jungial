@@ -7,6 +7,7 @@
   "scripts": {
     "test": "node --test --test-concurrency=1 tests/*.test.js",
     "simulate": "node src/simulation.js",
+    "dream:checkpoint": "node src/dreamSessionSaveFlow.js",
     "validate": "node src/contentValidator.js",
     "ready": "npm test && npm run validate && npm run contracts && npm run scenario:check && npm run simulate",
     "replay": "node src/replay.js",

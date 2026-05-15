@@ -13,6 +13,7 @@ UE5 was not available on PATH in this workspace, and no local C++ compiler was a
 ```powershell
 npm test
 npm run simulate
+npm run dream:checkpoint
 npm run validate
 npm run ready
 npm run campaign
@@ -25,6 +26,16 @@ npm run gni:smoke:async
 ```
 
 `npm run simulate` writes `saves/latest-session.json`. That folder is ignored by git.
+
+To exercise a longer dream that pauses in the middle and resumes through return:
+
+```powershell
+npm run dream:checkpoint
+npm run dream:checkpoint -- --checkpoint-save=saves/dream-session-checkpoint.json --final-save=saves/dream-session-resumed.json
+npm run dream:checkpoint -- --seed=808 --clock-start=2090-01-01T00:00:00.000Z --json
+```
+
+This writes a checkpoint SaveGame containing `DreamSessionCheckpointV1`, then reloads it and writes a final resumed SaveGame with one Journal of Mirrors entry and an ArchitectState update. Player response objects may contain raw speech while the session is active, but this flow only persists redacted EchoTrace/session context.
 
 To test the GNI handoff before the real provider exists:
 
@@ -264,6 +275,8 @@ The system can become strange, dark, or horrific when the covenant allows it, wh
 `DreamSessionV1` is the continuous dream runner result. Each hidden beat gathers a Passage, records a redacted EchoTrace, advances Session Arc, selects a DreamJourney, and resolves Dream Weather. It can keep moving until a return anchor is used, return becomes available, the beat limit is reached, or a checkpoint is requested. Raw player wording is not stored in the session.
 
 `DreamSessionCheckpointV1` is the pause/resume packet for long sessions. It stores completed hidden beats, the final arc, recent redacted EchoTraces, and `DreamflowRuntimeStateV1` so a suspended dream can resume onto the same procedural path as uninterrupted play.
+
+`src/dreamSessionSaveFlow.js` turns that checkpoint packet into a playable save/resume loop: Threshold Chamber, hidden dream beats, checkpoint save, runtime hydration from SaveGame, final return, journal entry, and Architect handoff. It is the current foundation for very long dream sessions where the player can stop and continue without exposing the hidden pacing machinery.
 
 Dream Weather is the hidden atmospheric layer for each session. `DreamWeatherV1` carries weather tags, pressure, atmosphere, and the embedded `DreadBudgetV1`; `WeatherTraceV1` records how those tags resolved. When sent toward GNI, it is redacted into `DreamWeatherContextV1` so the provider sees structured pressure context without owning the underlying weather machinery.
 
