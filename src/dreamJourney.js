@@ -44,6 +44,29 @@ export function selectDreamJourney({
   };
 }
 
+export function toGniDreamJourneyContext(dreamJourney = null) {
+  const policy = dreamJourney?.policy ?? {};
+
+  return {
+    schema: 'DreamJourneyContextV1',
+    schemaVersion: 1,
+    symbolTrail: normalizeTags(dreamJourney?.symbolTrail ?? []),
+    suppressedModuleIds: normalizeStringList(policy.suppressedModuleIds),
+    replacementRoutes: normalizeReplacementRoutes(policy.replacementRoutes),
+    fallbackUsed: Boolean(policy.fallbackUsed)
+  };
+}
+
+export function toDreamJourneyTracePolicy(dreamJourney = null) {
+  const context = toGniDreamJourneyContext(dreamJourney);
+
+  return {
+    suppressedModuleIds: context.suppressedModuleIds,
+    replacementRoutes: context.replacementRoutes,
+    fallbackUsed: context.fallbackUsed
+  };
+}
+
 function createDreamJourneyPolicy({ modules = [], covenant = null } = {}) {
   const hardBoundaryTags = normalizeTags([
     'real_world_self_harm',
@@ -248,6 +271,25 @@ function normalizeTags(tags = []) {
     .filter(Boolean))];
 }
 
+function normalizeReplacementRoutes(routes = []) {
+  return (Array.isArray(routes) ? routes : [])
+    .map((route) => ({
+      blockedId: stringOrEmpty(route?.blockedId),
+      selectedId: stringOrEmpty(route?.selectedId),
+      carriedTags: normalizeTags(route?.carriedTags),
+      suppressedTags: normalizeTags(route?.suppressedTags),
+      reason: stringOrEmpty(route?.reason)
+    }))
+    .filter((route) => route.blockedId && route.selectedId && route.reason);
+}
+
+function normalizeStringList(values = []) {
+  return [...new Set((Array.isArray(values) ? values : [])
+    .filter((value) => typeof value === 'string')
+    .map((value) => value.trim())
+    .filter(Boolean))];
+}
+
 function normalizeToken(value) {
   return typeof value === 'string'
     ? value.trim().toLowerCase().replace(/[^a-z0-9_]+/g, '_').replace(/^_+|_+$/g, '')
@@ -256,4 +298,8 @@ function normalizeToken(value) {
 
 function compactToken(value) {
   return normalizeToken(value).replace(/_/g, '');
+}
+
+function stringOrEmpty(value) {
+  return typeof value === 'string' ? value.trim() : '';
 }

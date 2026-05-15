@@ -165,6 +165,9 @@ export class GniAdapter {
           : {}),
         ...(sessionBundle.dreamWeatherContext
           ? { dreamWeatherContext: structuredClone(sessionBundle.dreamWeatherContext) }
+          : {}),
+        ...(sessionBundle.dreamJourneyContext
+          ? { dreamJourneyContext: structuredClone(sessionBundle.dreamJourneyContext) }
           : {})
       }
     };

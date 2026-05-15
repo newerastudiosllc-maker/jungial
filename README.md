@@ -195,6 +195,8 @@ That metadata is normalized into `providerJob` and saved in `GniBridgeResultV1` 
 
 `GniEmulator` in `src/gniEmulator.js` lets the prototype test AI-shaped behavior before real GNI is ready. Use `--emulate-gni` to have the simulation produce and apply a deterministic directive from the current `SessionBundleV1`.
 
+`DreamJourneyContextV1` is the compact GNI-facing form of DreamJourney policy evidence. It carries symbol trail, suppressed module ids, internal reroute summaries, and fallback use, but omits player-facing explanation, hard-boundary prose, and raw player material.
+
 The game sends `SessionBundleV1`:
 
 - dominant archetype
@@ -205,6 +207,7 @@ The game sends `SessionBundleV1`:
 - room snapshot
 - selected dream
 - archetype vector
+- optional DreamJourney, Dream Weather, Passage, covenant, and Dreamer memory contexts
 
 GNI should return `JungialDirectiveV1`:
 
@@ -289,6 +292,8 @@ The nested `DreamAtmospherePresentationV1` is deliberately presentation-only. It
 ## Trace/Audit Output
 
 `TraceRecorder` writes `JungialTraceV1` developer traces. These are not in-world exposition; they are black-box records for QA and GNI debugging. A trace captures First Listening beats when enabled, threshold input, room awakening, portal opening, dream journey selection, content-gate audit summaries, mask selection, journal grounding, Witness bundle creation, hidden Experience Director directives, GNI requests/directives, Firebreak suppression counts, queue processing summaries, and save output.
+
+Dream journey trace payloads include compact policy evidence for suppressed modules, reroutes, and fallback use so QA can replay why a symbol changed without exposing that reasoning in the world.
 
 Use `--trace=<path>` on simulation runs to write a standalone trace JSON file. Save files also include the trace snapshot, and `processSavedGniQueue()` appends a `gni.queue.processed` event when background AI work is resolved later.
 

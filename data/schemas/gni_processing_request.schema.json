@@ -60,7 +60,49 @@
         "archetypeVector": {
           "type": "object",
           "additionalProperties": { "type": "number" }
-        }
+        },
+        "dreamJourneyContext": { "$ref": "#/$defs/dreamJourneyContext" },
+        "dreamerMemoryContext": { "type": "object" },
+        "dreamWeatherContext": { "type": "object" },
+        "sessionCovenant": { "type": "object" },
+        "passageContext": { "type": "object" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "dreamJourneyContext": {
+      "type": "object",
+      "required": [
+        "schema",
+        "schemaVersion",
+        "symbolTrail",
+        "suppressedModuleIds",
+        "replacementRoutes",
+        "fallbackUsed"
+      ],
+      "properties": {
+        "schema": { "const": "DreamJourneyContextV1" },
+        "schemaVersion": { "const": 1 },
+        "symbolTrail": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "suppressedModuleIds": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "replacementRoutes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/dreamJourneyReplacementRoute" }
+        },
+        "fallbackUsed": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "dreamJourneyReplacementRoute": {
+      "type": "object",
+      "required": ["blockedId", "selectedId", "carriedTags", "suppressedTags", "reason"],
+      "properties": {
+        "blockedId": { "type": "string", "minLength": 1 },
+        "selectedId": { "type": "string", "minLength": 1 },
+        "carriedTags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "suppressedTags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "reason": { "type": "string", "minLength": 1 }
       },
       "additionalProperties": false
     }

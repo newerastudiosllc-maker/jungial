@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 
 import { createDeterministicClock } from './clock.js';
 import { createDreamSessionCheckpoint, resumeDreamSessionFromRuntime, runDreamSessionFromRuntime } from './dreamSession.js';
+import { toDreamJourneyTracePolicy, toGniDreamJourneyContext } from './dreamJourney.js';
 import { toGniWeatherContext } from './dreamWeather.js';
 import { GniBridge } from './gniBridge.js';
 import { GniHttpProvider } from './gniHttpProvider.js';
@@ -440,6 +441,7 @@ function applyDreamReturnEffects({ runtime, dreamSession, sessionCovenant }) {
     dreamWeather: dreamSession.finalDreamWeather,
     weatherTrace: lastBeat?.weatherTrace ?? null
   });
+  bundle.dreamJourneyContext = toGniDreamJourneyContext(dreamJourney);
 
   return {
     entry,
@@ -624,7 +626,8 @@ function recordDreamReturnEffects(traceRecorder, { dreamSession, returnEffects }
   traceRecorder.record('dream.journey.selected', {
     summary: returnEffects.dreamJourney.summary,
     symbolTrail: returnEffects.dreamJourney.symbolTrail,
-    beats: returnEffects.dreamJourney.beats
+    beats: returnEffects.dreamJourney.beats,
+    policy: toDreamJourneyTracePolicy(returnEffects.dreamJourney)
   });
   traceRecorder.record('journal.entry.written', {
     entryId: returnEffects.entry.id,
@@ -636,7 +639,8 @@ function recordDreamReturnEffects(traceRecorder, { dreamSession, returnEffects }
     sessionId: returnEffects.sessionBundle.sessionId,
     dominantArchetype: returnEffects.sessionBundle.dominantArchetype,
     coherence: returnEffects.sessionBundle.coherence,
-    recentSymbols: returnEffects.sessionBundle.recentSymbols
+    recentSymbols: returnEffects.sessionBundle.recentSymbols,
+    dreamJourneyContext: returnEffects.sessionBundle.dreamJourneyContext
   });
 }
 

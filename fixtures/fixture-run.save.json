@@ -1011,7 +1011,12 @@
                   "roll": 7.47346
                 }
               }
-            ]
+            ],
+            "policy": {
+              "suppressedModuleIds": [],
+              "replacementRoutes": [],
+              "fallbackUsed": false
+            }
           }
         },
         {
@@ -1101,7 +1106,22 @@
               "silence",
               "awakening",
               "portal"
-            ]
+            ],
+            "dreamJourneyContext": {
+              "schema": "DreamJourneyContextV1",
+              "schemaVersion": 1,
+              "symbolTrail": [
+                "boundlessness",
+                "dissolution",
+                "silence",
+                "annihilation",
+                "rebirth",
+                "cosmic_mystery"
+              ],
+              "suppressedModuleIds": [],
+              "replacementRoutes": [],
+              "fallbackUsed": false
+            }
           }
         },
         {
@@ -1386,6 +1406,21 @@
           "claustrophobia": 0.063
         },
         "suppressedTags": []
+      },
+      "dreamJourneyContext": {
+        "schema": "DreamJourneyContextV1",
+        "schemaVersion": 1,
+        "symbolTrail": [
+          "boundlessness",
+          "dissolution",
+          "silence",
+          "annihilation",
+          "rebirth",
+          "cosmic_mystery"
+        ],
+        "suppressedModuleIds": [],
+        "replacementRoutes": [],
+        "fallbackUsed": false
       }
     },
     "pendingGniRequest": {
@@ -1551,6 +1586,21 @@
             "claustrophobia": 0.063
           },
           "suppressedTags": []
+        },
+        "dreamJourneyContext": {
+          "schema": "DreamJourneyContextV1",
+          "schemaVersion": 1,
+          "symbolTrail": [
+            "boundlessness",
+            "dissolution",
+            "silence",
+            "annihilation",
+            "rebirth",
+            "cosmic_mystery"
+          ],
+          "suppressedModuleIds": [],
+          "replacementRoutes": [],
+          "fallbackUsed": false
         }
       }
     },
@@ -1726,6 +1776,21 @@
               "claustrophobia": 0.063
             },
             "suppressedTags": []
+          },
+          "dreamJourneyContext": {
+            "schema": "DreamJourneyContextV1",
+            "schemaVersion": 1,
+            "symbolTrail": [
+              "boundlessness",
+              "dissolution",
+              "silence",
+              "annihilation",
+              "rebirth",
+              "cosmic_mystery"
+            ],
+            "suppressedModuleIds": [],
+            "replacementRoutes": [],
+            "fallbackUsed": false
           }
         }
       },

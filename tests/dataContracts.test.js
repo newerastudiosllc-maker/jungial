@@ -181,6 +181,19 @@ test('DreamSession schema documents hidden DreamJourney policy reports', async (
   ]);
 });
 
+test('SessionBundle schema documents compact DreamJourney GNI context', async () => {
+  const schema = await readJson('data/schemas/session_bundle.schema.json');
+  const context = schema.$defs.dreamJourneyContext;
+  const route = schema.$defs.dreamJourneyReplacementRoute;
+
+  assert.deepEqual(schema.properties.dreamJourneyContext, { $ref: '#/$defs/dreamJourneyContext' });
+  assert.equal(context.properties.schema.const, 'DreamJourneyContextV1');
+  assert.equal(context.additionalProperties, false);
+  assert.equal(context.properties.playerFacingText, undefined);
+  assert.equal(context.properties.rawSpeech, undefined);
+  assert.deepEqual(route.required, ['blockedId', 'selectedId', 'carriedTags', 'suppressedTags', 'reason']);
+});
+
 test('session bundle validation reports missing GNI handoff fields', () => {
   const result = validateSessionBundle({
     schema: 'SessionBundleV1',
@@ -215,6 +228,52 @@ test('session bundle validation accepts compact Witness handoff data', () => {
   });
 
   assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('session bundle validation accepts compact DreamJourney context and rejects leaks', () => {
+  const bundle = {
+    ...validSessionBundle(),
+    dreamJourneyContext: {
+      schema: 'DreamJourneyContextV1',
+      schemaVersion: 1,
+      symbolTrail: ['reflection', 'growth'],
+      suppressedModuleIds: ['shadow_mirror'],
+      replacementRoutes: [
+        {
+          blockedId: 'shadow_mirror',
+          selectedId: 'clear_mirror',
+          carriedTags: ['reflection'],
+          suppressedTags: ['shadow'],
+          reason: 'dream_journey_boundary_reroute'
+        }
+      ],
+      fallbackUsed: false
+    }
+  };
+
+  assert.deepEqual(validateSessionBundle(bundle), { valid: true, errors: [] });
+
+  const result = validateSessionBundle({
+    ...bundle,
+    dreamJourneyContext: {
+      ...bundle.dreamJourneyContext,
+      playerFacingText: 'The route changed because...',
+      rawSpeech: 'do not keep me',
+      replacementRoutes: [
+        {
+          ...bundle.dreamJourneyContext.replacementRoutes[0],
+          target: 'dreamModule'
+        }
+      ]
+    }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'dreamJourneyContext.playerFacingText is not allowed',
+    'dreamJourneyContext.rawSpeech is not allowed',
+    'dreamJourneyContext.replacementRoutes[0].target is not allowed'
+  ]);
 });
 
 test('session covenant validation accepts bounded session preferences', () => {

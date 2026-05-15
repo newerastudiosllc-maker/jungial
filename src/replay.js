@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 
 import { createJungialRuntime } from './runtime.js';
 import { saveGameState } from './persistence.js';
-import { selectDreamJourney } from './dreamJourney.js';
+import { selectDreamJourney, toDreamJourneyTracePolicy, toGniDreamJourneyContext } from './dreamJourney.js';
 import { TraceRecorder } from './trace.js';
 import { applyPlayerInput } from './input.js';
 
@@ -28,7 +28,8 @@ export async function runReplay({ script, savePath, clock = undefined, trace = u
   traceRecorder.record('dream.journey.selected', {
     summary: journey.summary,
     symbolTrail: journey.symbolTrail,
-    beats: journey.beats
+    beats: journey.beats,
+    policy: toDreamJourneyTracePolicy(journey)
   });
   const selectedDream = {
     id: journey.beats[0].moduleId,
@@ -48,10 +49,12 @@ export async function runReplay({ script, savePath, clock = undefined, trace = u
     dominantArchetype: journalEntry.dominantArchetype
   });
   const bundle = runtime.witness.toSessionBundle({ selectedDream });
+  bundle.dreamJourneyContext = toGniDreamJourneyContext(journey);
   traceRecorder.record('witness.bundle.created', {
     sessionId: bundle.sessionId,
     dominantArchetype: bundle.dominantArchetype,
-    coherence: bundle.coherence
+    coherence: bundle.coherence,
+    dreamJourneyContext: bundle.dreamJourneyContext
   });
   runtime.architect.update(bundle);
   traceRecorder.record('architect.updated', { selectedDreamId: selectedDream.id });

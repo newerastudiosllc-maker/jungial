@@ -67,6 +67,7 @@ Responsibilities:
 
 - Own GNI provider integration.
 - Maintain `SessionBundleV1`, `GniProcessingRequestV1`, and `JungialDirectiveV1`.
+- Preserve `DreamJourneyContextV1` as compact symbolic reroute evidence, not player-facing explanation.
 - Keep Firebreak and queue behavior safe.
 - Build provider monitoring, retries, and contract tests.
 

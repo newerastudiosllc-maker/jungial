@@ -86,6 +86,48 @@ test('GNI adapter includes Dream Weather context when present', () => {
   assert.notEqual(request.payload.dreamWeatherContext, dreamWeatherContext);
 });
 
+test('GNI adapter includes compact Dream Journey reroute context when present', () => {
+  const adapter = new GniAdapter({ endpoint: 'local-gni-placeholder' });
+  const dreamJourneyContext = {
+    schema: 'DreamJourneyContextV1',
+    schemaVersion: 1,
+    symbolTrail: ['reflection', 'growth'],
+    suppressedModuleIds: ['shadow_mirror'],
+    replacementRoutes: [
+      {
+        blockedId: 'shadow_mirror',
+        selectedId: 'clear_mirror',
+        carriedTags: ['reflection'],
+        suppressedTags: ['shadow'],
+        reason: 'dream_journey_boundary_reroute'
+      }
+    ],
+    fallbackUsed: false
+  };
+
+  const request = adapter.createProcessingRequest({
+    schema: 'SessionBundleV1',
+    schemaVersion: 1,
+    sessionId: 'session-reroute',
+    dominantArchetype: 'Seeker',
+    vibeState: 'calm_hopeful_boundless_bright_warm',
+    coherence: 0.5,
+    recentSymbols: [],
+    recentActions: [],
+    roomConfigSnapshot: {},
+    selectedDream: { id: 'clear_mirror', symbolicTags: ['reflection'] },
+    archetypeVector: {},
+    dreamJourneyContext
+  });
+  const serialized = JSON.stringify(request);
+
+  assert.deepEqual(request.payload.dreamJourneyContext, dreamJourneyContext);
+  assert.notEqual(request.payload.dreamJourneyContext, dreamJourneyContext);
+  assert.equal(validateGniProcessingRequest(request).valid, true);
+  assert.equal(serialized.includes('rawSpeech'), false);
+  assert.equal(serialized.includes('playerFacingText'), false);
+});
+
 test('GNI adapter redacts session covenant return anchor values for provider requests', () => {
   const adapter = new GniAdapter({ endpoint: 'local-gni-placeholder' });
   const request = adapter.createProcessingRequest({

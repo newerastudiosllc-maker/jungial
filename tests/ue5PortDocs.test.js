@@ -36,6 +36,7 @@ test('UE5 core type pseudocode documents continuous dream sessions', async () =>
   assert.match(text, /struct FDreamSessionBeatV1/);
   assert.match(text, /struct FDreamSessionV1/);
   assert.match(text, /struct FDreamJourneyPolicyV1/);
+  assert.match(text, /DreamJourneyContext/);
   assert.match(text, /ReplacementRoutes/);
   assert.match(text, /ContentGate/);
   assert.match(text, /ContentReplacementPlan/);

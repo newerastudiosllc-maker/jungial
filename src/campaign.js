@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { createDeterministicClock } from './clock.js';
 import { createJungialRuntime, extractRuntimeSnapshots } from './runtime.js';
 import { loadGameState, saveGameState } from './persistence.js';
-import { selectDreamJourney } from './dreamJourney.js';
+import { selectDreamJourney, toDreamJourneyTracePolicy, toGniDreamJourneyContext } from './dreamJourney.js';
 import { createDreamWeightOverrides } from './directorPolicy.js';
 import { GniBridge } from './gniBridge.js';
 import { SymbolGrammar } from './symbolGrammar.js';
@@ -65,7 +65,8 @@ export async function runCampaign({
       selectedDreamId: selectedDream.id,
       summary: dreamJourney.summary,
       symbolTrail: dreamJourney.symbolTrail,
-      weightOverrides
+      weightOverrides,
+      policy: toDreamJourneyTracePolicy(dreamJourney)
     });
 
     symbolGrammar.ingest({ symbols: dreamJourney.symbolTrail, vibeState: runtime.feeling.vibeState });
@@ -78,11 +79,13 @@ export async function runCampaign({
       symbolGrammar
     });
     const bundle = runtime.witness.toSessionBundle({ selectedDream });
+    bundle.dreamJourneyContext = toGniDreamJourneyContext(dreamJourney);
     trace.record('witness.bundle.created', {
       cycle: cycleNumber,
       sessionId: bundle.sessionId,
       dominantArchetype: bundle.dominantArchetype,
-      coherence: bundle.coherence
+      coherence: bundle.coherence,
+      dreamJourneyContext: bundle.dreamJourneyContext
     });
     const architectUpdate = runtime.architect.update(bundle);
     const explicitDirective = gniDirectives[index] ?? null;

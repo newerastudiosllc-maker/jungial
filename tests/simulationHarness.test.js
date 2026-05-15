@@ -7,6 +7,7 @@ import { tmpdir } from 'node:os';
 import { createGniProviderFromOptions, parseSimulationArgs, runSimulation } from '../src/simulation.js';
 import { loadGameState } from '../src/persistence.js';
 import { createDeterministicClock } from '../src/clock.js';
+import { loadBundledContentCatalog } from '../src/contentCatalog.js';
 
 test('simulation can apply a mocked GNI directive and persist the result', async () => {
   const dir = await mkdtemp(join(tmpdir(), 'jungial-sim-'));
@@ -173,6 +174,52 @@ test('simulation applies session shape presets through SaveGame and GNI covenant
   }
 });
 
+test('simulation sends Dream Journey reroute evidence to traces and GNI context', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-reroute-context-'));
+  const savePath = join(dir, 'latest.json');
+  const requests = [];
+  const catalog = loadBundledContentCatalog();
+
+  try {
+    const result = await runSimulation({
+      seed: 21,
+      savePath,
+      catalog: {
+        ...catalog,
+        dreamModules: [
+          dreamModule('shadow_mirror', 'Shadow Mirror', ['shadow', 'reflection'], 5000),
+          dreamModule('clear_mirror', 'Clear Mirror', ['reflection', 'growth'], 1),
+          dreamModule('quiet_garden', 'Quiet Garden', ['growth', 'beauty'], 1)
+        ]
+      },
+      sessionCovenant: {
+        hardBoundaryTags: ['shadow']
+      },
+      gniProvider: async (request) => {
+        requests.push(request);
+        return null;
+      }
+    });
+    const journeyEntry = result.trace.entries.find((entry) => entry.type === 'dream.journey.selected');
+    const route = {
+      blockedId: 'shadow_mirror',
+      selectedId: 'clear_mirror',
+      carriedTags: ['reflection'],
+      suppressedTags: ['shadow'],
+      reason: 'dream_journey_boundary_reroute'
+    };
+
+    assert.deepEqual(journeyEntry.payload.policy.replacementRoutes, [route]);
+    assert.deepEqual(requests[0].payload.dreamJourneyContext.replacementRoutes, [route]);
+    assert.deepEqual(requests[0].payload.dreamJourneyContext.suppressedModuleIds, ['shadow_mirror']);
+    assert.equal(requests[0].payload.dreamJourneyContext.fallbackUsed, false);
+    assert.equal(JSON.stringify(requests[0]).includes('playerFacingText'), false);
+    assert.equal(JSON.stringify(requests[0]).includes('rawSpeech'), false);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
 test('simulation can build a GNI HTTP provider from CLI options without exposing secrets', () => {
   const previous = process.env.TEST_GNI_TOKEN;
   process.env.TEST_GNI_TOKEN = 'token-from-env';
@@ -195,6 +242,17 @@ test('simulation can build a GNI HTTP provider from CLI options without exposing
     }
   }
 });
+
+function dreamModule(id, name, symbolicTags, baseWeight) {
+  return {
+    id,
+    name,
+    symbolicTags,
+    archetypeAffinities: {},
+    vibeAffinities: {},
+    baseWeight
+  };
+}
 
 test('simulation can use deterministic GNI emulator when no real directive is provided', async () => {
   const dir = await mkdtemp(join(tmpdir(), 'jungial-emulated-gni-'));

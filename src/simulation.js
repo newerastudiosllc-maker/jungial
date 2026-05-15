@@ -5,7 +5,7 @@ import { readFile } from 'node:fs/promises';
 import { createJungialRuntime } from './runtime.js';
 import { saveGameState } from './persistence.js';
 import { GniBridge } from './gniBridge.js';
-import { selectDreamJourney } from './dreamJourney.js';
+import { selectDreamJourney, toDreamJourneyTracePolicy, toGniDreamJourneyContext } from './dreamJourney.js';
 import { SymbolGrammar } from './symbolGrammar.js';
 import { createDeterministicClock } from './clock.js';
 import { TraceRecorder, writeTrace } from './trace.js';
@@ -218,7 +218,8 @@ export async function runSimulation({
   traceRecorder.record('dream.journey.selected', {
     summary: dreamJourney.summary,
     symbolTrail: dreamJourney.symbolTrail,
-    beats: dreamJourney.beats
+    beats: dreamJourney.beats,
+    policy: toDreamJourneyTracePolicy(dreamJourney)
   });
   const currentEchoTraces = [...recentEchoTraces, echoTrace];
   const weatherSourceTags = [
@@ -316,11 +317,13 @@ export async function runSimulation({
     recentEchoTraces: currentEchoTraces
   });
   bundle.dreamWeatherContext = toGniWeatherContext({ dreamWeather, weatherTrace });
+  bundle.dreamJourneyContext = toGniDreamJourneyContext(dreamJourney);
   traceRecorder.record('witness.bundle.created', {
     sessionId: bundle.sessionId,
     dominantArchetype: bundle.dominantArchetype,
     coherence: bundle.coherence,
-    recentSymbols: bundle.recentSymbols
+    recentSymbols: bundle.recentSymbols,
+    dreamJourneyContext: bundle.dreamJourneyContext
   });
   const architectUpdate = architect.update(bundle);
   const gniBridge = new GniBridge({ adapter: gni, provider: gniProvider });

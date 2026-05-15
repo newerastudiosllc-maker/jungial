@@ -39,6 +39,8 @@ It intentionally avoids raw speech, raw room text, transcripts, and arbitrary no
 
 `DreamJourneyPolicyV1` routes blocked weighted dream-module picks through compatible allowed symbols before a journey is finalized. It may store suppressed module ids, replacement routes, and boundary tags for QA/replay, but it must keep `playerFacingText` null and must not describe why the dream changed.
 
+`DreamJourneyContextV1` is the GNI-facing summary of that policy. It should include only symbolic trails, suppressed module ids, compact reroute records, and fallback state. It must not carry raw speech, player-facing text, or hidden explanatory copy.
+
 Continuous `DreamSessionV1` beats should use the shared content surface resolver so the stored beat, checkpoint, renderer handoff, and eventual GNI context all see the same final Passage and Dream Weather. The gate report and replacement plan remain internal evidence, not world language.
 
 ## Save Modes

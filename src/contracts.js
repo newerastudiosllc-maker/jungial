@@ -152,11 +152,75 @@ export function validateSessionBundle(bundle) {
       }
     }
   }
+  if (bundle?.dreamJourneyContext !== undefined) {
+    errors.push(...validateDreamJourneyContext(bundle.dreamJourneyContext, 'dreamJourneyContext'));
+  }
 
   return {
     valid: errors.length === 0,
     errors
   };
+}
+
+function validateDreamJourneyContext(context, label) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'symbolTrail',
+    'suppressedModuleIds',
+    'replacementRoutes',
+    'fallbackUsed'
+  ];
+
+  if (!isObject(context)) {
+    return [`${label} must be an object`];
+  }
+  errors.push(...validateKnownKeys(context, allowedKeys, label));
+  if (context.schema !== 'DreamJourneyContextV1') {
+    errors.push(`${label}.schema must be DreamJourneyContextV1`);
+  }
+  if (context.schemaVersion !== 1) {
+    errors.push(`${label}.schemaVersion must be 1`);
+  }
+  errors.push(...validateStringList(context.symbolTrail, `${label}.symbolTrail`));
+  errors.push(...validateStringList(context.suppressedModuleIds, `${label}.suppressedModuleIds`));
+  errors.push(...validateGniDreamJourneyReplacementRoutes(context.replacementRoutes, `${label}.replacementRoutes`));
+  if (typeof context.fallbackUsed !== 'boolean') {
+    errors.push(`${label}.fallbackUsed must be a boolean`);
+  }
+
+  return errors;
+}
+
+function validateGniDreamJourneyReplacementRoutes(routes, label) {
+  const errors = [];
+  if (!Array.isArray(routes)) {
+    return [`${label} must be an array`];
+  }
+
+  routes.forEach((route, index) => {
+    const routeLabel = `${label}[${index}]`;
+    const allowedKeys = ['blockedId', 'selectedId', 'carriedTags', 'suppressedTags', 'reason'];
+    if (!isObject(route)) {
+      errors.push(`${routeLabel} must be an object`);
+      return;
+    }
+    errors.push(...validateKnownKeys(route, allowedKeys, routeLabel));
+    if (!isNonEmptyString(route.blockedId)) {
+      errors.push(`${routeLabel}.blockedId is required`);
+    }
+    if (!isNonEmptyString(route.selectedId)) {
+      errors.push(`${routeLabel}.selectedId is required`);
+    }
+    errors.push(...validateStringList(route.carriedTags, `${routeLabel}.carriedTags`));
+    errors.push(...validateStringList(route.suppressedTags, `${routeLabel}.suppressedTags`));
+    if (!isNonEmptyString(route.reason)) {
+      errors.push(`${routeLabel}.reason is required`);
+    }
+  });
+
+  return errors;
 }
 
 export function validateDreadBudget(budget) {

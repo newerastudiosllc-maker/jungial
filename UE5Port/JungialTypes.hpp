@@ -50,6 +50,7 @@ struct FSessionBundleV1
     Array<String> RecentActions;
     JsonObject RoomConfigSnapshot;
     JsonObject SelectedDream;
+    JsonObject DreamJourneyContext; // DreamJourneyContextV1: compact symbolic reroute evidence for GNI.
     Map<EJungialArchetype, float> ArchetypeVector;
 };
 
