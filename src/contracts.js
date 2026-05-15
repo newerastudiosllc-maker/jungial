@@ -277,6 +277,100 @@ export function validateDreamWeatherContext(context) {
   };
 }
 
+export function validateThresholdPresentation(presentation) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'room',
+    'note',
+    'heartlight',
+    'portal',
+    'toolSigils',
+    'forms',
+    'atmosphere',
+    'dreamAtmosphere'
+  ];
+
+  if (presentation?.schema !== 'ThresholdPresentationV1') {
+    errors.push('schema must be ThresholdPresentationV1');
+  }
+  errors.push(...validateKnownKeys(presentation, allowedKeys, 'thresholdPresentation'));
+  for (const key of ['room', 'note', 'heartlight', 'portal', 'toolSigils', 'atmosphere']) {
+    if (!isObject(presentation?.[key])) {
+      errors.push(`${key} must be an object`);
+    }
+  }
+  if (!Array.isArray(presentation?.forms)) {
+    errors.push('forms must be an array');
+  }
+  const dreamAtmosphereValidation = validateDreamAtmospherePresentation(presentation?.dreamAtmosphere);
+  if (!dreamAtmosphereValidation.valid) {
+    errors.push(...prefixNestedErrors(
+      dreamAtmosphereValidation.errors,
+      'dreamAtmosphere',
+      'dreamAtmosphere'
+    ));
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function validateDreamAtmospherePresentation(dreamAtmosphere) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'weatherId',
+    'mood',
+    'pressure',
+    'weatherTags',
+    'lighting',
+    'fog',
+    'audio',
+    'haptics',
+    'movement',
+    'comfort'
+  ];
+
+  if (!isObject(dreamAtmosphere)) {
+    return {
+      valid: false,
+      errors: ['dreamAtmosphere must be an object']
+    };
+  }
+  if (dreamAtmosphere.schema !== 'DreamAtmospherePresentationV1') {
+    errors.push('schema must be DreamAtmospherePresentationV1');
+  }
+  if (dreamAtmosphere.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  errors.push(...validateKnownKeys(dreamAtmosphere, allowedKeys, 'dreamAtmosphere'));
+  if (!(dreamAtmosphere.weatherId === null || isNonEmptyString(dreamAtmosphere.weatherId))) {
+    errors.push('weatherId must be a non-empty string or null');
+  }
+  if (!DREAM_WEATHER_MOODS.includes(dreamAtmosphere.mood)) {
+    errors.push(`mood must be one of ${DREAM_WEATHER_MOODS.join(', ')}`);
+  }
+  if (!DREAM_WEATHER_PRESSURES.includes(dreamAtmosphere.pressure)) {
+    errors.push(`pressure must be one of ${DREAM_WEATHER_PRESSURES.join(', ')}`);
+  }
+  errors.push(...validateWeatherTagList(dreamAtmosphere.weatherTags, 'weatherTags'));
+  errors.push(...validatePresentationNumberMap(dreamAtmosphere.lighting, 'lighting'));
+  errors.push(...validatePresentationNumberMap(dreamAtmosphere.fog, 'fog'));
+  errors.push(...validatePresentationNumberMap(dreamAtmosphere.audio, 'audio'));
+  errors.push(...validatePresentationHaptics(dreamAtmosphere.haptics));
+  errors.push(...validatePresentationNumberMap(dreamAtmosphere.movement, 'movement'));
+  errors.push(...validatePresentationComfort(dreamAtmosphere.comfort));
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
 export function validateDreamerMemoryContext(context) {
   const errors = [];
   const allowedKeys = [
@@ -1062,6 +1156,11 @@ export function validateSaveGame(saveGame) {
     validateGniQueueProcessResult
   ));
   errors.push(...validateOptionalNestedContract(
+    saveGame.payload.thresholdPresentation,
+    'payload.thresholdPresentation',
+    validateThresholdPresentation
+  ));
+  errors.push(...validateOptionalNestedContract(
     saveGame.payload.dreamerProfile,
     'payload.dreamerProfile',
     validateDreamerProfile
@@ -1209,6 +1308,59 @@ function validateDreadAxisList(value, label) {
       errors.push(`${label}[${index}] must be a known dread axis`);
     }
   });
+  return errors;
+}
+
+function validatePresentationNumberMap(value, label) {
+  const errors = [];
+  if (!isObject(value)) {
+    return [`${label} must be an object`];
+  }
+  for (const [key, entry] of Object.entries(value)) {
+    errors.push(...validateNumberBetween(entry, `${label}.${key}`, 0, 1));
+  }
+  return errors;
+}
+
+function validatePresentationHaptics(value) {
+  const errors = [];
+  const allowedKeys = ['enabled', 'amplitude', 'pulseRate'];
+  if (!isObject(value)) {
+    return ['haptics must be an object'];
+  }
+  errors.push(...validateKnownKeys(value, allowedKeys, 'haptics'));
+  if (typeof value.enabled !== 'boolean') {
+    errors.push('haptics.enabled must be a boolean');
+  }
+  errors.push(...validateNumberBetween(value.amplitude, 'haptics.amplitude', 0, 1));
+  errors.push(...validateNumberBetween(value.pulseRate, 'haptics.pulseRate', 0, 1));
+  return errors;
+}
+
+function validatePresentationComfort(value) {
+  const errors = [];
+  const allowedKeys = [
+    'ceiling',
+    'suddenFlashAllowed',
+    'pursuitAllowed',
+    'locomotionIntensity',
+    'returnAnchorKind'
+  ];
+  if (!isObject(value)) {
+    return ['comfort must be an object'];
+  }
+  errors.push(...validateKnownKeys(value, allowedKeys, 'comfort'));
+  errors.push(...validateNumberBetween(value.ceiling, 'comfort.ceiling', 0, 1));
+  if (typeof value.suddenFlashAllowed !== 'boolean') {
+    errors.push('comfort.suddenFlashAllowed must be a boolean');
+  }
+  if (typeof value.pursuitAllowed !== 'boolean') {
+    errors.push('comfort.pursuitAllowed must be a boolean');
+  }
+  errors.push(...validateNumberBetween(value.locomotionIntensity, 'comfort.locomotionIntensity', 0, 1));
+  if (!isNonEmptyString(value.returnAnchorKind)) {
+    errors.push('comfort.returnAnchorKind is required');
+  }
   return errors;
 }
 

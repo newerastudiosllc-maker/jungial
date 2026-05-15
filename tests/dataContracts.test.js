@@ -22,6 +22,7 @@ import {
   validateSaveGame,
   validateSessionCovenant,
   validateSessionBundle,
+  validateThresholdPresentation,
   validateWeatherTrace
 } from '../src/contracts.js';
 import { DreamerProfile } from '../src/dreamerProfile.js';
@@ -33,6 +34,7 @@ import {
   normalizeDreadBudget,
   toGniWeatherContext
 } from '../src/dreamWeather.js';
+import { buildThresholdPresentation } from '../src/presentation.js';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 
@@ -228,6 +230,58 @@ test('validates DreadBudgetV1 contracts', () => {
   assert.deepEqual(result.errors, [
     'dreadBudget.teeth is not allowed',
     'pursuit must be between 0 and 1'
+  ]);
+});
+
+test('validates ThresholdPresentationV1 render contracts', () => {
+  const covenant = createSessionCovenant({
+    toneTags: ['dark'],
+    intensityCeiling: 0.5,
+    hardBoundaryTags: ['pursuit']
+  });
+  const dreamWeather = createDreamWeather({
+    seed: 33,
+    covenant,
+    weatherTags: ['gravity'],
+    dreadBudget: { cosmicDread: 0.4 }
+  });
+  const presentation = buildThresholdPresentation({
+    chamber: {
+      awakened: true,
+      boundaryState: 'boundless',
+      note: 'the word',
+      heartlight: { awake: true, intensity: 1, color: 'silver-blue placeholder' },
+      portalOpen: true,
+      visibleToolSigils: [],
+      spawnedForms: []
+    },
+    feeling: {},
+    dreamWeather,
+    sessionCovenant: covenant
+  });
+
+  assert.deepEqual(validateThresholdPresentation(presentation), { valid: true, errors: [] });
+
+  const result = validateThresholdPresentation({
+    ...presentation,
+    dreamAtmosphere: {
+      ...presentation.dreamAtmosphere,
+      weatherTags: ['gravity', 'raw_private_token'],
+      lighting: { ...presentation.dreamAtmosphere.lighting, bloom: 4 },
+      comfort: {
+        ...presentation.dreamAtmosphere.comfort,
+        pursuitAllowed: 'sometimes'
+      },
+      dreadBudget: dreamWeather.dreadBudget
+    }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'dreamAtmosphere.dreadBudget is not allowed',
+    'dreamAtmosphere.weatherTags[1] must be an allowed weather tag',
+    'dreamAtmosphere.lighting.bloom must be between 0 and 1',
+    'dreamAtmosphere.comfort.pursuitAllowed must be a boolean'
   ]);
 });
 

@@ -19,6 +19,7 @@ const FIXTURE_FILES = Object.freeze([
   'dreamer_memory_context_v1.json',
   'dream_weather_v1.json',
   'weather_trace_v1.json',
+  'threshold_presentation_v1.json',
   'gni_request_v1.json',
   'gni_directive_v1.json',
   'gni_bridge_result_v1.json',
@@ -72,6 +73,7 @@ export async function exportContractFixtures({
   });
   const dreamWeather = run.dreamWeather;
   const weatherTrace = run.weatherTrace;
+  const thresholdPresentation = run.thresholdPresentation;
   const gniRequest = run.gniRequest;
   const gniDirective = run.appliedGniDirective;
   const gniBridgeResult = run.gniBridgeResult;
@@ -113,6 +115,7 @@ export async function exportContractFixtures({
     'dreamer_memory_context_v1.json': dreamerMemoryContext,
     'dream_weather_v1.json': dreamWeather,
     'weather_trace_v1.json': weatherTrace,
+    'threshold_presentation_v1.json': thresholdPresentation,
     'gni_request_v1.json': gniRequest,
     'gni_directive_v1.json': gniDirective,
     'gni_bridge_result_v1.json': gniBridgeResult,

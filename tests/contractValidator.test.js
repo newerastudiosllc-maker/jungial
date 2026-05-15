@@ -7,6 +7,7 @@ import { tmpdir } from 'node:os';
 import { validateContractDocument, validateContractFiles } from '../src/contractValidator.js';
 import { createDreamWeather, createWeatherTrace } from '../src/dreamWeather.js';
 import { exportContractFixtures } from '../src/fixtureExporter.js';
+import { buildThresholdPresentation } from '../src/presentation.js';
 
 test('contract validator routes known Jungial contract schemas', () => {
   const directiveResult = validateContractDocument({
@@ -142,6 +143,18 @@ test('contract validator routes known Jungial contract schemas', () => {
     boundarySignals: [],
     dreamflowDeltas: {}
   });
+  const thresholdPresentationResult = validateContractDocument(buildThresholdPresentation({
+    chamber: {
+      awakened: true,
+      boundaryState: 'boundless',
+      note: 'the word',
+      heartlight: { awake: true, intensity: 1, color: 'silver-blue placeholder' },
+      portalOpen: true,
+      visibleToolSigils: [],
+      spawnedForms: []
+    },
+    feeling: {}
+  }));
 
   assert.deepEqual(directiveResult, { valid: true, errors: [] });
   assert.deepEqual(traceResult, { valid: true, errors: [] });
@@ -152,6 +165,7 @@ test('contract validator routes known Jungial contract schemas', () => {
   assert.deepEqual(sessionCovenantResult, { valid: true, errors: [] });
   assert.deepEqual(passageResult, { valid: true, errors: [] });
   assert.deepEqual(echoTraceResult, { valid: true, errors: [] });
+  assert.deepEqual(thresholdPresentationResult, { valid: true, errors: [] });
 });
 
 test('contract validator validates save game payload and nested GNI state', () => {
@@ -202,6 +216,7 @@ test('contract validator validates generated Dream Weather and summary fixture f
     });
 
     const report = await validateContractFiles([
+      join(dir, 'threshold_presentation_v1.json'),
       join(dir, 'dream_weather_v1.json'),
       join(dir, 'weather_trace_v1.json'),
       join(dir, 'trace_summary_v1.json'),
@@ -210,12 +225,13 @@ test('contract validator validates generated Dream Weather and summary fixture f
 
     assert.equal(report.ok, true);
     assert.deepEqual(report.files.map((file) => file.schema), [
+      'ThresholdPresentationV1',
       'DreamWeatherV1',
       'WeatherTraceV1',
       'JungialTraceSummaryV1',
       'JungialContractFixtureManifestV1'
     ]);
-    assert.deepEqual(report.files.map((file) => file.valid), [true, true, true, true]);
+    assert.deepEqual(report.files.map((file) => file.valid), [true, true, true, true, true]);
   } finally {
     await rm(dir, { recursive: true, force: true });
   }

@@ -17,6 +17,7 @@ import {
   validateSaveGame,
   validateSessionCovenant,
   validateSessionBundle,
+  validateThresholdPresentation,
   validateTrace,
   validateTraceSummary,
   validateWeatherTrace
@@ -44,6 +45,8 @@ export function validateContractDocument(document) {
       return validatePassage(document);
     case 'EchoTraceV1':
       return validateEchoTrace(document);
+    case 'ThresholdPresentationV1':
+      return validateThresholdPresentation(document);
     case 'GniBridgeResultV1':
       return validateGniBridgeResult(document);
     case 'GniContractCheckReportV1':

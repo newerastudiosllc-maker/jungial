@@ -11,6 +11,7 @@
     "dreamer_memory_context_v1.json",
     "dream_weather_v1.json",
     "weather_trace_v1.json",
+    "threshold_presentation_v1.json",
     "gni_request_v1.json",
     "gni_directive_v1.json",
     "gni_bridge_result_v1.json",
@@ -21,5 +22,5 @@
     "fixture-pending-run.save.json",
     "trace_summary_v1.json"
   ],
-  "hash": "b75c969f9a405ced453e41f5917b543cab44323141131df9746d49b15ea3eb2e"
+  "hash": "d4b96a03054aa2362e9843197804492e6a006e11cbf036fe1d6b1814efb8a6b4"
 }
