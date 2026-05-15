@@ -156,11 +156,15 @@ test('simulation applies session shape presets through SaveGame and GNI covenant
     assert.equal(result.sessionContentGate.schema, 'SessionContentGateV1');
     assert.equal(result.sessionContentGate.playerFacingText, null);
     assert.equal(result.sessionContentGate.allowed, true);
+    assert.equal(result.sessionContentReplacementPlan.schema, 'SessionContentReplacementPlanV1');
+    assert.equal(result.sessionContentReplacementPlan.status, 'not_needed');
+    assert.equal(result.sessionContentReplacementPlan.playerFacingText, null);
     assert.equal(result.sessionShapeSelection.shapeId, 'nightmare_veil');
     assert.equal(result.sessionCovenant.intensityCeiling, 0.44);
     assert.equal(result.sessionCovenant.hardBoundaryTags.includes('body_horror'), true);
     assert.equal(saved.sessionShapeSelection.shapeId, 'nightmare_veil');
     assert.deepEqual(saved.sessionContentGate, result.sessionContentGate);
+    assert.deepEqual(saved.sessionContentReplacementPlan, result.sessionContentReplacementPlan);
     assert.equal(saved.sessionCovenant.intensityCeiling, 0.44);
     assert.equal(requests[0].payload.sessionCovenant.intensityCeiling, 0.44);
     assert.equal(JSON.stringify(saved).includes('sessionShapeSelection'), true);

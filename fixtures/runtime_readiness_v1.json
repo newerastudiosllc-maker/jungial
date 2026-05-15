@@ -20,6 +20,7 @@
     "experienceDirector": true,
     "sessionFrame": true,
     "sessionContentGate": true,
+    "sessionContentReplacement": true,
     "saveResume": true,
     "asyncGniQueue": true,
     "gniFirebreak": true
@@ -33,6 +34,7 @@
     "SessionCovenantV1",
     "SessionShapeSelectionV1",
     "SessionContentGateV1",
+    "SessionContentReplacementPlanV1",
     "FirstListeningRunV1",
     "PassageV1",
     "EchoTraceV1",
@@ -70,7 +72,7 @@
       "severity": "required",
       "summary": "Versioned contract documents are available for runtime, GNI, saves, and renderer handoff.",
       "details": {
-        "contracts": 21
+        "contracts": 22
       },
       "errors": []
     },

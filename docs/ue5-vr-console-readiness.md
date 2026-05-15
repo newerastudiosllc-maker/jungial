@@ -14,6 +14,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - `UJungialDreamSessionRunner`: orchestrates multi-beat dream sessions from Passage, EchoTrace, SessionArc, DreamJourney, and DreamWeather packets.
 - `FDreamSessionCheckpointV1`: SaveGame payload for suspended long dreams, including Dreamflow RNG state.
 - `UJungialContentGateSubsystem`: audits selected Passage, DreamWeather, DreamJourney, and Mask packets against the active `SessionCovenantV1`.
+- `UJungialContentReplacementRouter`: consumes blocked gate reports and emits `SessionContentReplacementPlanV1` with safe substitute Passage/Weather packets.
 - `UArchetypeResonanceComponent`: tracks local archetype vector and event history.
 - `UFeelingEngineComponent`: maps feeling axes to lighting, fog, post-process, audio, and movement parameters.
 - `AThresholdChamberActor`: owns chamber objects, Heartlight, note, portal, and tool-sigil actors.
@@ -51,6 +52,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - GNI/GNI-emulator outputs must pass through the Firebreak before touching gameplay state.
 - GNI contract fixtures should pass strict validation before provider changes are accepted.
 - Selected content should pass `SessionContentGateV1` checks before save, renderer handoff, or replacement routing.
+- `SessionContentReplacementPlanV1` should be deterministic from gate report, covenant, catalog, and seed so QA can replay reroutes.
 - Content validation must run before packaged builds and before accepting AI-authored content.
 - `RuntimeReadinessV1` should run before a playable session starts so missing GNI can degrade safely while broken content blocks startup.
 - Session shape presets should be DataAssets or config rows that resolve into `SessionCovenantV1` before GNI, Dream Weather, or renderer systems see them.
@@ -69,6 +71,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - `DreamSessionV1` should remain a hidden orchestration packet; individual beats can feed level streaming, presentation, and GNI context without exposing the runner to the player.
 - `DreamflowRuntimeStateV1` should be stored only in SaveGame/developer traces, never surfaced as UI or player-facing language.
 - `SessionContentGateV1` should stay internal to tooling, traces, and replacement routing; UE widgets and world actors should not expose blocked reasons to the player.
+- `SessionContentReplacementPlanV1` should be applied before presentation mapping, so unsafe content never needs to be hidden by UI after it appears.
 - Speech events should be captured as intent/symbol events so platforms without microphone permission still work.
 - Console and VR builds should send the same symbolic intents as speech builds instead of branching chamber logic by platform.
 

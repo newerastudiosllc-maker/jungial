@@ -89,3 +89,12 @@ test('UE5 core type pseudocode documents session content gate reports', async ()
   assert.match(text, /ReplacementHints/);
   assert.match(text, /UJungialContentGateSubsystem/);
 });
+
+test('UE5 core type pseudocode documents session content replacement plans', async () => {
+  const text = await readFile('UE5Port/JungialTypes.hpp', 'utf8');
+
+  assert.match(text, /struct FSessionContentReplacementPlanV1/);
+  assert.match(text, /ReplacementRequired/);
+  assert.match(text, /Routes/);
+  assert.match(text, /UJungialContentReplacementRouter/);
+});

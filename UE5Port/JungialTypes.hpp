@@ -126,6 +126,36 @@ struct FSessionContentGateV1
 // It reports boundary and intensity drift before save, renderer handoff, or GNI context packaging.
 // The subsystem may request replacement content, but should never describe the hidden rule path in-world.
 
+enum class EJungialContentReplacementStatus
+{
+    NotNeeded,
+    ReplacementRequired
+};
+
+struct FSessionContentReplacementRouteV1
+{
+    String Target; // passage, dreamWeather, or mask.
+    String Action; // replace or suppress.
+    String SelectedId;
+    String Reason;
+};
+
+struct FSessionContentReplacementPlanV1
+{
+    String PlanId;
+    String SourceGateId;
+    EJungialContentReplacementStatus Status = EJungialContentReplacementStatus::NotNeeded;
+    Array<String> AvoidTags;
+    Array<String> BlockedReasons;
+    FSessionContentGateReplacementHintsV1 ReplacementHints;
+    JsonObject Replacement; // PassageV1, DreamWeatherV1, and optional Mask id.
+    Array<FSessionContentReplacementRouteV1> Routes;
+    String PlayerFacingText; // Must stay empty. The player sees the changed world, not the route.
+};
+
+// UJungialContentReplacementRouter should consume SessionContentGateV1 and emit this plan.
+// ReplacementRequired means selectors should use the replacement packet before save, renderer handoff, or GNI context.
+
 enum class EJungialRuntimeReadinessStatus
 {
     Ready,

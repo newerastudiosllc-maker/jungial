@@ -24,6 +24,7 @@ import {
   validateRuntimeReadiness,
   validateSessionArc,
   validateSessionContentGate,
+  validateSessionContentReplacementPlan,
   validateSessionCovenant,
   validateSessionShapeSelection,
   validateSessionBundle,
@@ -60,6 +61,8 @@ export function validateContractDocument(document) {
       return validateSessionShapeSelection(document);
     case 'SessionContentGateV1':
       return validateSessionContentGate(document);
+    case 'SessionContentReplacementPlanV1':
+      return validateSessionContentReplacementPlan(document);
     case 'PassageV1':
       return validatePassage(document);
     case 'EchoTraceV1':

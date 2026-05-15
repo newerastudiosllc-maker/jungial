@@ -35,6 +35,8 @@ It intentionally avoids raw speech, raw room text, transcripts, and arbitrary no
 
 `SessionContentGateV1` is the hidden audit after content selection. It checks Passage, Dream Weather, DreamJourney, and Mask packets against the current covenant, records suppressed tags and replacement hints, and stays internal. It should never become player-facing explanation, diagnostic language, or a storehouse for raw speech.
 
+`SessionContentReplacementPlanV1` is the hidden follow-up route. It can carry a safer Passage and Dream Weather packet when the gate blocks content, but it should still feel like dream continuity to the player rather than a rule correction.
+
 ## Save Modes
 
 Use these modes as the product language and system shape:
@@ -107,6 +109,7 @@ Production safety should include:
 - Session length awareness and gentle stopping points.
 - Clear separation between world voice and support resources.
 - Hidden content-gate checks before save, renderer handoff, or future replacement routing.
+- Replacement routes should swap content silently and preserve mystery; blocked reasons stay internal.
 - Human review before any medical, therapeutic, or clinical claim.
 
 ## Team Checklist

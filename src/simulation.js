@@ -17,6 +17,7 @@ import { prepareSaveSlot } from './saveSlotManager.js';
 import { advanceSessionArc } from './sessionArc.js';
 import { createSessionCovenant } from './sessionCovenant.js';
 import { createSessionContentGateReport } from './sessionContentGate.js';
+import { createSessionContentReplacementPlan } from './sessionContentReplacement.js';
 import { createSessionShapeSelection } from './sessionShape.js';
 import { createEchoTrace, selectPassage, toGniPassageContext } from './passageLattice.js';
 import { createDreamWeather, createWeatherTrace, toGniWeatherContext } from './dreamWeather.js';
@@ -268,6 +269,16 @@ export async function runSimulation({
     dreamJourney,
     mask
   });
+  const sessionContentReplacementPlan = createSessionContentReplacementPlan({
+    gateReport: sessionContentGate,
+    sessionCovenant: activeSessionCovenant,
+    sessionShapeSelection,
+    passages: contentCatalog.passages,
+    recentEchoTraces: currentEchoTraces,
+    dreamerMemoryContext,
+    architectState: architect.snapshot(),
+    seed: effectiveSeed
+  });
   traceRecorder.record('session.content_gate.created', {
     gateId: sessionContentGate.gateId,
     allowed: sessionContentGate.allowed,
@@ -431,6 +442,7 @@ export async function runSimulation({
     appliedGniDirective,
     ...(sessionShapeSelection ? { sessionShapeSelection } : {}),
     sessionContentGate,
+    sessionContentReplacementPlan,
     sessionCovenant: activeSessionCovenant,
     echoTrace,
     activePassage,
@@ -465,6 +477,7 @@ export async function runSimulation({
     sessionArcDirective,
     sessionShapeSelection,
     sessionContentGate,
+    sessionContentReplacementPlan,
     sessionCovenant: activeSessionCovenant,
     firstListeningRun,
     experienceDirective,

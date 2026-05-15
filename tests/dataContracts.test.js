@@ -30,6 +30,7 @@ import {
   validateRuntimeReadiness,
   validateSessionArc,
   validateSessionContentGate,
+  validateSessionContentReplacementPlan,
   validateSessionCovenant,
   validateSessionShapeSelection,
   validateSessionFrame,
@@ -49,6 +50,7 @@ import {
 import { buildThresholdPresentation } from '../src/presentation.js';
 import { createRuntimeReadinessReport } from '../src/runtimeReadiness.js';
 import { createSessionContentGateReport } from '../src/sessionContentGate.js';
+import { createSessionContentReplacementPlan } from '../src/sessionContentReplacement.js';
 import { createSessionShapeSelection } from '../src/sessionShape.js';
 import { createDeterministicClock } from '../src/clock.js';
 import { applyPlayerInput } from '../src/input.js';
@@ -143,6 +145,17 @@ test('Session Content Gate schema documents internal boundary audit reports', as
 
   assert.equal(schema.title, 'SessionContentGateV1');
   assert.deepEqual(schema.properties.schema, { const: 'SessionContentGateV1' });
+  assert.equal(schema.additionalProperties, false);
+  assert.equal(schema.properties.playerFacingText.type, 'null');
+  assert.equal(schema.properties.rawSpeech, undefined);
+});
+
+test('Session Content Replacement schema documents internal reroute plans', async () => {
+  const schema = await readJson('data/schemas/session_content_replacement_plan.schema.json');
+
+  assert.equal(schema.title, 'SessionContentReplacementPlanV1');
+  assert.deepEqual(schema.properties.schema, { const: 'SessionContentReplacementPlanV1' });
+  assert.deepEqual(schema.properties.status.enum, ['not_needed', 'replacement_required']);
   assert.equal(schema.additionalProperties, false);
   assert.equal(schema.properties.playerFacingText.type, 'null');
   assert.equal(schema.properties.rawSpeech, undefined);
@@ -254,6 +267,32 @@ test('Session Content Gate validation accepts internal reports and rejects leaks
   assert.equal(result.valid, false);
   assert.deepEqual(result.errors, [
     'sessionContentGate.rawSpeech is not allowed',
+    'playerFacingText must be null'
+  ]);
+});
+
+test('Session Content Replacement validation accepts internal plans and rejects leaks', () => {
+  const selection = createSessionShapeSelection({ shapeId: 'quiet_lantern' });
+  const gateReport = createSessionContentGateReport({
+    sessionShapeSelection: selection,
+    sessionCovenant: selection.covenant
+  });
+  const plan = createSessionContentReplacementPlan({
+    gateReport,
+    sessionCovenant: selection.covenant
+  });
+
+  assert.deepEqual(validateSessionContentReplacementPlan(plan), { valid: true, errors: [] });
+
+  const result = validateSessionContentReplacementPlan({
+    ...plan,
+    playerFacingText: 'The world swapped this because...',
+    rawSpeech: 'do not keep me'
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'sessionContentReplacementPlan.rawSpeech is not allowed',
     'playerFacingText must be null'
   ]);
 });

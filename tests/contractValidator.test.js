@@ -18,6 +18,7 @@ import { createExperienceDirective } from '../src/experienceDirector.js';
 import { buildSessionFrame } from '../src/sessionFrame.js';
 import { createRuntimeReadinessReport } from '../src/runtimeReadiness.js';
 import { createSessionContentGateReport } from '../src/sessionContentGate.js';
+import { createSessionContentReplacementPlan } from '../src/sessionContentReplacement.js';
 import { createSessionShapeSelection } from '../src/sessionShape.js';
 
 test('contract validator routes known Jungial contract schemas', () => {
@@ -135,6 +136,11 @@ test('contract validator routes known Jungial contract schemas', () => {
   const sessionContentGateResult = validateContractDocument(createSessionContentGateReport({
     sessionShapeSelection: createSessionShapeSelection({ shapeId: 'quiet_lantern' })
   }));
+  const sessionContentReplacementResult = validateContractDocument(createSessionContentReplacementPlan({
+    gateReport: createSessionContentGateReport({
+      sessionShapeSelection: createSessionShapeSelection({ shapeId: 'quiet_lantern' })
+    })
+  }));
   const passageResult = validateContractDocument({
     schema: 'PassageV1',
     schemaVersion: 1,
@@ -215,6 +221,7 @@ test('contract validator routes known Jungial contract schemas', () => {
   assert.deepEqual(sessionCovenantResult, { valid: true, errors: [] });
   assert.deepEqual(sessionShapeResult, { valid: true, errors: [] });
   assert.deepEqual(sessionContentGateResult, { valid: true, errors: [] });
+  assert.deepEqual(sessionContentReplacementResult, { valid: true, errors: [] });
   assert.deepEqual(passageResult, { valid: true, errors: [] });
   assert.deepEqual(echoTraceResult, { valid: true, errors: [] });
   assert.deepEqual(firebreakTraceResult, { valid: true, errors: [] });
@@ -374,6 +381,7 @@ test('contract validator validates generated Dream Weather and summary fixture f
       join(dir, 'session_frame_v1.json'),
       join(dir, 'session_shape_selection_v1.json'),
       join(dir, 'session_content_gate_v1.json'),
+      join(dir, 'session_content_replacement_plan_v1.json'),
       join(dir, 'runtime_readiness_v1.json'),
       join(dir, 'dream_session_v1.json'),
       join(dir, 'dream_session_checkpoint_v1.json'),
@@ -393,6 +401,7 @@ test('contract validator validates generated Dream Weather and summary fixture f
       'SessionFrameV1',
       'SessionShapeSelectionV1',
       'SessionContentGateV1',
+      'SessionContentReplacementPlanV1',
       'RuntimeReadinessV1',
       'DreamSessionV1',
       'DreamSessionCheckpointV1',
@@ -401,7 +410,7 @@ test('contract validator validates generated Dream Weather and summary fixture f
       'JungialTraceSummaryV1',
       'JungialContractFixtureManifestV1'
     ]);
-    assert.deepEqual(report.files.map((file) => file.valid), [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true]);
+    assert.deepEqual(report.files.map((file) => file.valid), [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true]);
   } finally {
     await rm(dir, { recursive: true, force: true });
   }

@@ -229,6 +229,7 @@ The current contract schemas live in `data/schemas/`:
 - `session_covenant.schema.json`
 - `session_shape_selection.schema.json`
 - `session_content_gate.schema.json`
+- `session_content_replacement_plan.schema.json`
 - `passage.schema.json`
 - `echo_trace.schema.json`
 - `first_listening.schema.json`
@@ -252,7 +253,7 @@ The current contract schemas live in `data/schemas/`:
 
 ## Runtime Readiness
 
-`src/runtimeReadiness.js` builds `RuntimeReadinessV1`, an internal preflight report for the prototype and future UE5/VR/console boot path. It marks required blockers, optional degradations, known platform targets, active contracts, and core capabilities before a session starts. Missing GNI degrades the report but does not block the chamber; invalid content blocks startup. The current capability list includes the hidden content gate so production builds know boundary audits are wired before play.
+`src/runtimeReadiness.js` builds `RuntimeReadinessV1`, an internal preflight report for the prototype and future UE5/VR/console boot path. It marks required blockers, optional degradations, known platform targets, active contracts, and core capabilities before a session starts. Missing GNI degrades the report but does not block the chamber; invalid content blocks startup. The current capability list includes the hidden content gate and replacement route so production builds know boundary audits and fallback content packets are wired before play.
 
 Run it with:
 
@@ -311,6 +312,8 @@ See `docs/dreamer-memory-and-safety.md` for the product/architecture guardrails:
 
 `SessionContentGateV1` is the final internal audit over the selected Passage, Dream Weather, DreamJourney, and Mask. It records whether the current content stays inside the covenant, which tags were suppressed, and replacement hints for future UE5/GNI routing. It stays out of in-world narration and never stores raw player speech.
 
+`SessionContentReplacementPlanV1` is the quiet reroute packet created from the content gate. If the gate allows the content, the plan is `not_needed`; if the gate blocks it, the plan carries a covenant-safe replacement Passage, Dream Weather packet, avoid tags, and route records. The player only experiences the changed dream surface.
+
 The system can become strange, dark, or horrific when the covenant allows it, while exact Passage repeats and boundary violations are filtered before GNI or Dreamflow can use them.
 
 `SessionArcV1` is the hidden pacing layer for immersive long sessions. It tracks pressure, return readiness, recent beat roles, and the current arc decision so Dreamflow can deepen, distort, mirror, soften, or return without showing the machinery to the player.
@@ -335,7 +338,7 @@ Export GNI contract fixtures:
 npm run fixtures
 ```
 
-This writes `fixtures/session_bundle_v1.json`, `fixtures/session_covenant_v1.json`, `fixtures/session_shape_selection_v1.json`, `fixtures/session_content_gate_v1.json`, `fixtures/passage_v1.json`, `fixtures/echo_trace_v1.json`, `fixtures/first_listening_v1.json`, `fixtures/experience_directive_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/session_arc_v1.json`, `fixtures/dream_session_v1.json`, `fixtures/dream_session_checkpoint_v1.json`, `fixtures/dream_weather_v1.json`, `fixtures/weather_trace_v1.json`, `fixtures/threshold_presentation_v1.json`, `fixtures/session_frame_v1.json`, `fixtures/runtime_readiness_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_firebreak_trace_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_contract_check_report_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
+This writes `fixtures/session_bundle_v1.json`, `fixtures/session_covenant_v1.json`, `fixtures/session_shape_selection_v1.json`, `fixtures/session_content_gate_v1.json`, `fixtures/session_content_replacement_plan_v1.json`, `fixtures/passage_v1.json`, `fixtures/echo_trace_v1.json`, `fixtures/first_listening_v1.json`, `fixtures/experience_directive_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/session_arc_v1.json`, `fixtures/dream_session_v1.json`, `fixtures/dream_session_checkpoint_v1.json`, `fixtures/dream_weather_v1.json`, `fixtures/weather_trace_v1.json`, `fixtures/threshold_presentation_v1.json`, `fixtures/session_frame_v1.json`, `fixtures/runtime_readiness_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_firebreak_trace_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_contract_check_report_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
 
 The provider-safe fixture surface is `gni_request_v1.json` and its nested `SessionBundleV1`. Full SaveGame fixtures are internal examples for resume, migration, and QA flows; they may include local or session state that should not be treated as provider input.
 
@@ -354,10 +357,11 @@ npm run contracts
 5. Key of Portals opens a transition.
 6. Dreamflow selects Cabin, Garden, Boundless White Void, Space / Black Hole, or Mirror Hall.
 7. The hidden content gate audits the Passage, atmosphere, journey, and mask against the active covenant.
-8. A mask may emerge.
-9. Journal of Mirrors writes a placeholder poetic entry.
-10. ArchitectState updates long-range weights.
-11. Save JSON is written.
+8. A replacement plan is created internally if the chosen surface needs to reroute.
+9. A mask may emerge.
+10. Journal of Mirrors writes a placeholder poetic entry.
+11. ArchitectState updates long-range weights.
+12. Save JSON is written.
 
 For longer play, `src/dreamSession.js` can chain many hidden beats after the portal opens. That runner is the foundation for an intense, evolving dream that keeps responding until the player returns or the caller stops the loop.
 
@@ -376,6 +380,7 @@ For longer play, `src/dreamSession.js` can chain many hidden beats after the por
 - `GniDirectiveQueue` -> SaveGame-backed async GNI request queue
 - `SessionShapeSelectionV1` -> preset-to-covenant handoff for gentle through horrific starts
 - `SessionContentGateV1` -> `UJungialContentGateSubsystem` audit before save, renderer handoff, and future replacement routing
+- `SessionContentReplacementPlanV1` -> `UJungialContentReplacementRouter` fallback packet for safe Passage/Weather substitution
 - `SessionFrameV1` -> renderer/audio/haptics handoff packet for UE5, VR, console, and browser prototypes
 - `RuntimeReadinessV1` -> internal startup preflight for build gates, QA, and platform boot checks
 - `JournalOfMirrors` -> SaveGame-backed library model

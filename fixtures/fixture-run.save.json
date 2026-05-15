@@ -1834,6 +1834,40 @@
       },
       "playerFacingText": null
     },
+    "sessionContentReplacementPlan": {
+      "schema": "SessionContentReplacementPlanV1",
+      "schemaVersion": 1,
+      "planId": "replacement-plan-204c35b2ed01",
+      "sourceGateId": "content-gate-0972746d7bd7",
+      "status": "not_needed",
+      "avoidTags": [
+        "real_world_self_harm"
+      ],
+      "blockedReasons": [],
+      "replacementHints": {
+        "preferredToneTags": [
+          "curious",
+          "deep"
+        ],
+        "allowedPressureTags": [
+          "threshold",
+          "word",
+          "lamp",
+          "breath"
+        ],
+        "passageIntensityBand": "gentle",
+        "weatherPressure": "medium",
+        "returnAnchorKind": "image",
+        "groundingPreference": "quiet_room"
+      },
+      "replacement": {
+        "passage": null,
+        "dreamWeather": null,
+        "maskId": null
+      },
+      "routes": [],
+      "playerFacingText": null
+    },
     "sessionCovenant": {
       "schema": "SessionCovenantV1",
       "schemaVersion": 1,

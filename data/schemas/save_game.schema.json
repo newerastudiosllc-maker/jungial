@@ -31,6 +31,7 @@
         "dreamerProfile": { "$ref": "dreamer_profile.schema.json" },
         "sessionShapeSelection": { "$ref": "session_shape_selection.schema.json" },
         "sessionContentGate": { "$ref": "session_content_gate.schema.json" },
+        "sessionContentReplacementPlan": { "$ref": "session_content_replacement_plan.schema.json" },
         "sessionCovenant": { "$ref": "session_covenant.schema.json" },
         "echoTrace": { "$ref": "echo_trace.schema.json" },
         "dreamWeather": { "$ref": "dream_weather.schema.json" },

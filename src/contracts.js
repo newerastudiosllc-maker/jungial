@@ -71,6 +71,7 @@ const RUNTIME_READINESS_CAPABILITIES = Object.freeze([
   'experienceDirector',
   'sessionFrame',
   'sessionContentGate',
+  'sessionContentReplacement',
   'saveResume',
   'asyncGniQueue',
   'gniFirebreak'
@@ -814,6 +815,53 @@ export function validateSessionContentGate(gate) {
   errors.push(...validateStringList(gate?.blockedReasons, 'blockedReasons'));
   errors.push(...validateSessionContentGateReplacementHints(gate?.replacementHints));
   if (gate?.playerFacingText !== null) {
+    errors.push('playerFacingText must be null');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function validateSessionContentReplacementPlan(plan) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'planId',
+    'sourceGateId',
+    'status',
+    'avoidTags',
+    'blockedReasons',
+    'replacementHints',
+    'replacement',
+    'routes',
+    'playerFacingText'
+  ];
+
+  if (plan?.schema !== 'SessionContentReplacementPlanV1') {
+    errors.push('schema must be SessionContentReplacementPlanV1');
+  }
+  if (plan?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  errors.push(...validateKnownKeys(plan, allowedKeys, 'sessionContentReplacementPlan'));
+  if (!isNonEmptyString(plan?.planId)) {
+    errors.push('planId is required');
+  }
+  if (!isNullableString(plan?.sourceGateId)) {
+    errors.push('sourceGateId must be a string or null');
+  }
+  if (!['not_needed', 'replacement_required'].includes(plan?.status)) {
+    errors.push('status must be not_needed or replacement_required');
+  }
+  errors.push(...validateStringList(plan?.avoidTags, 'avoidTags'));
+  errors.push(...validateStringList(plan?.blockedReasons, 'blockedReasons'));
+  errors.push(...validateSessionContentGateReplacementHints(plan?.replacementHints));
+  errors.push(...validateSessionContentReplacement(plan?.replacement));
+  errors.push(...validateSessionContentReplacementRoutes(plan?.routes));
+  if (plan?.playerFacingText !== null) {
     errors.push('playerFacingText must be null');
   }
 
@@ -2198,6 +2246,11 @@ export function validateSaveGame(saveGame) {
     validateSessionContentGate
   ));
   errors.push(...validateOptionalNestedContract(
+    saveGame.payload.sessionContentReplacementPlan,
+    'payload.sessionContentReplacementPlan',
+    validateSessionContentReplacementPlan
+  ));
+  errors.push(...validateOptionalNestedContract(
     saveGame.payload.sessionArc,
     'payload.sessionArc',
     validateSessionArc
@@ -2377,6 +2430,60 @@ function validateSessionContentGateReplacementHints(value) {
   if (!isNonEmptyString(value.groundingPreference)) {
     errors.push('replacementHints.groundingPreference is required');
   }
+  return errors;
+}
+
+function validateSessionContentReplacement(value) {
+  const errors = [];
+  const allowedKeys = ['passage', 'dreamWeather', 'maskId'];
+  if (!isObject(value)) {
+    return ['replacement must be an object'];
+  }
+  errors.push(...validateKnownKeys(value, allowedKeys, 'replacement'));
+  if (value.passage !== null) {
+    const passageValidation = validatePassage(value.passage);
+    if (!passageValidation.valid) {
+      errors.push(...prefixNestedErrors(passageValidation.errors, 'replacement.passage', 'passage'));
+    }
+  }
+  if (value.dreamWeather !== null) {
+    const weatherValidation = validateDreamWeather(value.dreamWeather);
+    if (!weatherValidation.valid) {
+      errors.push(...prefixNestedErrors(weatherValidation.errors, 'replacement.dreamWeather', 'dreamWeather'));
+    }
+  }
+  if (!isNullableString(value.maskId)) {
+    errors.push('replacement.maskId must be a string or null');
+  }
+  return errors;
+}
+
+function validateSessionContentReplacementRoutes(value) {
+  const errors = [];
+  const allowedKeys = ['target', 'action', 'selectedId', 'reason'];
+  if (!Array.isArray(value)) {
+    return ['routes must be an array'];
+  }
+  value.forEach((route, index) => {
+    const label = `routes[${index}]`;
+    if (!isObject(route)) {
+      errors.push(`${label} must be an object`);
+      return;
+    }
+    errors.push(...validateKnownKeys(route, allowedKeys, label));
+    if (!['passage', 'dreamWeather', 'mask'].includes(route.target)) {
+      errors.push(`${label}.target must be passage, dreamWeather, or mask`);
+    }
+    if (!['replace', 'suppress'].includes(route.action)) {
+      errors.push(`${label}.action must be replace or suppress`);
+    }
+    if (!isNullableString(route.selectedId)) {
+      errors.push(`${label}.selectedId must be a string or null`);
+    }
+    if (!isNonEmptyString(route.reason)) {
+      errors.push(`${label}.reason is required`);
+    }
+  });
   return errors;
 }
 
