@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/save_slot_plan.schema.json",
+  "title": "SaveSlotPlanV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "schemaVersion",
+    "slotId",
+    "mode",
+    "incarnationIndex",
+    "runSeed",
+    "crossSaveEchoes",
+    "sourceProfileId",
+    "profile",
+    "dreamerMemoryContext"
+  ],
+  "properties": {
+    "schema": { "const": "SaveSlotPlanV1" },
+    "schemaVersion": { "const": 1 },
+    "slotId": { "type": "string", "minLength": 1 },
+    "mode": { "enum": ["fresh", "continue", "new_incarnation"] },
+    "incarnationIndex": { "type": "integer", "minimum": 0 },
+    "runSeed": { "type": "integer", "minimum": 0 },
+    "crossSaveEchoes": { "type": "boolean" },
+    "sourceProfileId": { "type": ["string", "null"] },
+    "profile": { "$ref": "dreamer_profile.schema.json" },
+    "dreamerMemoryContext": { "$ref": "dreamer_memory_context.schema.json" }
+  },
+  "additionalProperties": false
+}

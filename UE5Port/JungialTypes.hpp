@@ -52,3 +52,22 @@ struct FSessionBundleV1
     JsonObject SelectedDream;
     Map<EJungialArchetype, float> ArchetypeVector;
 };
+
+enum class ESaveSlotMode
+{
+    Fresh,
+    Continue,
+    NewIncarnation
+};
+
+struct FSaveSlotPlanV1
+{
+    String SlotId;
+    ESaveSlotMode Mode = ESaveSlotMode::Continue;
+    int32 IncarnationIndex = 0;
+    int32 RunSeed = 0;
+    bool bCrossSaveEchoes = false;
+    String SourceProfileId;
+    JsonObject DreamerProfile;
+    JsonObject DreamerMemoryContext;
+};

@@ -207,6 +207,7 @@ The current contract schemas live in `data/schemas/`:
 - `weather_trace.schema.json`
 - `dreamer_profile.schema.json`
 - `dreamer_memory_context.schema.json`
+- `save_slot_plan.schema.json`
 - `gni_processing_request.schema.json`
 - `gni_directive.schema.json`
 - `gni_firebreak_trace.schema.json`
@@ -244,6 +245,8 @@ Use `--trace=<path>` on simulation runs to write a standalone trace JSON file. S
 ## Dreamer Memory And Safety
 
 `DreamerProfileV1` is the hidden long-term memory layer for gradual personalization across sessions. It stores redacted symbolic aggregates, not raw speech or private transcripts, and can provide `DreamerMemoryContextV1` to GNI without exposing the mechanics to the player.
+
+`SaveSlotPlanV1` is the internal handoff for `fresh`, `continue`, and `new_incarnation` starts. It derives the effective run seed, chooses the active profile, and only allows cross-save echoes through the redacted memory context when the profile consent allows it.
 
 See `docs/dreamer-memory-and-safety.md` for the product/architecture guardrails: mystery in-world, transparent profile controls out-of-world, save/incarnation modes, and safety boundaries around therapeutic positioning.
 

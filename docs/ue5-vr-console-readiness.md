@@ -7,6 +7,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 ## Proposed UE5 Mapping
 
 - `UJungialRuntimeSubsystem`: validates DataAssets and wires services.
+- `UJungialSaveSlotSubsystem`: prepares `SaveSlotPlanV1` for fresh, continue, and new incarnation starts before runtime bootstrap.
 - `UArchetypeResonanceComponent`: tracks local archetype vector and event history.
 - `UFeelingEngineComponent`: maps feeling axes to lighting, fog, post-process, audio, and movement parameters.
 - `AThresholdChamberActor`: owns chamber objects, Heartlight, note, portal, and tool-sigil actors.
@@ -28,6 +29,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - All procedural choices must accept a seed or UE `FRandomStream`.
 - Runtime timestamps and session IDs must come from an injected clock/session service during replays and QA captures.
 - Runtime services must hydrate from SaveGame snapshots so campaign memory can survive process restarts.
+- Save slot starts must derive deterministic run seeds from slot id, mode, incarnation index, profile root seed, and session count so new saves do not collapse into identical paths.
 - Replay scripts should produce stable dream journey, journal text shape, and ArchitectState.
 - QA and GNI debugging should use `JungialTraceV1` audit output rather than adding exposition to the world.
 - Scenario matrices should gate changes to procedural logic with stable hashes for selected dream, journey, trace summary, and journal shape.

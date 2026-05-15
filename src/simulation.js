@@ -13,6 +13,7 @@ import { applyPlayerInput } from './input.js';
 import { GniHttpProvider } from './gniHttpProvider.js';
 import { buildThresholdPresentation } from './presentation.js';
 import { DreamerProfile } from './dreamerProfile.js';
+import { prepareSaveSlot } from './saveSlotManager.js';
 import { createSessionCovenant } from './sessionCovenant.js';
 import { createEchoTrace, selectPassage, toGniPassageContext } from './passageLattice.js';
 import { createDreamWeather, createWeatherTrace, toGniWeatherContext } from './dreamWeather.js';
@@ -33,12 +34,34 @@ export async function runSimulation({
   dreamerProfile = null,
   saveSlotId = 'default',
   saveMode = 'continue',
+  incarnationIndex = null,
   sessionCovenant = null,
   passageResponse = null,
   recentEchoTraces = []
 } = {}) {
+  const saveSlot = shouldPrepareSaveSlot({ dreamerProfile, saveSlotId, saveMode, incarnationIndex })
+    ? prepareSaveSlot({
+        profileSnapshot: dreamerProfile,
+        slotId: saveSlotId,
+        mode: saveMode,
+        incarnationIndex,
+        clock: clock?.fork?.() ?? undefined
+      })
+    : null;
+  const effectiveSeed = saveSlot?.runSeed ?? seed;
   const traceRecorder = trace ?? new TraceRecorder({ clock: clock?.fork?.() ?? undefined });
-  traceRecorder.record('simulation.started', { seed, emulateGni, hasGniResponse: Boolean(gniResponse) });
+  traceRecorder.record('simulation.started', {
+    seed: effectiveSeed,
+    emulateGni,
+    hasGniResponse: Boolean(gniResponse),
+    ...(saveSlot
+      ? {
+          requestedSeed: seed,
+          saveMode: saveSlot.mode,
+          saveSlotId: saveSlot.slotId
+        }
+      : {})
+  });
 
   const {
     catalog: contentCatalog,
@@ -52,12 +75,17 @@ export async function runSimulation({
     masks,
     gni,
     gniQueue
-  } = createJungialRuntime({ seed, catalog, clock });
-  const dreamer = dreamerProfile
-    ? new DreamerProfile(dreamerProfile, { clock: clock?.fork?.() ?? undefined })
-    : null;
+  } = createJungialRuntime({ seed: effectiveSeed, catalog, clock });
+  const dreamer = saveSlot?.profile
+    ? new DreamerProfile(saveSlot.profile, { clock: clock?.fork?.() ?? undefined })
+    : dreamerProfile
+      ? new DreamerProfile(dreamerProfile, { clock: clock?.fork?.() ?? undefined })
+      : null;
+  const activeSaveSlotId = saveSlot?.slotId ?? saveSlotId;
+  const activeSaveMode = saveSlot?.mode ?? saveMode;
+  const dreamerMemoryContext = saveSlot?.dreamerMemoryContext
+    ?? (dreamer ? dreamer.toGniMemoryContext({ slotId: activeSaveSlotId, mode: activeSaveMode }) : null);
   const activeSessionCovenant = createSessionCovenant(sessionCovenant ?? {});
-  const dreamerMemoryContext = dreamer?.toGniMemoryContext({ slotId: saveSlotId, mode: saveMode }) ?? null;
 
   const transcript = [];
   transcript.push('Threshold Chamber: silent, dim, confined.');
@@ -309,7 +337,8 @@ export async function runSimulation({
     activePassage,
     dreamWeather,
     weatherTrace,
-    ...(dreamerProfileSnapshot ? { dreamerProfile: dreamerProfileSnapshot } : {})
+    ...(dreamerProfileSnapshot ? { dreamerProfile: dreamerProfileSnapshot } : {}),
+    ...(saveSlot ? { saveSlot: { ...saveSlot, profile: dreamerProfileSnapshot ?? saveSlot.profile } } : {})
   }, { clock });
   transcript.push(`Saved session JSON to ${savePath}.`);
 
@@ -336,8 +365,17 @@ export async function runSimulation({
     dreamWeather,
     weatherTrace,
     dreamerProfile: dreamerProfileSnapshot,
+    saveSlot: saveSlot ? { ...saveSlot, profile: dreamerProfileSnapshot ?? saveSlot.profile } : null,
+    effectiveSeed,
     savePath
   };
+}
+
+function shouldPrepareSaveSlot({ dreamerProfile, saveSlotId, saveMode, incarnationIndex }) {
+  return Boolean(dreamerProfile)
+    || saveSlotId !== 'default'
+    || saveMode !== 'continue'
+    || incarnationIndex !== null;
 }
 
 export function parseSimulationArgs(args) {

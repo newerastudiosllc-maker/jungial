@@ -1142,6 +1142,69 @@ function validateContractCheckDirectiveReport(directive, label) {
   };
 }
 
+export function validateSaveSlotPlan(plan) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'slotId',
+    'mode',
+    'incarnationIndex',
+    'runSeed',
+    'crossSaveEchoes',
+    'sourceProfileId',
+    'profile',
+    'dreamerMemoryContext'
+  ];
+
+  if (plan?.schema !== 'SaveSlotPlanV1') {
+    errors.push('schema must be SaveSlotPlanV1');
+  }
+  if (plan?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  errors.push(...validateKnownKeys(plan, allowedKeys, 'saveSlot'));
+  if (!isNonEmptyString(plan?.slotId)) {
+    errors.push('slotId is required');
+  }
+  if (!['fresh', 'continue', 'new_incarnation'].includes(plan?.mode)) {
+    errors.push('mode must be fresh, continue, or new_incarnation');
+  }
+  if (!isNonNegativeInteger(plan?.incarnationIndex)) {
+    errors.push('incarnationIndex must be a non-negative integer');
+  }
+  if (!isNonNegativeInteger(plan?.runSeed)) {
+    errors.push('runSeed must be a non-negative integer');
+  }
+  if (typeof plan?.crossSaveEchoes !== 'boolean') {
+    errors.push('crossSaveEchoes must be a boolean');
+  }
+  if (!isNullableString(plan?.sourceProfileId)) {
+    errors.push('sourceProfileId must be a string or null');
+  }
+  if (!isObject(plan?.profile)) {
+    errors.push('profile must be an object');
+  } else {
+    const profileValidation = validateDreamerProfile(plan.profile);
+    if (!profileValidation.valid) {
+      errors.push(...profileValidation.errors.map((error) => `profile.${error}`));
+    }
+  }
+  if (!isObject(plan?.dreamerMemoryContext)) {
+    errors.push('dreamerMemoryContext must be an object');
+  } else {
+    const memoryValidation = validateDreamerMemoryContext(plan.dreamerMemoryContext);
+    if (!memoryValidation.valid) {
+      errors.push(...memoryValidation.errors.map((error) => `dreamerMemoryContext.${error}`));
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
 export function validateSaveGame(saveGame) {
   const errors = [];
 
@@ -1217,6 +1280,11 @@ export function validateSaveGame(saveGame) {
     saveGame.payload.dreamerProfile,
     'payload.dreamerProfile',
     validateDreamerProfile
+  ));
+  errors.push(...validateOptionalNestedContract(
+    saveGame.payload.saveSlot,
+    'payload.saveSlot',
+    validateSaveSlotPlan
   ));
   errors.push(...validateOptionalNestedContract(
     saveGame.payload.sessionCovenant,

@@ -21,6 +21,7 @@ import {
   validateGniProcessingRequest,
   validatePassage,
   validateSaveGame,
+  validateSaveSlotPlan,
   validateSessionCovenant,
   validateSessionBundle,
   validateThresholdPresentation,
@@ -863,6 +864,56 @@ test('save game validation checks optional Dreamer profile payload', () => {
   assert.deepEqual(result.errors, ['payload.dreamerProfile.profileId is required']);
 });
 
+test('SaveSlotPlan validation accepts slot mode and redacted memory context', () => {
+  const result = validateSaveSlotPlan({
+    schema: 'SaveSlotPlanV1',
+    schemaVersion: 1,
+    slotId: 'slot-a',
+    mode: 'new_incarnation',
+    incarnationIndex: 2,
+    runSeed: 12345,
+    crossSaveEchoes: true,
+    sourceProfileId: 'dreamer-source',
+    profile: validDreamerProfile(),
+    dreamerMemoryContext: {
+      ...validDreamerMemoryContext(),
+      saveMode: 'new_incarnation'
+    }
+  });
+
+  assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('save game validation checks optional SaveSlotPlan payload', () => {
+  const result = validateSaveGame({
+    ...validSaveGame(),
+    payload: {
+      ...validSaveGame().payload,
+      saveSlot: {
+        schema: 'SaveSlotPlanV1',
+        schemaVersion: 1,
+        slotId: '',
+        mode: 'old_life',
+        incarnationIndex: -1,
+        runSeed: -4,
+        crossSaveEchoes: 'yes',
+        sourceProfileId: null,
+        profile: validDreamerProfile(),
+        dreamerMemoryContext: validDreamerMemoryContext()
+      }
+    }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'payload.saveSlot.slotId is required',
+    'payload.saveSlot.mode must be fresh, continue, or new_incarnation',
+    'payload.saveSlot.incarnationIndex must be a non-negative integer',
+    'payload.saveSlot.runSeed must be a non-negative integer',
+    'payload.saveSlot.crossSaveEchoes must be a boolean'
+  ]);
+});
+
 test('GNI contract check report validation accepts endpoint check summaries', () => {
   const result = validateGniContractCheckReport({
     schema: 'GniContractCheckReportV1',
@@ -1253,6 +1304,43 @@ function validFirebreakTrace() {
       maskPressure: 0,
       pacingDelta: 1
     }
+  };
+}
+
+function validDreamerProfile() {
+  return new DreamerProfile({
+    profileId: 'dreamer-source',
+    rootSeed: 'root-source',
+    createdAt: '2080-01-01T00:00:00.000Z',
+    updatedAt: '2080-01-01T00:00:00.000Z',
+    consent: {
+      profileMemory: true,
+      crossSaveEchoes: true
+    }
+  }).snapshot();
+}
+
+function validDreamerMemoryContext() {
+  return {
+    schema: 'DreamerMemoryContextV1',
+    schemaVersion: 1,
+    profileId: 'dreamer-source',
+    slotId: 'slot-a',
+    saveMode: 'continue',
+    sessionCount: 1,
+    strongSymbols: ['portal'],
+    recurringArchetypes: ['Seeker'],
+    familiarMasks: [],
+    familiarDreamModules: [],
+    familiarActions: [],
+    familiarPassages: [],
+    familiarMotifs: [],
+    familiarGestures: [],
+    echoThreadIds: [],
+    vibeEchoes: [],
+    familiarWeatherTags: [],
+    familiarDreadAxes: [],
+    lastSessionDigest: 'digest-one'
   };
 }
 

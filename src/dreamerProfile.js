@@ -139,13 +139,14 @@ export class DreamerProfile {
     return this.snapshot();
   }
 
-  deriveRunSeed({ slotId = 'default', mode = 'continue', incarnationIndex = 0 } = {}) {
+  deriveRunSeed({ slotId = 'default', mode = 'continue', incarnationIndex = 0, sessionOrdinal = this.memory.sessionCount } = {}) {
     return SeededRandom.normalizeSeed(stableHash({
       profileId: this.profileId,
       rootSeed: this.rootSeed,
       slotId,
       mode,
-      incarnationIndex
+      incarnationIndex,
+      sessionOrdinal
     }));
   }
 

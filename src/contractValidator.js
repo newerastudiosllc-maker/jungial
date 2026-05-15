@@ -16,6 +16,7 @@ import {
   validateGniProcessingRequest,
   validatePassage,
   validateSaveGame,
+  validateSaveSlotPlan,
   validateSessionCovenant,
   validateSessionBundle,
   validateThresholdPresentation,
@@ -66,6 +67,8 @@ export function validateContractDocument(document) {
       return validateFixtureManifest(document);
     case 'JungialSaveGame':
       return validateSaveGame(document);
+    case 'SaveSlotPlanV1':
+      return validateSaveSlotPlan(document);
     default:
       return {
         valid: false,

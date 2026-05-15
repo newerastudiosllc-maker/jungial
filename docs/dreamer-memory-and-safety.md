@@ -35,6 +35,8 @@ Use these modes as the product language and system shape:
 
 Every save slot should derive procedural seeds from profile root seed, slot id, mode, and incarnation index so two saves do not collapse into the same dream path.
 
+`SaveSlotPlanV1` is the runtime contract for this. It stores the slot id, mode, incarnation index, effective run seed, active redacted profile, and the redacted GNI memory context. In `new_incarnation`, the active profile begins empty; cross-save echoes come only from `DreamerMemoryContextV1` when consent allows them.
+
 ## Consent Controls
 
 Minimum controls to keep before production:
@@ -112,4 +114,3 @@ Before adding any in-world explanation, ask:
 - Does this break the dream?
 - Does this reveal scoring or model logic?
 - Can the same idea be expressed as atmosphere, symbol, recurrence, or object behavior?
-
