@@ -1,9 +1,12 @@
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { readFile } from 'node:fs/promises';
 
 import { createDeterministicClock } from './clock.js';
 import { createDreamSessionCheckpoint, resumeDreamSessionFromRuntime, runDreamSessionFromRuntime } from './dreamSession.js';
 import { toGniWeatherContext } from './dreamWeather.js';
+import { GniBridge } from './gniBridge.js';
+import { GniHttpProvider } from './gniHttpProvider.js';
 import { applyPlayerInput } from './input.js';
 import { buildThresholdPresentation } from './presentation.js';
 import { loadGameState, saveGameState } from './persistence.js';
@@ -67,6 +70,9 @@ export async function resumeDreamSessionCheckpointRun({
   stopWhenReturnAvailable = false,
   sessionCovenant = null,
   dreamerMemoryContext = null,
+  gniResponse = null,
+  gniProvider = null,
+  emulateGni = false,
   catalog = undefined,
   clock = undefined
 } = {}) {
@@ -97,12 +103,23 @@ export async function resumeDreamSessionCheckpointRun({
   const returnEffects = shouldApplyReturnEffects
     ? applyDreamReturnEffects({ runtime, dreamSession, sessionCovenant: activeSessionCovenant })
     : null;
+  const gniEffects = returnEffects
+    ? await processDreamReturnGni({
+        runtime,
+        returnEffects,
+        gniResponse,
+        gniProvider,
+        emulateGni,
+        seed: dreamSession.seed
+      })
+    : null;
   const savePayload = createDreamSessionSavePayload({
     runtime,
     dreamSession,
     checkpoint: resumedCheckpoint,
     sessionCovenant: activeSessionCovenant,
     returnEffects,
+    gniEffects,
     previousState: savedState
   });
   const transcript = ['Dream session resumed from checkpoint.'];
@@ -110,6 +127,12 @@ export async function resumeDreamSessionCheckpointRun({
   if (returnEffects?.entry) {
     transcript.push(`Journal of Mirrors: ${returnEffects.entry.text}`);
     transcript.push(`Architect updates ${Object.keys(returnEffects.architectUpdate.adjustedWeights).length} dream weight(s).`);
+    transcript.push(`GNI request prepared as ${gniEffects.pendingGniRequest.contract.inputFormat} -> ${gniEffects.pendingGniRequest.contract.outputFormat}.`);
+    if (gniEffects.appliedGniDirective) {
+      transcript.push(`GNI directive applied: ${Object.keys(gniEffects.appliedGniDirective.dreamWeightDeltas).length} dream delta(s).`);
+    } else if (gniEffects.queuedGniRequest) {
+      transcript.push('GNI request queued for later processing.');
+    }
   } else if (!resumedCheckpoint.isComplete) {
     transcript.push(`Dream session checkpoint saved to ${outputPath}.`);
   } else {
@@ -124,6 +147,11 @@ export async function resumeDreamSessionCheckpointRun({
     checkpoint: resumedCheckpoint,
     entry: returnEffects?.entry ?? null,
     architectUpdate: returnEffects?.architectUpdate ?? null,
+    gniRequest: gniEffects?.pendingGniRequest ?? null,
+    gniBridgeResult: gniEffects?.gniBridgeResult ?? null,
+    gniQueue: runtime.gniQueue.snapshot(),
+    appliedGniDirective: gniEffects?.appliedGniDirective ?? null,
+    directiveUpdate: gniEffects?.directiveUpdate ?? null,
     thresholdPresentation: savePayload.thresholdPresentation,
     sessionCovenant: activeSessionCovenant,
     savePath,
@@ -139,6 +167,9 @@ export async function runDreamSessionCheckpointDemo({
     toneTags: ['strange', 'dark'],
     intensityCeiling: 0.62
   },
+  gniResponse = null,
+  gniProvider = null,
+  emulateGni = false,
   clock = undefined,
   catalog = undefined
 } = {}) {
@@ -159,6 +190,9 @@ export async function runDreamSessionCheckpointDemo({
     savePath: checkpointSavePath,
     outputPath: finalSavePath,
     sessionCovenant,
+    gniResponse,
+    gniProvider,
+    emulateGni,
     catalog,
     clock,
     responses: [
@@ -191,6 +225,16 @@ export function parseDreamSessionSaveFlowArgs(args = []) {
       options.checkpointSavePath = arg.slice('--checkpoint-save='.length);
     } else if (arg.startsWith('--final-save=')) {
       options.finalSavePath = arg.slice('--final-save='.length);
+    } else if (arg.startsWith('--gni-response=')) {
+      options.gniResponsePath = arg.slice('--gni-response='.length);
+    } else if (arg === '--emulate-gni') {
+      options.emulateGni = true;
+    } else if (arg.startsWith('--gni-endpoint=')) {
+      options.gniEndpoint = arg.slice('--gni-endpoint='.length);
+    } else if (arg.startsWith('--gni-token-env=')) {
+      options.gniTokenEnv = arg.slice('--gni-token-env='.length);
+    } else if (arg.startsWith('--gni-timeout-ms=')) {
+      options.gniTimeoutMs = Number(arg.slice('--gni-timeout-ms='.length));
     } else if (arg.startsWith('--clock-start=')) {
       options.clockStartIso = arg.slice('--clock-start='.length);
     } else if (arg.startsWith('--clock-step-ms=')) {
@@ -201,6 +245,19 @@ export function parseDreamSessionSaveFlowArgs(args = []) {
   }
 
   return options;
+}
+
+export function createGniProviderFromDreamSessionOptions(options = {}) {
+  if (!options.gniEndpoint) {
+    return null;
+  }
+
+  const tokenEnv = options.gniTokenEnv ?? 'GNI_API_KEY';
+  return new GniHttpProvider({
+    endpoint: options.gniEndpoint,
+    bearerToken: process.env[tokenEnv] ?? '',
+    timeoutMs: Number.isFinite(options.gniTimeoutMs) ? options.gniTimeoutMs : 10000
+  });
 }
 
 function prepareThreshold(runtime) {
@@ -252,12 +309,50 @@ function applyDreamReturnEffects({ runtime, dreamSession, sessionCovenant }) {
   };
 }
 
+async function processDreamReturnGni({
+  runtime,
+  returnEffects,
+  gniResponse,
+  gniProvider,
+  emulateGni,
+  seed
+}) {
+  const gniBridge = new GniBridge({ adapter: runtime.gni, provider: gniProvider });
+  const gniBridgeResult = await gniBridge.processSessionBundle({
+    sessionBundle: returnEffects.sessionBundle,
+    providedDirective: gniResponse,
+    emulate: emulateGni,
+    seed
+  });
+  const pendingGniRequest = gniBridgeResult.request;
+  const appliedGniDirective = gniBridgeResult.directive;
+  const queuedGniRequest = !appliedGniDirective && pendingGniRequest
+    ? runtime.gniQueue.enqueue({
+        request: pendingGniRequest,
+        reason: gniBridgeResult.status,
+        providerJob: gniBridgeResult.providerJob
+      })
+    : null;
+  const directiveUpdate = appliedGniDirective
+    ? runtime.architect.applyDirective(appliedGniDirective)
+    : null;
+
+  return {
+    pendingGniRequest,
+    gniBridgeResult,
+    queuedGniRequest,
+    appliedGniDirective,
+    directiveUpdate
+  };
+}
+
 function createDreamSessionSavePayload({
   runtime,
   dreamSession,
   checkpoint,
   sessionCovenant,
   returnEffects = null,
+  gniEffects = null,
   previousState = {}
 }) {
   const lastBeat = dreamSession.beats.at(-1) ?? null;
@@ -293,6 +388,10 @@ function createDreamSessionSavePayload({
     dreamWeather: dreamSession.finalDreamWeather ?? previousState.dreamWeather ?? null,
     weatherTrace: lastBeat?.weatherTrace ?? previousState.weatherTrace ?? null,
     lastSessionBundle: returnEffects?.sessionBundle ?? previousState.lastSessionBundle,
+    pendingGniRequest: gniEffects?.pendingGniRequest ?? previousState.pendingGniRequest,
+    gniBridgeResult: gniEffects?.gniBridgeResult ?? previousState.gniBridgeResult,
+    appliedGniDirective: gniEffects ? gniEffects.appliedGniDirective : previousState.appliedGniDirective,
+    directiveUpdate: gniEffects ? gniEffects.directiveUpdate : previousState.directiveUpdate,
     gniQueue: runtime.gniQueue.snapshot()
   });
 }
@@ -351,7 +450,15 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const clock = options.clockStartIso
     ? createDeterministicClock({ startIso: options.clockStartIso, stepMs: options.clockStepMs ?? 1000 })
     : undefined;
-  const result = await runDreamSessionCheckpointDemo({ ...options, clock });
+  const gniResponse = options.gniResponsePath
+    ? JSON.parse(await readFile(options.gniResponsePath, 'utf8'))
+    : null;
+  const result = await runDreamSessionCheckpointDemo({
+    ...options,
+    gniResponse,
+    gniProvider: createGniProviderFromDreamSessionOptions(options),
+    clock
+  });
 
   if (options.json) {
     console.log(JSON.stringify(result, null, 2));

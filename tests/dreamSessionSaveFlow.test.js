@@ -107,11 +107,118 @@ test('dream session checkpoint demo writes both save files and reports a transcr
   }
 });
 
+test('resumed dream sessions queue pending GNI work after final return', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-dream-session-gni-pending-'));
+  const checkpointPath = join(dir, 'checkpoint.json');
+  const finalPath = join(dir, 'final.json');
+
+  try {
+    await startDreamSessionCheckpointRun({
+      seed: 808,
+      savePath: checkpointPath,
+      maxBeats: 5,
+      checkpointAfterBeats: 2,
+      responses: [
+        { kind: 'approach', gestureTags: ['approached'], pressureAccepted: 0.4 },
+        { kind: 'speak', gestureTags: ['answered'], pressureAccepted: 0.46 }
+      ],
+      clock: createDeterministicClock({ startIso: '2098-01-01T00:00:00.000Z' })
+    });
+
+    const result = await resumeDreamSessionCheckpointRun({
+      savePath: checkpointPath,
+      outputPath: finalPath,
+      gniProvider: async () => null,
+      responses: [
+        { kind: 'wait', gestureTags: ['listened'], pressureAccepted: 0.3 },
+        {
+          kind: 'return_anchor',
+          gestureTags: ['touched_note'],
+          pressureAccepted: 0.2,
+          returnAnchorUsed: true,
+          rawSpeech: 'do not send this private return phrase'
+        }
+      ],
+      clock: createDeterministicClock({ startIso: '2098-01-02T00:00:00.000Z' })
+    });
+    const saved = await loadGameState(finalPath);
+    const serialized = JSON.stringify(saved);
+
+    assert.equal(result.gniBridgeResult.status, 'provider_empty');
+    assert.equal(saved.pendingGniRequest.schema, 'GniProcessingRequestV1');
+    assert.equal(saved.gniBridgeResult.status, 'provider_empty');
+    assert.equal(saved.gniQueue.pending.length, 1);
+    assert.equal(saved.gniQueue.pending[0].reason, 'provider_empty');
+    assert.equal(saved.gniQueue.pending[0].request.payload.sessionId, saved.lastSessionBundle.sessionId);
+    assert.equal(saved.appliedGniDirective, null);
+    assert.equal(serialized.includes('do not send this private return phrase'), false);
+    assert.equal(serialized.includes('rawSpeech'), false);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('resumed dream sessions apply ready GNI directives after final return', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-dream-session-gni-directive-'));
+  const checkpointPath = join(dir, 'checkpoint.json');
+  const finalPath = join(dir, 'final.json');
+
+  try {
+    await startDreamSessionCheckpointRun({
+      seed: 909,
+      savePath: checkpointPath,
+      maxBeats: 5,
+      checkpointAfterBeats: 2,
+      sessionCovenant: { intensityCeiling: 0.8 },
+      responses: [
+        { kind: 'approach', gestureTags: ['approached'], pressureAccepted: 0.4 },
+        { kind: 'speak', gestureTags: ['answered'], pressureAccepted: 0.46 }
+      ],
+      clock: createDeterministicClock({ startIso: '2099-01-01T00:00:00.000Z' })
+    });
+
+    const result = await resumeDreamSessionCheckpointRun({
+      savePath: checkpointPath,
+      outputPath: finalPath,
+      sessionCovenant: { intensityCeiling: 0.8 },
+      gniResponse: {
+        schema: 'JungialDirectiveV1',
+        schemaVersion: 1,
+        dreamWeightDeltas: { garden: 0.4 },
+        symbolEchoes: ['mirror'],
+        maskPressure: { double: 0.2 },
+        pacingDelta: { repetition: 0.2 }
+      },
+      responses: [
+        { kind: 'wait', gestureTags: ['listened'], pressureAccepted: 0.3 },
+        { kind: 'return_anchor', gestureTags: ['touched_note'], pressureAccepted: 0.2, returnAnchorUsed: true }
+      ],
+      clock: createDeterministicClock({ startIso: '2099-01-02T00:00:00.000Z' })
+    });
+    const saved = await loadGameState(finalPath);
+
+    assert.equal(result.gniBridgeResult.source, 'provided');
+    assert.equal(result.appliedGniDirective.schema, 'JungialDirectiveV1');
+    assert.equal(saved.appliedGniDirective.dreamWeightDeltas.garden, 0.4);
+    assert.equal(saved.architectState.globalDreamWeights.garden >= 1.4, true);
+    assert.equal(saved.architectState.symbolFrequency.mirror, 1);
+    assert.equal(saved.gniQueue.pending.length, 0);
+    assert.equal(result.directiveUpdate.adjustedWeights.garden, saved.architectState.globalDreamWeights.garden);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
 test('dream session checkpoint CLI args parse save paths and deterministic clock options', () => {
   const options = parseDreamSessionSaveFlowArgs([
     '--seed=909',
     '--checkpoint-save=saves/checkpoint.json',
     '--final-save=saves/final.json',
+    '--gni-response=data/mock_gni_directive.json',
+    '--emulate-gni',
+    '--gni-endpoint=https://gni.local/process',
+    '--gni-token-env=TEST_GNI_TOKEN',
+    '--gni-timeout-ms=2500',
     '--clock-start=2097-01-01T00:00:00.000Z',
     '--clock-step-ms=250',
     '--json'
@@ -121,6 +228,11 @@ test('dream session checkpoint CLI args parse save paths and deterministic clock
     seed: 909,
     checkpointSavePath: 'saves/checkpoint.json',
     finalSavePath: 'saves/final.json',
+    gniResponsePath: 'data/mock_gni_directive.json',
+    emulateGni: true,
+    gniEndpoint: 'https://gni.local/process',
+    gniTokenEnv: 'TEST_GNI_TOKEN',
+    gniTimeoutMs: 2500,
     clockStartIso: '2097-01-01T00:00:00.000Z',
     clockStepMs: 250,
     json: true
