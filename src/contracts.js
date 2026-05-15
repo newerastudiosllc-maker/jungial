@@ -59,7 +59,7 @@ const DREAM_WEATHER_PRESSURES = Object.freeze(['low', 'medium', 'heavy', 'storm'
 const SESSION_ARC_PHASES = Object.freeze(['opening', 'deepening', 'distorting', 'mirroring', 'softening', 'returning']);
 const SESSION_ARC_DECISIONS = Object.freeze(['deepen', 'distort', 'mirror', 'soften', 'return']);
 const SESSION_ARC_ROLES = Object.freeze(['entry', 'pressure', 'mirror', 'return']);
-const DREAM_SESSION_END_REASONS = Object.freeze(['max_beats', 'return_anchor', 'return_available']);
+const DREAM_SESSION_END_REASONS = Object.freeze(['max_beats', 'checkpoint', 'return_anchor', 'return_available']);
 const DREAM_JOURNEY_WEIGHT_KEYS = Object.freeze([
   'base',
   'archetype',
@@ -1318,6 +1318,7 @@ export function validateDreamSession(session) {
     'beats',
     'finalSessionArc',
     'recentEchoTraces',
+    'dreamflowState',
     'finalDreamWeather',
     'finalSelectedDream'
   ];
@@ -1379,6 +1380,14 @@ export function validateDreamSession(session) {
       }
     });
   }
+  if (!isObject(session?.dreamflowState)) {
+    errors.push('dreamflowState must be an object');
+  } else {
+    const flowValidation = validateDreamflowRuntimeState(session.dreamflowState);
+    if (!flowValidation.valid) {
+      errors.push(...flowValidation.errors);
+    }
+  }
   if (!hasOwn(session, 'finalDreamWeather')) {
     errors.push('finalDreamWeather is required');
   } else if (session?.finalDreamWeather !== null) {
@@ -1395,6 +1404,145 @@ export function validateDreamSession(session) {
     if (!selectedValidation.valid) {
       errors.push(...selectedValidation.errors);
     }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function validateDreamSessionCheckpoint(checkpoint) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'sessionId',
+    'seed',
+    'maxBeats',
+    'completedBeats',
+    'nextBeatIndex',
+    'endedBecause',
+    'isComplete',
+    'beats',
+    'finalSessionArc',
+    'recentEchoTraces',
+    'dreamflowState',
+    'finalDreamWeather',
+    'finalSelectedDream'
+  ];
+
+  if (checkpoint?.schema !== 'DreamSessionCheckpointV1') {
+    errors.push('schema must be DreamSessionCheckpointV1');
+  }
+  if (checkpoint?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  errors.push(...validateKnownKeys(checkpoint, allowedKeys, 'dreamSessionCheckpoint'));
+  if (!isNonEmptyString(checkpoint?.sessionId)) {
+    errors.push('sessionId is required');
+  }
+  if (!(typeof checkpoint?.seed === 'string' || Number.isFinite(checkpoint?.seed))) {
+    errors.push('seed must be a string or number');
+  }
+  if (!Number.isInteger(checkpoint?.maxBeats) || checkpoint.maxBeats < 1 || checkpoint.maxBeats > 24) {
+    errors.push('maxBeats must be an integer between 1 and 24');
+  }
+  if (!isNonNegativeInteger(checkpoint?.completedBeats)) {
+    errors.push('completedBeats must be a non-negative integer');
+  }
+  if (checkpoint?.nextBeatIndex !== (checkpoint?.completedBeats ?? -2) + 1) {
+    errors.push('nextBeatIndex must be completedBeats + 1');
+  }
+  if (!DREAM_SESSION_END_REASONS.includes(checkpoint?.endedBecause)) {
+    errors.push('endedBecause is unsupported');
+  }
+  if (typeof checkpoint?.isComplete !== 'boolean') {
+    errors.push('isComplete must be a boolean');
+  }
+  if (typeof checkpoint?.isComplete === 'boolean' && DREAM_SESSION_END_REASONS.includes(checkpoint?.endedBecause)) {
+    const expectedComplete = checkpoint.endedBecause !== 'checkpoint';
+    if (checkpoint.isComplete !== expectedComplete) {
+      errors.push('isComplete must match endedBecause');
+    }
+  }
+  if (!Array.isArray(checkpoint?.beats)) {
+    errors.push('beats must be an array');
+  } else {
+    if (isNonNegativeInteger(checkpoint?.completedBeats) && checkpoint.completedBeats !== checkpoint.beats.length) {
+      errors.push('completedBeats must equal beats length');
+    }
+    checkpoint.beats.forEach((beat, index) => {
+      const beatValidation = validateDreamSessionBeat(beat, index);
+      if (!beatValidation.valid) {
+        errors.push(...beatValidation.errors);
+      }
+    });
+  }
+  if (!isObject(checkpoint?.finalSessionArc)) {
+    errors.push('finalSessionArc must be an object');
+  } else {
+    errors.push(...validateOptionalNestedContract(
+      checkpoint.finalSessionArc,
+      'finalSessionArc',
+      validateSessionArc
+    ));
+  }
+  if (!Array.isArray(checkpoint?.recentEchoTraces)) {
+    errors.push('recentEchoTraces must be an array');
+  } else {
+    checkpoint.recentEchoTraces.forEach((trace, index) => {
+      const traceValidation = validateEchoTrace(trace);
+      if (!traceValidation.valid) {
+        errors.push(...prefixNestedErrors(traceValidation.errors, `recentEchoTraces[${index}]`, 'echoTrace'));
+      }
+    });
+  }
+  if (!isObject(checkpoint?.dreamflowState)) {
+    errors.push('dreamflowState must be an object');
+  } else {
+    const flowValidation = validateDreamflowRuntimeState(checkpoint.dreamflowState);
+    if (!flowValidation.valid) {
+      errors.push(...flowValidation.errors);
+    }
+  }
+  if (!hasOwn(checkpoint, 'finalDreamWeather')) {
+    errors.push('finalDreamWeather is required');
+  } else if (checkpoint?.finalDreamWeather !== null) {
+    errors.push(...validateOptionalNestedContract(
+      checkpoint.finalDreamWeather,
+      'finalDreamWeather',
+      validateDreamWeather
+    ));
+  }
+  if (!hasOwn(checkpoint, 'finalSelectedDream')) {
+    errors.push('finalSelectedDream is required');
+  } else if (checkpoint?.finalSelectedDream !== null) {
+    const selectedValidation = validateSelectedDream(checkpoint.finalSelectedDream, 'finalSelectedDream');
+    if (!selectedValidation.valid) {
+      errors.push(...selectedValidation.errors);
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function validateDreamflowRuntimeState(state, label = 'dreamflowState') {
+  const errors = [];
+  const allowedKeys = ['schema', 'schemaVersion', 'randomState'];
+
+  if (state?.schema !== 'DreamflowRuntimeStateV1') {
+    errors.push(`${label}.schema must be DreamflowRuntimeStateV1`);
+  }
+  if (state?.schemaVersion !== 1) {
+    errors.push(`${label}.schemaVersion must be 1`);
+  }
+  errors.push(...validateKnownKeys(state, allowedKeys, label));
+  if (!(state?.randomState === null || (Number.isInteger(state?.randomState) && state.randomState >= 0 && state.randomState <= 0xffffffff))) {
+    errors.push(`${label}.randomState must be null or an unsigned integer`);
   }
 
   return {
@@ -1649,6 +1797,11 @@ export function validateSaveGame(saveGame) {
     saveGame.payload.dreamSession,
     'payload.dreamSession',
     validateDreamSession
+  ));
+  errors.push(...validateOptionalNestedContract(
+    saveGame.payload.dreamSessionCheckpoint,
+    'payload.dreamSessionCheckpoint',
+    validateDreamSessionCheckpoint
   ));
   errors.push(...validateOptionalNestedContract(
     saveGame.payload.sessionCovenant,

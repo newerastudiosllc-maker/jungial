@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/dream_session_checkpoint.schema.json",
+  "title": "DreamSessionCheckpointV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "schemaVersion",
+    "sessionId",
+    "seed",
+    "maxBeats",
+    "completedBeats",
+    "nextBeatIndex",
+    "endedBecause",
+    "isComplete",
+    "beats",
+    "finalSessionArc",
+    "recentEchoTraces",
+    "dreamflowState",
+    "finalDreamWeather",
+    "finalSelectedDream"
+  ],
+  "properties": {
+    "schema": { "const": "DreamSessionCheckpointV1" },
+    "schemaVersion": { "const": 1 },
+    "sessionId": { "type": "string", "minLength": 1 },
+    "seed": { "type": ["string", "number"] },
+    "maxBeats": { "type": "integer", "minimum": 1, "maximum": 24 },
+    "completedBeats": { "type": "integer", "minimum": 0 },
+    "nextBeatIndex": { "type": "integer", "minimum": 1 },
+    "endedBecause": { "enum": ["max_beats", "checkpoint", "return_anchor", "return_available"] },
+    "isComplete": { "type": "boolean" },
+    "beats": {
+      "type": "array",
+      "items": { "$ref": "dream_session.schema.json#/$defs/dreamSessionBeat" }
+    },
+    "finalSessionArc": { "$ref": "session_arc.schema.json" },
+    "recentEchoTraces": {
+      "type": "array",
+      "items": { "$ref": "echo_trace.schema.json" }
+    },
+    "dreamflowState": { "$ref": "dream_session.schema.json#/$defs/dreamflowRuntimeState" },
+    "finalDreamWeather": {
+      "anyOf": [
+        { "$ref": "dream_weather.schema.json" },
+        { "type": "null" }
+      ]
+    },
+    "finalSelectedDream": {
+      "anyOf": [
+        { "$ref": "dream_session.schema.json#/$defs/selectedDream" },
+        { "type": "null" }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

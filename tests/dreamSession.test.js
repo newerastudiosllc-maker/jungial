@@ -5,7 +5,11 @@ import { createDeterministicClock } from '../src/clock.js';
 import { applyPlayerInput } from '../src/input.js';
 import { createJungialRuntime } from '../src/runtime.js';
 import { createSessionCovenant } from '../src/sessionCovenant.js';
-import { runDreamSessionFromRuntime } from '../src/dreamSession.js';
+import {
+  createDreamSessionCheckpoint,
+  resumeDreamSessionFromRuntime,
+  runDreamSessionFromRuntime
+} from '../src/dreamSession.js';
 
 function createReadyRuntime(seed = 777) {
   const runtime = createJungialRuntime({
@@ -131,4 +135,90 @@ test('continuous dream sessions are deterministic from runtime seed and response
   });
 
   assert.deepEqual(first, second);
+});
+
+test('dream session checkpoints resume to the same path as uninterrupted play', () => {
+  const covenant = createSessionCovenant({ toneTags: ['strange', 'dark'], intensityCeiling: 0.62 });
+  const responses = [
+    { kind: 'approach', gestureTags: ['approached'], pressureAccepted: 0.4 },
+    { kind: 'speak', gestureTags: ['answered'], pressureAccepted: 0.46 },
+    { kind: 'wait', gestureTags: ['listened'], pressureAccepted: 0.3 },
+    { kind: 'approach', gestureTags: ['opened'], pressureAccepted: 0.5 },
+    { kind: 'speak', gestureTags: ['named'], pressureAccepted: 0.52 }
+  ];
+  const uninterrupted = runDreamSessionFromRuntime({
+    runtime: createReadyRuntime(55),
+    covenant,
+    seed: 2025,
+    maxBeats: 5,
+    responses
+  });
+  const partial = runDreamSessionFromRuntime({
+    runtime: createReadyRuntime(55),
+    covenant,
+    seed: 2025,
+    maxBeats: 5,
+    beatsToRun: 2,
+    responses: responses.slice(0, 2)
+  });
+  const checkpoint = createDreamSessionCheckpoint(partial);
+  const resumed = resumeDreamSessionFromRuntime({
+    runtime: createReadyRuntime(55),
+    checkpoint,
+    covenant,
+    responses: responses.slice(2),
+    beatsToRun: 3
+  });
+
+  assert.equal(partial.endedBecause, 'checkpoint');
+  assert.equal(checkpoint.schema, 'DreamSessionCheckpointV1');
+  assert.equal(checkpoint.nextBeatIndex, 3);
+  assert.equal(checkpoint.isComplete, false);
+  assert.deepEqual(resumed, uninterrupted);
+});
+
+test('dream session checkpoints stay redacted', () => {
+  const partial = runDreamSessionFromRuntime({
+    runtime: createReadyRuntime(56),
+    covenant: createSessionCovenant({ intensityCeiling: 0.45 }),
+    seed: 2026,
+    maxBeats: 4,
+    beatsToRun: 1,
+    responses: [{
+      kind: 'speak',
+      gestureTags: ['answered'],
+      pressureAccepted: 0.4,
+      rawSpeech: 'do not preserve this private sentence'
+    }]
+  });
+  const checkpoint = createDreamSessionCheckpoint(partial);
+  const serialized = JSON.stringify(checkpoint);
+
+  assert.equal(serialized.includes('do not preserve this private sentence'), false);
+  assert.equal(serialized.includes('rawSpeech'), false);
+});
+
+test('complete dream session checkpoints do not resume into extra beats', () => {
+  const completed = runDreamSessionFromRuntime({
+    runtime: createReadyRuntime(57),
+    covenant: createSessionCovenant({ intensityCeiling: 0.7 }),
+    seed: 2027,
+    maxBeats: 5,
+    responses: [
+      { kind: 'approach', gestureTags: ['approached'], pressureAccepted: 0.4 },
+      { kind: 'return_anchor', gestureTags: ['touched_note'], pressureAccepted: 0.2, returnAnchorUsed: true }
+    ]
+  });
+  const checkpoint = createDreamSessionCheckpoint(completed);
+  const resumed = resumeDreamSessionFromRuntime({
+    runtime: createReadyRuntime(57),
+    checkpoint,
+    covenant: createSessionCovenant({ intensityCeiling: 0.7 }),
+    responses: [
+      { kind: 'speak', gestureTags: ['should_not_happen'], pressureAccepted: 0.9 }
+    ]
+  });
+
+  assert.equal(checkpoint.isComplete, true);
+  assert.deepEqual(resumed, completed);
 });

@@ -25,6 +25,7 @@ test('fixture exporter writes stable GNI handoff fixtures', async () => {
       'dreamer_memory_context_v1.json',
       'session_arc_v1.json',
       'dream_session_v1.json',
+      'dream_session_checkpoint_v1.json',
       'dream_weather_v1.json',
       'weather_trace_v1.json',
       'threshold_presentation_v1.json',
@@ -49,6 +50,7 @@ test('fixture exporter writes stable GNI handoff fixtures', async () => {
     const memoryContext = JSON.parse(await readFile(join(dir, 'dreamer_memory_context_v1.json'), 'utf8'));
     const sessionArc = JSON.parse(await readFile(join(dir, 'session_arc_v1.json'), 'utf8'));
     const dreamSession = JSON.parse(await readFile(join(dir, 'dream_session_v1.json'), 'utf8'));
+    const dreamSessionCheckpoint = JSON.parse(await readFile(join(dir, 'dream_session_checkpoint_v1.json'), 'utf8'));
     const dreamWeather = JSON.parse(await readFile(join(dir, 'dream_weather_v1.json'), 'utf8'));
     const weatherTrace = JSON.parse(await readFile(join(dir, 'weather_trace_v1.json'), 'utf8'));
     const thresholdPresentation = JSON.parse(await readFile(join(dir, 'threshold_presentation_v1.json'), 'utf8'));
@@ -74,6 +76,9 @@ test('fixture exporter writes stable GNI handoff fixtures', async () => {
     assert.equal(dreamSession.schema, 'DreamSessionV1');
     assert.equal(dreamSession.completedBeats, 3);
     assert.equal(dreamSession.beats[0].echoTrace.schema, 'EchoTraceV1');
+    assert.equal(dreamSessionCheckpoint.schema, 'DreamSessionCheckpointV1');
+    assert.equal(dreamSessionCheckpoint.nextBeatIndex, dreamSession.completedBeats + 1);
+    assert.deepEqual(dreamSessionCheckpoint.dreamflowState, dreamSession.dreamflowState);
     assert.equal(dreamWeather.schema, 'DreamWeatherV1');
     assert.equal(dreamWeather.schemaVersion, 1);
     assert.equal(typeof dreamWeather.dreadBudget, 'object');

@@ -8,6 +8,7 @@ import { ARCHETYPES } from '../src/constants.js';
 import {
   validateDirective,
   validateDreamSession,
+  validateDreamSessionCheckpoint,
   validateEchoTrace,
   validateDreamerMemoryContext,
   validateDreamerProfile,
@@ -42,7 +43,7 @@ import { buildThresholdPresentation } from '../src/presentation.js';
 import { createDeterministicClock } from '../src/clock.js';
 import { applyPlayerInput } from '../src/input.js';
 import { createJungialRuntime } from '../src/runtime.js';
-import { runDreamSessionFromRuntime } from '../src/dreamSession.js';
+import { createDreamSessionCheckpoint, runDreamSessionFromRuntime } from '../src/dreamSession.js';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 
@@ -914,6 +915,39 @@ test('DreamSession validation accepts continuous hidden session results', () => 
   const result = validateDreamSession(validDreamSession());
 
   assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('DreamSessionCheckpoint validation accepts pause-ready hidden state', () => {
+  const result = validateDreamSessionCheckpoint(createDreamSessionCheckpoint(validDreamSession()));
+
+  assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('save game validation checks optional DreamSessionCheckpoint payload', () => {
+  const checkpoint = createDreamSessionCheckpoint(validDreamSession());
+  const result = validateSaveGame({
+    ...validSaveGame(),
+    payload: {
+      ...validSaveGame().payload,
+      dreamSessionCheckpoint: {
+        ...checkpoint,
+        nextBeatIndex: 1,
+        isComplete: 'no',
+        dreamflowState: {
+          schema: 'DreamflowRuntimeStateV1',
+          schemaVersion: 1,
+          randomState: -1
+        }
+      }
+    }
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'payload.dreamSessionCheckpoint.nextBeatIndex must be completedBeats + 1',
+    'payload.dreamSessionCheckpoint.isComplete must be a boolean',
+    'payload.dreamSessionCheckpoint.dreamflowState.randomState must be null or an unsigned integer'
+  ]);
 });
 
 test('save game validation checks optional DreamSession payload', () => {

@@ -210,6 +210,7 @@ The current contract schemas live in `data/schemas/`:
 - `save_slot_plan.schema.json`
 - `session_arc.schema.json`
 - `dream_session.schema.json`
+- `dream_session_checkpoint.schema.json`
 - `gni_processing_request.schema.json`
 - `gni_directive.schema.json`
 - `gni_firebreak_trace.schema.json`
@@ -260,7 +261,9 @@ The system can become strange, dark, or horrific when the covenant allows it, wh
 
 `SessionArcV1` is the hidden pacing layer for immersive long sessions. It tracks pressure, return readiness, recent beat roles, and the current arc decision so Dreamflow can deepen, distort, mirror, soften, or return without showing the machinery to the player.
 
-`DreamSessionV1` is the continuous dream runner result. Each hidden beat gathers a Passage, records a redacted EchoTrace, advances Session Arc, selects a DreamJourney, and resolves Dream Weather. It can keep moving until a return anchor is used, return becomes available, or the beat limit is reached. Raw player wording is not stored in the session.
+`DreamSessionV1` is the continuous dream runner result. Each hidden beat gathers a Passage, records a redacted EchoTrace, advances Session Arc, selects a DreamJourney, and resolves Dream Weather. It can keep moving until a return anchor is used, return becomes available, the beat limit is reached, or a checkpoint is requested. Raw player wording is not stored in the session.
+
+`DreamSessionCheckpointV1` is the pause/resume packet for long sessions. It stores completed hidden beats, the final arc, recent redacted EchoTraces, and `DreamflowRuntimeStateV1` so a suspended dream can resume onto the same procedural path as uninterrupted play.
 
 Dream Weather is the hidden atmospheric layer for each session. `DreamWeatherV1` carries weather tags, pressure, atmosphere, and the embedded `DreadBudgetV1`; `WeatherTraceV1` records how those tags resolved. When sent toward GNI, it is redacted into `DreamWeatherContextV1` so the provider sees structured pressure context without owning the underlying weather machinery.
 
@@ -276,7 +279,7 @@ Export GNI contract fixtures:
 npm run fixtures
 ```
 
-This writes `fixtures/session_bundle_v1.json`, `fixtures/session_covenant_v1.json`, `fixtures/passage_v1.json`, `fixtures/echo_trace_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/session_arc_v1.json`, `fixtures/dream_session_v1.json`, `fixtures/dream_weather_v1.json`, `fixtures/weather_trace_v1.json`, `fixtures/threshold_presentation_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_firebreak_trace_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_contract_check_report_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
+This writes `fixtures/session_bundle_v1.json`, `fixtures/session_covenant_v1.json`, `fixtures/passage_v1.json`, `fixtures/echo_trace_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/session_arc_v1.json`, `fixtures/dream_session_v1.json`, `fixtures/dream_session_checkpoint_v1.json`, `fixtures/dream_weather_v1.json`, `fixtures/weather_trace_v1.json`, `fixtures/threshold_presentation_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_firebreak_trace_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_contract_check_report_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
 
 The provider-safe fixture surface is `gni_request_v1.json` and its nested `SessionBundleV1`. Full SaveGame fixtures are internal examples for resume, migration, and QA flows; they may include local or session state that should not be treated as provider input.
 
@@ -309,6 +312,7 @@ For longer play, `src/dreamSession.js` can chain many hidden beats after the por
 - `ThresholdChamber` -> `AThresholdChamberActor`
 - `DreamflowGenerator` -> `UDreamflowComponent` plus Dream Module DataAssets
 - `runDreamSession` -> `UJungialDreamSessionRunner` or an async gameplay task that owns multi-beat dream pacing
+- `DreamSessionCheckpointV1` -> SaveGame-backed suspend/resume packet for long dreams
 - `WitnessState` -> local/session observer component
 - `ArchitectState` -> SaveGame-backed director service
 - `GniAdapter` -> `IJungialAiProvider` implementation

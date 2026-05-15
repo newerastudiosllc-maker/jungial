@@ -6,6 +6,7 @@ import {
   validateDreamerMemoryContext,
   validateDreamerProfile,
   validateDreamSession,
+  validateDreamSessionCheckpoint,
   validateDreamWeather,
   validateEchoTrace,
   validateFixtureManifest,
@@ -41,6 +42,8 @@ export function validateContractDocument(document) {
       return validateDreamerMemoryContext(document);
     case 'DreamSessionV1':
       return validateDreamSession(document);
+    case 'DreamSessionCheckpointV1':
+      return validateDreamSessionCheckpoint(document);
     case 'DreamWeatherV1':
       return validateDreamWeather(document);
     case 'WeatherTraceV1':

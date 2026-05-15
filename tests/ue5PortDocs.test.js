@@ -37,3 +37,11 @@ test('UE5 core type pseudocode documents continuous dream sessions', async () =>
   assert.match(text, /struct FDreamSessionV1/);
   assert.match(text, /ReturnAvailable/);
 });
+
+test('UE5 core type pseudocode documents dream session checkpoints', async () => {
+  const text = await readFile('UE5Port/JungialTypes.hpp', 'utf8');
+
+  assert.match(text, /struct FDreamflowRuntimeStateV1/);
+  assert.match(text, /struct FDreamSessionCheckpointV1/);
+  assert.match(text, /NextBeatIndex/);
+});

@@ -1,11 +1,13 @@
 {
-  "schema": "DreamSessionV1",
+  "schema": "DreamSessionCheckpointV1",
   "schemaVersion": 1,
   "sessionId": "dream-session-b4d4135a7e9b",
   "seed": 777,
   "maxBeats": 3,
   "completedBeats": 3,
+  "nextBeatIndex": 4,
   "endedBecause": "max_beats",
+  "isComplete": true,
   "beats": [
     {
       "schema": "DreamSessionBeatV1",

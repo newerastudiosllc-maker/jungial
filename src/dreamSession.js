@@ -7,6 +7,7 @@ import { stableHash } from './stableHash.js';
 
 const END_REASONS = Object.freeze({
   maxBeats: 'max_beats',
+  checkpoint: 'checkpoint',
   returnAnchor: 'return_anchor',
   returnAvailable: 'return_available'
 });
@@ -28,24 +29,40 @@ export function runDreamSession({
   architectState = null,
   seed = 0,
   maxBeats = 4,
+  beatsToRun = null,
   responses = [],
   initialArc = null,
   recentEchoTraces = [],
-  stopWhenReturnAvailable = false
+  stopWhenReturnAvailable = false,
+  existingBeats = [],
+  startBeatIndex = null,
+  dreamflowState = null,
+  sessionId = null
 } = {}) {
   if (!dreamflow || typeof dreamflow.selectNext !== 'function') {
     throw new Error('runDreamSession requires a dreamflow generator');
   }
 
+  applyDreamflowState(dreamflow, dreamflowState);
+
   const activeCovenant = createSessionCovenant(covenant ?? {});
   const beatLimit = normalizeMaxBeats(maxBeats);
+  const beats = cloneJsonArray(existingBeats);
+  const previousBeatCount = beats.length;
+  const remainingBeats = Math.max(0, beatLimit - previousBeatCount);
+  const runBudget = normalizeBeatsToRun(beatsToRun, remainingBeats);
+  const firstNewBeatIndex = normalizeStartBeatIndex(startBeatIndex, previousBeatCount);
   const echoWindow = [...recentEchoTraces];
-  let currentArc = initialArc ? createSessionArc(initialArc) : null;
-  let endedBecause = END_REASONS.maxBeats;
-  const beats = [];
+  let currentArc = initialArc
+    ? createSessionArc(initialArc)
+    : beats.at(-1)?.sessionArc
+      ? createSessionArc(beats.at(-1).sessionArc)
+      : null;
+  let endedBecause = previousBeatCount >= beatLimit ? END_REASONS.maxBeats : END_REASONS.checkpoint;
 
-  for (let index = 0; index < beatLimit; index += 1) {
-    const beatSeed = createBeatSeed(seed, index + 1);
+  for (let localIndex = 0; localIndex < runBudget; localIndex += 1) {
+    const beatNumber = firstNewBeatIndex + localIndex;
+    const beatSeed = createBeatSeed(seed, beatNumber);
     const weatherPreview = createDreamWeather({
       covenant: activeCovenant,
       archetypeVector: cloneArchetypeVector(archetypeState),
@@ -63,7 +80,7 @@ export function runDreamSession({
       architectState,
       dreamWeather: weatherPreview
     });
-    const response = selectResponseForBeat(responses, index);
+    const response = selectResponseForBeat(responses, localIndex);
     const echoTrace = createEchoTrace({
       passage: passageSelection.passage,
       response,
@@ -110,7 +127,7 @@ export function runDreamSession({
     const beat = {
       schema: 'DreamSessionBeatV1',
       schemaVersion: 1,
-      index: index + 1,
+      index: beatNumber,
       passage: passageSelection.passage,
       echoTrace,
       sessionArc: arcAdvance.arc,
@@ -135,11 +152,14 @@ export function runDreamSession({
       break;
     }
   }
+  if (!isTerminalEndReason(endedBecause)) {
+    endedBecause = beats.length >= beatLimit ? END_REASONS.maxBeats : END_REASONS.checkpoint;
+  }
 
   return {
     schema: 'DreamSessionV1',
     schemaVersion: 1,
-    sessionId: `dream-session-${stableHash({ seed, beatLimit, firstEcho: echoWindow[0]?.passageId ?? null }).slice(0, 12)}`,
+    sessionId: sessionId ?? createSessionId({ seed, beatLimit, firstEcho: echoWindow[0]?.passageId ?? null }),
     seed,
     maxBeats: beatLimit,
     completedBeats: beats.length,
@@ -147,6 +167,7 @@ export function runDreamSession({
     beats,
     finalSessionArc: currentArc ?? createSessionArc(),
     recentEchoTraces: echoWindow,
+    dreamflowState: snapshotDreamflowState(dreamflow),
     finalDreamWeather: beats.at(-1)?.dreamWeather ?? null,
     finalSelectedDream: beats.at(-1)?.selectedDream ?? null
   };
@@ -157,11 +178,16 @@ export function runDreamSessionFromRuntime({
   covenant = null,
   seed = 0,
   maxBeats = 4,
+  beatsToRun = null,
   responses = [],
   initialArc = null,
   recentEchoTraces = [],
   stopWhenReturnAvailable = false,
-  dreamerMemoryContext = null
+  dreamerMemoryContext = null,
+  existingBeats = [],
+  startBeatIndex = null,
+  dreamflowState = null,
+  sessionId = null
 } = {}) {
   if (!runtime) {
     throw new Error('runDreamSessionFromRuntime requires a Jungial runtime');
@@ -178,11 +204,93 @@ export function runDreamSessionFromRuntime({
     architectState: runtime.architect?.snapshot?.() ?? null,
     seed,
     maxBeats,
+    beatsToRun,
     responses,
     initialArc,
     recentEchoTraces,
-    stopWhenReturnAvailable
+    stopWhenReturnAvailable,
+    existingBeats,
+    startBeatIndex,
+    dreamflowState,
+    sessionId
   });
+}
+
+export function createDreamSessionCheckpoint(session) {
+  if (!session || session.schema !== 'DreamSessionV1') {
+    throw new Error('createDreamSessionCheckpoint requires a DreamSessionV1 session');
+  }
+
+  return {
+    schema: 'DreamSessionCheckpointV1',
+    schemaVersion: 1,
+    sessionId: session.sessionId,
+    seed: session.seed,
+    maxBeats: session.maxBeats,
+    completedBeats: session.completedBeats,
+    nextBeatIndex: session.completedBeats + 1,
+    endedBecause: session.endedBecause,
+    isComplete: isTerminalEndReason(session.endedBecause),
+    beats: cloneJsonArray(session.beats),
+    finalSessionArc: cloneJson(session.finalSessionArc),
+    recentEchoTraces: cloneJsonArray(session.recentEchoTraces),
+    dreamflowState: normalizeDreamflowState(session.dreamflowState),
+    finalDreamWeather: cloneJson(session.finalDreamWeather),
+    finalSelectedDream: cloneJson(session.finalSelectedDream)
+  };
+}
+
+export function resumeDreamSessionFromRuntime({
+  runtime,
+  checkpoint,
+  covenant = null,
+  responses = [],
+  beatsToRun = null,
+  stopWhenReturnAvailable = false,
+  dreamerMemoryContext = null,
+  maxBeats = null
+} = {}) {
+  if (!checkpoint || checkpoint.schema !== 'DreamSessionCheckpointV1') {
+    throw new Error('resumeDreamSessionFromRuntime requires a DreamSessionCheckpointV1 checkpoint');
+  }
+  if (checkpoint.isComplete) {
+    return dreamSessionFromCheckpoint(checkpoint);
+  }
+
+  return runDreamSessionFromRuntime({
+    runtime,
+    covenant,
+    seed: checkpoint.seed,
+    maxBeats: maxBeats ?? checkpoint.maxBeats,
+    beatsToRun,
+    responses,
+    initialArc: checkpoint.finalSessionArc,
+    recentEchoTraces: checkpoint.recentEchoTraces,
+    stopWhenReturnAvailable,
+    dreamerMemoryContext,
+    existingBeats: checkpoint.beats,
+    startBeatIndex: checkpoint.nextBeatIndex,
+    dreamflowState: checkpoint.dreamflowState,
+    sessionId: checkpoint.sessionId
+  });
+}
+
+function dreamSessionFromCheckpoint(checkpoint) {
+  return {
+    schema: 'DreamSessionV1',
+    schemaVersion: 1,
+    sessionId: checkpoint.sessionId,
+    seed: checkpoint.seed,
+    maxBeats: checkpoint.maxBeats,
+    completedBeats: checkpoint.completedBeats,
+    endedBecause: checkpoint.endedBecause,
+    beats: cloneJsonArray(checkpoint.beats),
+    finalSessionArc: cloneJson(checkpoint.finalSessionArc),
+    recentEchoTraces: cloneJsonArray(checkpoint.recentEchoTraces),
+    dreamflowState: normalizeDreamflowState(checkpoint.dreamflowState),
+    finalDreamWeather: cloneJson(checkpoint.finalDreamWeather),
+    finalSelectedDream: cloneJson(checkpoint.finalSelectedDream)
+  };
 }
 
 function selectDreamFromJourney(journey, suggestedRole) {
@@ -211,6 +319,47 @@ function createBeatSeed(seed, beatNumber) {
   return stableHash({ seed, beatNumber }).slice(0, 16);
 }
 
+function createSessionId({ seed, beatLimit, firstEcho }) {
+  return `dream-session-${stableHash({ seed, beatLimit, firstEcho }).slice(0, 12)}`;
+}
+
+function snapshotDreamflowState(dreamflow) {
+  return normalizeDreamflowState({
+    schema: 'DreamflowRuntimeStateV1',
+    schemaVersion: 1,
+    randomState: Number.isInteger(dreamflow?.random?.state)
+      ? dreamflow.random.state >>> 0
+      : null
+  });
+}
+
+function applyDreamflowState(dreamflow, dreamflowState) {
+  const normalized = normalizeDreamflowState(dreamflowState);
+  if (Number.isInteger(normalized.randomState) && dreamflow?.random) {
+    dreamflow.random.state = normalized.randomState >>> 0;
+  }
+}
+
+function normalizeDreamflowState(dreamflowState = null) {
+  const randomState = Number.isInteger(dreamflowState?.randomState)
+    ? dreamflowState.randomState >>> 0
+    : null;
+
+  return {
+    schema: 'DreamflowRuntimeStateV1',
+    schemaVersion: 1,
+    randomState
+  };
+}
+
+function isTerminalEndReason(reason) {
+  return [
+    END_REASONS.maxBeats,
+    END_REASONS.returnAnchor,
+    END_REASONS.returnAvailable
+  ].includes(reason);
+}
+
 function cloneArchetypeVector(archetypeState) {
   return { ...(archetypeState?.archetypeVector ?? archetypeState?.archetype_vector ?? {}) };
 }
@@ -225,4 +374,34 @@ function normalizeMaxBeats(value) {
     return 4;
   }
   return Math.max(1, Math.min(24, number));
+}
+
+function normalizeBeatsToRun(value, remainingBeats) {
+  if (remainingBeats <= 0) {
+    return 0;
+  }
+  if (value === null || value === undefined) {
+    return remainingBeats;
+  }
+  const number = Number(value);
+  if (!Number.isInteger(number)) {
+    return remainingBeats;
+  }
+  return Math.max(0, Math.min(remainingBeats, number));
+}
+
+function normalizeStartBeatIndex(value, previousBeatCount) {
+  const expected = previousBeatCount + 1;
+  return Number.isInteger(value) && value >= expected ? value : expected;
+}
+
+function cloneJsonArray(values = []) {
+  return (Array.isArray(values) ? values : []).map(cloneJson);
+}
+
+function cloneJson(value) {
+  if (value === undefined || value === null) {
+    return null;
+  }
+  return JSON.parse(JSON.stringify(value));
 }

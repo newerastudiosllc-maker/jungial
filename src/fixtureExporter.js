@@ -11,7 +11,7 @@ import { checkGniContract } from './gniContractCheck.js';
 import { DreamerProfile } from './dreamerProfile.js';
 import { createJungialRuntime } from './runtime.js';
 import { applyPlayerInput } from './input.js';
-import { runDreamSessionFromRuntime } from './dreamSession.js';
+import { createDreamSessionCheckpoint, runDreamSessionFromRuntime } from './dreamSession.js';
 
 const FIXTURE_FILES = Object.freeze([
   'session_bundle_v1.json',
@@ -22,6 +22,7 @@ const FIXTURE_FILES = Object.freeze([
   'dreamer_memory_context_v1.json',
   'session_arc_v1.json',
   'dream_session_v1.json',
+  'dream_session_checkpoint_v1.json',
   'dream_weather_v1.json',
   'weather_trace_v1.json',
   'threshold_presentation_v1.json',
@@ -95,6 +96,7 @@ export async function exportContractFixtures({
       { kind: 'wait', gestureTags: ['listened'], pressureAccepted: 0.3 }
     ]
   });
+  const dreamSessionCheckpoint = createDreamSessionCheckpoint(dreamSession);
   const dreamWeather = run.dreamWeather;
   const weatherTrace = run.weatherTrace;
   const thresholdPresentation = run.thresholdPresentation;
@@ -140,6 +142,7 @@ export async function exportContractFixtures({
     'dreamer_memory_context_v1.json': dreamerMemoryContext,
     'session_arc_v1.json': sessionArc,
     'dream_session_v1.json': dreamSession,
+    'dream_session_checkpoint_v1.json': dreamSessionCheckpoint,
     'dream_weather_v1.json': dreamWeather,
     'weather_trace_v1.json': weatherTrace,
     'threshold_presentation_v1.json': thresholdPresentation,

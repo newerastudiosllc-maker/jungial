@@ -107,8 +107,15 @@ struct FSessionArcV1
 enum class EDreamSessionEndReason
 {
     MaxBeats,
+    Checkpoint,
     ReturnAnchor,
     ReturnAvailable
+};
+
+struct FDreamflowRuntimeStateV1
+{
+    // Maps to FRandomStream state or an equivalent deterministic RNG cursor.
+    int64 RandomState = -1;
 };
 
 struct FDreamSessionBeatV1
@@ -135,6 +142,24 @@ struct FDreamSessionV1
     Array<FDreamSessionBeatV1> Beats;
     FSessionArcV1 FinalSessionArc;
     Array<JsonObject> RecentEchoTraces;
+    FDreamflowRuntimeStateV1 DreamflowState;
+    JsonObject FinalDreamWeather;
+    JsonObject FinalSelectedDream;
+};
+
+struct FDreamSessionCheckpointV1
+{
+    String SessionId;
+    String Seed;
+    int32 MaxBeats = 0;
+    int32 CompletedBeats = 0;
+    int32 NextBeatIndex = 1;
+    EDreamSessionEndReason EndedBecause = EDreamSessionEndReason::Checkpoint;
+    bool bIsComplete = false;
+    Array<FDreamSessionBeatV1> Beats;
+    FSessionArcV1 FinalSessionArc;
+    Array<JsonObject> RecentEchoTraces;
+    FDreamflowRuntimeStateV1 DreamflowState;
     JsonObject FinalDreamWeather;
     JsonObject FinalSelectedDream;
 };
