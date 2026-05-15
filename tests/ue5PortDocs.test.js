@@ -71,3 +71,12 @@ test('UE5 core type pseudocode documents runtime readiness preflight', async () 
   assert.match(text, /content\.catalog/);
   assert.match(text, /gni\.provider/);
 });
+
+test('UE5 core type pseudocode documents session shape selections', async () => {
+  const text = await readFile('UE5Port/JungialTypes.hpp', 'utf8');
+
+  assert.match(text, /struct FSessionShapeSelectionV1/);
+  assert.match(text, /quiet_lantern/);
+  assert.match(text, /nightmare_veil/);
+  assert.match(text, /PlayerFacingText/);
+});

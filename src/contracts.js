@@ -74,6 +74,8 @@ const RUNTIME_READINESS_CAPABILITIES = Object.freeze([
   'asyncGniQueue',
   'gniFirebreak'
 ]);
+const SESSION_SHAPE_IDS = Object.freeze(['quiet_lantern', 'strange_threshold', 'dark_mirror', 'nightmare_veil']);
+const SESSION_SHAPE_INTENSITY_BANDS = Object.freeze(['gentle', 'strange', 'dark', 'horrific']);
 const DREAM_JOURNEY_WEIGHT_KEYS = Object.freeze([
   'base',
   'archetype',
@@ -717,6 +719,50 @@ export function validateSessionCovenant(covenant) {
   }
   if (!['session_only', 'profile_aggregate'].includes(covenant?.memoryScope)) {
     errors.push('memoryScope must be session_only or profile_aggregate');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function validateSessionShapeSelection(selection) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'shapeId',
+    'source',
+    'intensityBand',
+    'shapeTags',
+    'covenant',
+    'playerFacingText'
+  ];
+
+  if (selection?.schema !== 'SessionShapeSelectionV1') {
+    errors.push('schema must be SessionShapeSelectionV1');
+  }
+  if (selection?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  errors.push(...validateKnownKeys(selection, allowedKeys, 'sessionShapeSelection'));
+  if (!SESSION_SHAPE_IDS.includes(selection?.shapeId)) {
+    errors.push(`shapeId must be one of ${SESSION_SHAPE_IDS.join(', ')}`);
+  }
+  if (!['preset', 'fallback'].includes(selection?.source)) {
+    errors.push('source must be preset or fallback');
+  }
+  if (!SESSION_SHAPE_INTENSITY_BANDS.includes(selection?.intensityBand)) {
+    errors.push(`intensityBand must be one of ${SESSION_SHAPE_INTENSITY_BANDS.join(', ')}`);
+  }
+  errors.push(...validateStringList(selection?.shapeTags, 'shapeTags'));
+  const covenantValidation = validateSessionCovenant(selection?.covenant);
+  if (!covenantValidation.valid) {
+    errors.push(...prefixNestedErrors(covenantValidation.errors, 'covenant', 'covenant'));
+  }
+  if (selection?.playerFacingText !== null) {
+    errors.push('playerFacingText must be null');
   }
 
   return {
@@ -2088,6 +2134,11 @@ export function validateSaveGame(saveGame) {
     saveGame.payload.saveSlot,
     'payload.saveSlot',
     validateSaveSlotPlan
+  ));
+  errors.push(...validateOptionalNestedContract(
+    saveGame.payload.sessionShapeSelection,
+    'payload.sessionShapeSelection',
+    validateSessionShapeSelection
   ));
   errors.push(...validateOptionalNestedContract(
     saveGame.payload.sessionArc,

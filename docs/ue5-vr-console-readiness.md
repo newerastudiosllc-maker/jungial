@@ -9,6 +9,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - `UJungialRuntimeSubsystem`: validates DataAssets and wires services.
 - `FRuntimeReadinessV1`: startup preflight report for required blockers, optional degradations, platform targets, and contract coverage.
 - `UJungialSaveSlotSubsystem`: prepares `SaveSlotPlanV1` for fresh, continue, and new incarnation starts before runtime bootstrap.
+- `FSessionShapeSelectionV1`: small preset-to-covenant packet for gentle, strange, dark, and horrific starts.
 - `UJungialSessionArcDirector`: advances hidden pressure, return readiness, and beat-role pacing before Dreamflow selection.
 - `UJungialDreamSessionRunner`: orchestrates multi-beat dream sessions from Passage, EchoTrace, SessionArc, DreamJourney, and DreamWeather packets.
 - `FDreamSessionCheckpointV1`: SaveGame payload for suspended long dreams, including Dreamflow RNG state.
@@ -50,6 +51,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - GNI contract fixtures should pass strict validation before provider changes are accepted.
 - Content validation must run before packaged builds and before accepting AI-authored content.
 - `RuntimeReadinessV1` should run before a playable session starts so missing GNI can degrade safely while broken content blocks startup.
+- Session shape presets should be DataAssets or config rows that resolve into `SessionCovenantV1` before GNI, Dream Weather, or renderer systems see them.
 - Dream modules should reference known lexicon symbols rather than ad hoc strings.
 
 ## VR/Console Constraints

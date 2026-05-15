@@ -30,6 +30,7 @@ import {
   validateRuntimeReadiness,
   validateSessionArc,
   validateSessionCovenant,
+  validateSessionShapeSelection,
   validateSessionFrame,
   validateSessionBundle,
   validateThresholdPresentation,
@@ -46,6 +47,7 @@ import {
 } from '../src/dreamWeather.js';
 import { buildThresholdPresentation } from '../src/presentation.js';
 import { createRuntimeReadinessReport } from '../src/runtimeReadiness.js';
+import { createSessionShapeSelection } from '../src/sessionShape.js';
 import { createDeterministicClock } from '../src/clock.js';
 import { applyPlayerInput } from '../src/input.js';
 import { createJungialRuntime } from '../src/runtime.js';
@@ -124,6 +126,16 @@ test('Runtime Readiness schema documents internal preflight reports', async () =
   assert.equal(schema.properties.playerFacingText.type, 'null');
 });
 
+test('Session Shape schema documents bounded session tone presets', async () => {
+  const schema = await readJson('data/schemas/session_shape_selection.schema.json');
+
+  assert.equal(schema.title, 'SessionShapeSelectionV1');
+  assert.deepEqual(schema.properties.schema, { const: 'SessionShapeSelectionV1' });
+  assert.deepEqual(schema.properties.shapeId.enum, ['quiet_lantern', 'strange_threshold', 'dark_mirror', 'nightmare_veil']);
+  assert.equal(schema.additionalProperties, false);
+  assert.equal(schema.properties.playerFacingText.type, 'null');
+});
+
 test('session bundle validation reports missing GNI handoff fields', () => {
   const result = validateSessionBundle({
     schema: 'SessionBundleV1',
@@ -181,6 +193,35 @@ test('session covenant validation rejects raw speech fields', () => {
 
   assert.equal(result.valid, false);
   assert.deepEqual(result.errors, ['covenant.rawSpeech is not allowed']);
+});
+
+test('Session Shape validation accepts bounded preset selections', () => {
+  const result = validateSessionShapeSelection(createSessionShapeSelection({ shapeId: 'dark_mirror' }));
+
+  assert.deepEqual(result, { valid: true, errors: [] });
+});
+
+test('Session Shape validation rejects raw or player-facing fields', () => {
+  const selection = createSessionShapeSelection({ shapeId: 'quiet_lantern' });
+  const result = validateSessionShapeSelection({
+    ...selection,
+    shapeId: 'therapy_protocol',
+    source: 'intake',
+    intensityBand: 'diagnosis',
+    shapeTags: ['dark', ''],
+    rawSpeech: 'do not store',
+    playerFacingText: 'The system chose this because...'
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'sessionShapeSelection.rawSpeech is not allowed',
+    'shapeId must be one of quiet_lantern, strange_threshold, dark_mirror, nightmare_veil',
+    'source must be preset or fallback',
+    'intensityBand must be one of gentle, strange, dark, horrific',
+    'shapeTags[1] must be a non-empty string',
+    'playerFacingText must be null'
+  ]);
 });
 
 test('validates DreamWeatherV1 contracts', () => {

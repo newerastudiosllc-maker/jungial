@@ -29,6 +29,7 @@
         "dreamSession": { "$ref": "dream_session.schema.json" },
         "dreamSessionCheckpoint": { "$ref": "dream_session_checkpoint.schema.json" },
         "dreamerProfile": { "$ref": "dreamer_profile.schema.json" },
+        "sessionShapeSelection": { "$ref": "session_shape_selection.schema.json" },
         "sessionCovenant": { "$ref": "session_covenant.schema.json" },
         "echoTrace": { "$ref": "echo_trace.schema.json" },
         "dreamWeather": { "$ref": "dream_weather.schema.json" },

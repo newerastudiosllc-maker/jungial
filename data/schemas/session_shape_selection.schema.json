@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/session_shape_selection.schema.json",
+  "title": "SessionShapeSelectionV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "schemaVersion",
+    "shapeId",
+    "source",
+    "intensityBand",
+    "shapeTags",
+    "covenant",
+    "playerFacingText"
+  ],
+  "properties": {
+    "schema": { "const": "SessionShapeSelectionV1" },
+    "schemaVersion": { "const": 1 },
+    "shapeId": { "enum": ["quiet_lantern", "strange_threshold", "dark_mirror", "nightmare_veil"] },
+    "source": { "enum": ["preset", "fallback"] },
+    "intensityBand": { "enum": ["gentle", "strange", "dark", "horrific"] },
+    "shapeTags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "covenant": { "$ref": "session_covenant.schema.json" },
+    "playerFacingText": { "type": "null" }
+  },
+  "additionalProperties": false
+}

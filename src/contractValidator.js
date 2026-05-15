@@ -24,6 +24,7 @@ import {
   validateRuntimeReadiness,
   validateSessionArc,
   validateSessionCovenant,
+  validateSessionShapeSelection,
   validateSessionBundle,
   validateSessionFrame,
   validateThresholdPresentation,
@@ -54,6 +55,8 @@ export function validateContractDocument(document) {
       return validateWeatherTrace(document);
     case 'SessionCovenantV1':
       return validateSessionCovenant(document);
+    case 'SessionShapeSelectionV1':
+      return validateSessionShapeSelection(document);
     case 'PassageV1':
       return validatePassage(document);
     case 'EchoTraceV1':

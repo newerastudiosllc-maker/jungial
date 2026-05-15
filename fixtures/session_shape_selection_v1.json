@@ -1,0 +1,44 @@
+{
+  "schema": "SessionShapeSelectionV1",
+  "schemaVersion": 1,
+  "shapeId": "dark_mirror",
+  "source": "preset",
+  "intensityBand": "dark",
+  "shapeTags": [
+    "shadowed",
+    "cathartic",
+    "reflective"
+  ],
+  "covenant": {
+    "schema": "SessionCovenantV1",
+    "schemaVersion": 1,
+    "mode": "tonight_shape",
+    "toneTags": [
+      "strange",
+      "dark",
+      "cathartic"
+    ],
+    "intensityCeiling": 0.62,
+    "hardBoundaryTags": [
+      "real_world_self_harm"
+    ],
+    "softBoundaryTags": [
+      "body_horror",
+      "pursuit",
+      "claustrophobia"
+    ],
+    "allowedPressureTags": [
+      "shadow",
+      "loss",
+      "transformation",
+      "reflection"
+    ],
+    "returnAnchor": {
+      "kind": "image",
+      "value": "the Heartlight"
+    },
+    "groundingPreference": "quiet_room",
+    "memoryScope": "session_only"
+  },
+  "playerFacingText": null
+}

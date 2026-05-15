@@ -16,6 +16,7 @@ import { DreamerProfile } from './dreamerProfile.js';
 import { prepareSaveSlot } from './saveSlotManager.js';
 import { advanceSessionArc } from './sessionArc.js';
 import { createSessionCovenant } from './sessionCovenant.js';
+import { createSessionShapeSelection } from './sessionShape.js';
 import { createEchoTrace, selectPassage, toGniPassageContext } from './passageLattice.js';
 import { createDreamWeather, createWeatherTrace, toGniWeatherContext } from './dreamWeather.js';
 import { deriveSessionCovenantFromListening, runFirstListeningSequence } from './firstListening.js';
@@ -40,6 +41,7 @@ export async function runSimulation({
   saveMode = 'continue',
   incarnationIndex = null,
   sessionArc = null,
+  sessionShape = null,
   sessionCovenant = null,
   firstListening = false,
   firstListeningBeats = undefined,
@@ -98,12 +100,19 @@ export async function runSimulation({
         beats: firstListeningBeats
       })
     : null;
+  const sessionShapeSelection = sessionShape
+    ? createSessionShapeSelection({
+        shapeId: sessionShape,
+        overrides: sessionCovenant ?? {}
+      })
+    : null;
+  const explicitSessionSettings = sessionShapeSelection?.covenant ?? sessionCovenant ?? {};
   const activeSessionCovenant = firstListeningRun
     ? deriveSessionCovenantFromListening({
         listeningRun: firstListeningRun,
-        explicitSessionSettings: sessionCovenant ?? {}
+        explicitSessionSettings
       })
-    : createSessionCovenant(sessionCovenant ?? {});
+    : createSessionCovenant(explicitSessionSettings);
 
   const transcript = [];
   transcript.push('Threshold Chamber: silent, dim, confined.');
@@ -403,6 +412,7 @@ export async function runSimulation({
     gniQueue: gniQueueSnapshot,
     gniBridgeResult,
     appliedGniDirective,
+    ...(sessionShapeSelection ? { sessionShapeSelection } : {}),
     sessionCovenant: activeSessionCovenant,
     echoTrace,
     activePassage,
@@ -435,6 +445,7 @@ export async function runSimulation({
     trace: traceSnapshot,
     sessionArc: activeSessionArc,
     sessionArcDirective,
+    sessionShapeSelection,
     sessionCovenant: activeSessionCovenant,
     firstListeningRun,
     experienceDirective,
@@ -488,6 +499,8 @@ export function parseSimulationArgs(args) {
       options.seed = Number(arg.slice('--seed='.length));
     } else if (arg.startsWith('--save=')) {
       options.savePath = arg.slice('--save='.length);
+    } else if (arg.startsWith('--session-shape=')) {
+      options.sessionShape = arg.slice('--session-shape='.length);
     } else if (arg.startsWith('--gni-response=')) {
       options.gniResponsePath = arg.slice('--gni-response='.length);
     } else if (arg === '--emulate-gni') {
@@ -541,6 +554,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     gniResponse,
     gniProvider: createGniProviderFromOptions(options),
     emulateGni: options.emulateGni,
+    sessionShape: options.sessionShape,
     firstListening: options.firstListening,
     clock,
     tracePath: options.tracePath

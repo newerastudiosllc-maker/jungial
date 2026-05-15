@@ -72,6 +72,24 @@ struct FSaveSlotPlanV1
     JsonObject DreamerMemoryContext;
 };
 
+enum class EJungialSessionShapeId
+{
+    quiet_lantern,
+    strange_threshold,
+    dark_mirror,
+    nightmare_veil
+};
+
+struct FSessionShapeSelectionV1
+{
+    EJungialSessionShapeId ShapeId = EJungialSessionShapeId::quiet_lantern;
+    String Source; // preset or fallback
+    String IntensityBand;
+    Array<String> ShapeTags;
+    JsonObject Covenant; // SessionCovenantV1 built from the selected shape plus safe overrides.
+    String PlayerFacingText; // Must stay empty. The player sees atmosphere and options, not hidden mechanics.
+};
+
 enum class EJungialRuntimeReadinessStatus
 {
     Ready,

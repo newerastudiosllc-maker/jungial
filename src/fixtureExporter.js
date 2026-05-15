@@ -13,6 +13,7 @@ import { createJungialRuntime } from './runtime.js';
 import { applyPlayerInput } from './input.js';
 import { createDreamSessionCheckpoint, runDreamSessionFromRuntime } from './dreamSession.js';
 import { createRuntimeReadinessReport } from './runtimeReadiness.js';
+import { createSessionShapeSelection } from './sessionShape.js';
 
 const FIXTURE_FILES = Object.freeze([
   'session_bundle_v1.json',
@@ -22,6 +23,7 @@ const FIXTURE_FILES = Object.freeze([
   'first_listening_v1.json',
   'experience_directive_v1.json',
   'session_frame_v1.json',
+  'session_shape_selection_v1.json',
   'runtime_readiness_v1.json',
   'dreamer_profile_v1.json',
   'dreamer_memory_context_v1.json',
@@ -69,6 +71,9 @@ export async function exportContractFixtures({
   const firstListeningRun = run.firstListeningRun;
   const experienceDirective = run.experienceDirective;
   const sessionFrame = run.sessionFrame;
+  const sessionShapeSelection = createSessionShapeSelection({
+    shapeId: 'dark_mirror'
+  });
   const runtimeReadiness = createRuntimeReadinessReport({
     gniEndpoint: 'gni://local-dev-placeholder',
     platformTargets: ['node_prototype', 'ue5', 'vr', 'console']
@@ -154,6 +159,7 @@ export async function exportContractFixtures({
     'first_listening_v1.json': firstListeningRun,
     'experience_directive_v1.json': experienceDirective,
     'session_frame_v1.json': sessionFrame,
+    'session_shape_selection_v1.json': sessionShapeSelection,
     'runtime_readiness_v1.json': runtimeReadiness,
     'dreamer_profile_v1.json': dreamerProfile,
     'dreamer_memory_context_v1.json': dreamerMemoryContext,

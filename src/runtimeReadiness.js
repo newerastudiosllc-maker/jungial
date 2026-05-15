@@ -11,6 +11,7 @@ const RUNTIME_CONTRACTS = Object.freeze([
   'GniBridgeResultV1',
   'GniDirectiveQueueV1',
   'SessionCovenantV1',
+  'SessionShapeSelectionV1',
   'FirstListeningRunV1',
   'PassageV1',
   'EchoTraceV1',

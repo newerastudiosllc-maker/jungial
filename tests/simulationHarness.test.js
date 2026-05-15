@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -101,6 +101,7 @@ test('simulation CLI args parse seed, save path, JSON mode, and mock GNI respons
   const options = parseSimulationArgs([
     '--seed=123',
     '--save=saves/test.json',
+    '--session-shape=dark_mirror',
     '--first-listening',
     '--gni-response=data/mock.json',
     '--emulate-gni',
@@ -116,6 +117,7 @@ test('simulation CLI args parse seed, save path, JSON mode, and mock GNI respons
   assert.deepEqual(options, {
     seed: 123,
     savePath: 'saves/test.json',
+    sessionShape: 'dark_mirror',
     firstListening: true,
     gniResponsePath: 'data/mock.json',
     emulateGni: true,
@@ -127,6 +129,40 @@ test('simulation CLI args parse seed, save path, JSON mode, and mock GNI respons
     tracePath: 'saves/trace.json',
     json: true
   });
+});
+
+test('simulation applies session shape presets through SaveGame and GNI covenant context', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-session-shape-'));
+  const savePath = join(dir, 'latest.json');
+  const requests = [];
+
+  try {
+    const result = await runSimulation({
+      seed: 616,
+      savePath,
+      sessionShape: 'nightmare_veil',
+      sessionCovenant: {
+        intensityCeiling: 0.44,
+        hardBoundaryTags: ['body_horror']
+      },
+      gniProvider: async (request) => {
+        requests.push(request);
+        return null;
+      }
+    });
+    const saved = JSON.parse(await readFile(savePath, 'utf8')).payload;
+
+    assert.equal(result.sessionShapeSelection.schema, 'SessionShapeSelectionV1');
+    assert.equal(result.sessionShapeSelection.shapeId, 'nightmare_veil');
+    assert.equal(result.sessionCovenant.intensityCeiling, 0.44);
+    assert.equal(result.sessionCovenant.hardBoundaryTags.includes('body_horror'), true);
+    assert.equal(saved.sessionShapeSelection.shapeId, 'nightmare_veil');
+    assert.equal(saved.sessionCovenant.intensityCeiling, 0.44);
+    assert.equal(requests[0].payload.sessionCovenant.intensityCeiling, 0.44);
+    assert.equal(JSON.stringify(saved).includes('sessionShapeSelection'), true);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
 });
 
 test('simulation can build a GNI HTTP provider from CLI options without exposing secrets', () => {

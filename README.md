@@ -58,6 +58,7 @@ node src/simulation.js --seed=777 --emulate-gni
 node src/simulation.js --seed=777 --emulate-gni --clock-start=2040-01-02T03:04:05.000Z
 node src/simulation.js --seed=777 --emulate-gni --trace=saves/latest-trace.json
 node src/simulation.js --seed=777 --first-listening --trace=saves/first-listening-trace.json
+node src/simulation.js --seed=777 --session-shape=dark_mirror
 node src/simulation.js --gni-endpoint=https://example.local/gni --gni-token-env=GNI_API_KEY
 ```
 
@@ -226,6 +227,7 @@ The current contract schemas live in `data/schemas/`:
 - `runtime_readiness.schema.json`
 - `session_bundle.schema.json`
 - `session_covenant.schema.json`
+- `session_shape_selection.schema.json`
 - `passage.schema.json`
 - `echo_trace.schema.json`
 - `first_listening.schema.json`
@@ -304,6 +306,8 @@ See `docs/dreamer-memory-and-safety.md` for the product/architecture guardrails:
 
 `SessionCovenantV1` captures the current session's tone, intensity ceiling, boundaries, and return anchor. `PassageV1` is the dream-native adaptive fragment format, and `EchoTraceV1` records symbolic response patterns without raw speech.
 
+`SessionShapeSelectionV1` is the internal preset handoff for broad session tone. Current shapes are `quiet_lantern`, `strange_threshold`, `dark_mirror`, and `nightmare_veil`; each resolves to a bounded `SessionCovenantV1`. Overrides can lower intensity or add boundaries, but they do not store raw speech or player-facing rationale.
+
 The system can become strange, dark, or horrific when the covenant allows it, while exact Passage repeats and boundary violations are filtered before GNI or Dreamflow can use them.
 
 `SessionArcV1` is the hidden pacing layer for immersive long sessions. It tracks pressure, return readiness, recent beat roles, and the current arc decision so Dreamflow can deepen, distort, mirror, soften, or return without showing the machinery to the player.
@@ -328,7 +332,7 @@ Export GNI contract fixtures:
 npm run fixtures
 ```
 
-This writes `fixtures/session_bundle_v1.json`, `fixtures/session_covenant_v1.json`, `fixtures/passage_v1.json`, `fixtures/echo_trace_v1.json`, `fixtures/first_listening_v1.json`, `fixtures/experience_directive_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/session_arc_v1.json`, `fixtures/dream_session_v1.json`, `fixtures/dream_session_checkpoint_v1.json`, `fixtures/dream_weather_v1.json`, `fixtures/weather_trace_v1.json`, `fixtures/threshold_presentation_v1.json`, `fixtures/session_frame_v1.json`, `fixtures/runtime_readiness_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_firebreak_trace_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_contract_check_report_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
+This writes `fixtures/session_bundle_v1.json`, `fixtures/session_covenant_v1.json`, `fixtures/session_shape_selection_v1.json`, `fixtures/passage_v1.json`, `fixtures/echo_trace_v1.json`, `fixtures/first_listening_v1.json`, `fixtures/experience_directive_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/session_arc_v1.json`, `fixtures/dream_session_v1.json`, `fixtures/dream_session_checkpoint_v1.json`, `fixtures/dream_weather_v1.json`, `fixtures/weather_trace_v1.json`, `fixtures/threshold_presentation_v1.json`, `fixtures/session_frame_v1.json`, `fixtures/runtime_readiness_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_firebreak_trace_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_contract_check_report_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
 
 The provider-safe fixture surface is `gni_request_v1.json` and its nested `SessionBundleV1`. Full SaveGame fixtures are internal examples for resume, migration, and QA flows; they may include local or session state that should not be treated as provider input.
 
@@ -366,6 +370,7 @@ For longer play, `src/dreamSession.js` can chain many hidden beats after the por
 - `ArchitectState` -> SaveGame-backed director service
 - `GniAdapter` -> `IJungialAiProvider` implementation
 - `GniDirectiveQueue` -> SaveGame-backed async GNI request queue
+- `SessionShapeSelectionV1` -> preset-to-covenant handoff for gentle through horrific starts
 - `SessionFrameV1` -> renderer/audio/haptics handoff packet for UE5, VR, console, and browser prototypes
 - `RuntimeReadinessV1` -> internal startup preflight for build gates, QA, and platform boot checks
 - `JournalOfMirrors` -> SaveGame-backed library model

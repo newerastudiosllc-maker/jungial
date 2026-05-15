@@ -27,6 +27,7 @@ The repo already contains engine-agnostic Node.js systems, JSON contracts, and U
 - Passage Lattice
 - Dream Weather
 - Session Arc
+- Session Shape presets
 - Dream Session checkpoints
 - Dreamer Profile memory
 - GNI bridge, queue, emulator, and Firebreak
@@ -150,6 +151,7 @@ For the next 30 to 45 days, prioritize:
 - Raw speech is not persisted.
 - GNI never owns mutable gameplay state.
 - AI output is advisory and must pass through Firebreak.
+- Session shape choices must resolve into bounded covenants before gameplay, renderer, or GNI systems consume them.
 - Content must pass validation before entering the runtime catalog.
 - Runtime readiness must block broken content and degrade optional provider gaps before a session starts.
 - Procedural changes must pass replay/scenario checks.

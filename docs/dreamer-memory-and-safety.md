@@ -31,6 +31,8 @@ It intentionally avoids raw speech, raw room text, transcripts, and arbitrary no
 
 `SessionFrameV1` is the renderer handoff that combines presentation state and hidden direction. It should never contain raw speech, private memory, diagnostic explanation, or player-facing rationale; it exists so lights, audio, haptics, movement, and VR comfort can react without learning the hidden machinery.
 
+`SessionShapeSelectionV1` lets the player or platform choose broad tone without exposing hidden scoring. A shape may make the session gentle, strange, dark, or horrific, but it resolves to bounded covenant fields and can only lower intensity or add boundaries through overrides.
+
 ## Save Modes
 
 Use these modes as the product language and system shape:

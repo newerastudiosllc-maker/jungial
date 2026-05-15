@@ -30,6 +30,7 @@
     "GniBridgeResultV1",
     "GniDirectiveQueueV1",
     "SessionCovenantV1",
+    "SessionShapeSelectionV1",
     "FirstListeningRunV1",
     "PassageV1",
     "EchoTraceV1",
@@ -67,7 +68,7 @@
       "severity": "required",
       "summary": "Versioned contract documents are available for runtime, GNI, saves, and renderer handoff.",
       "details": {
-        "contracts": 19
+        "contracts": 20
       },
       "errors": []
     },
