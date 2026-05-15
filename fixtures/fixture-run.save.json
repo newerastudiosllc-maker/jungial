@@ -654,7 +654,7 @@
         "movementDrag": 0.318
       },
       "debug": {
-        "eventCount": 21,
+        "eventCount": 22,
         "lastEventType": "experience.directive.created"
       },
       "playerFacingText": null
@@ -1046,6 +1046,21 @@
         {
           "index": 16,
           "at": "2060-01-01T00:00:15.000Z",
+          "type": "session.content_gate.created",
+          "payload": {
+            "gateId": "content-gate-0972746d7bd7",
+            "allowed": true,
+            "blockedReasons": [],
+            "suppressedTags": [],
+            "warnings": [
+              "passage.pressureTags.hope outside allowedPressureTags",
+              "passage.pressureTags.refusal outside allowedPressureTags"
+            ]
+          }
+        },
+        {
+          "index": 17,
+          "at": "2060-01-01T00:00:16.000Z",
           "type": "journal.entry.written",
           "payload": {
             "entryId": "journal_001",
@@ -1062,8 +1077,8 @@
           }
         },
         {
-          "index": 17,
-          "at": "2060-01-01T00:00:16.000Z",
+          "index": 18,
+          "at": "2060-01-01T00:00:17.000Z",
           "type": "witness.bundle.created",
           "payload": {
             "sessionId": "session_0001",
@@ -1079,8 +1094,8 @@
           }
         },
         {
-          "index": 18,
-          "at": "2060-01-01T00:00:17.000Z",
+          "index": 19,
+          "at": "2060-01-01T00:00:18.000Z",
           "type": "gni.request.created",
           "payload": {
             "provider": "GNI",
@@ -1099,8 +1114,8 @@
           }
         },
         {
-          "index": 19,
-          "at": "2060-01-01T00:00:18.000Z",
+          "index": 20,
+          "at": "2060-01-01T00:00:19.000Z",
           "type": "gni.emulator.directive.created",
           "payload": {
             "directive": {
@@ -1124,8 +1139,8 @@
           }
         },
         {
-          "index": 20,
-          "at": "2060-01-01T00:00:19.000Z",
+          "index": 21,
+          "at": "2060-01-01T00:00:20.000Z",
           "type": "gni.directive.applied",
           "payload": {
             "directive": {
@@ -1169,8 +1184,8 @@
           }
         },
         {
-          "index": 21,
-          "at": "2060-01-01T00:00:20.000Z",
+          "index": 22,
+          "at": "2060-01-01T00:00:21.000Z",
           "type": "experience.directive.created",
           "payload": {
             "directiveId": "experience-7dcf26c64a",
@@ -1185,8 +1200,8 @@
           }
         },
         {
-          "index": 22,
-          "at": "2060-01-01T00:00:21.000Z",
+          "index": 23,
+          "at": "2060-01-01T00:00:22.000Z",
           "type": "simulation.saved",
           "payload": {
             "savePath": "fixtures\\fixture-run.save.json",
@@ -1781,6 +1796,43 @@
         "repetition": 0,
         "silence": 0.02
       }
+    },
+    "sessionContentGate": {
+      "schema": "SessionContentGateV1",
+      "schemaVersion": 1,
+      "gateId": "content-gate-0972746d7bd7",
+      "allowed": true,
+      "sessionShapeId": null,
+      "intensityCeiling": 0.44,
+      "checked": {
+        "passageId": "candle_refuses_dark",
+        "dreamWeatherId": "weather-777",
+        "dreamJourneySummary": "entry:Boundless White Void -> pressure:Space / Black Hole -> mirror:Space / Black Hole -> return:Boundless White Void",
+        "maskId": "double"
+      },
+      "suppressedTags": [],
+      "warnings": [
+        "passage.pressureTags.hope outside allowedPressureTags",
+        "passage.pressureTags.refusal outside allowedPressureTags"
+      ],
+      "blockedReasons": [],
+      "replacementHints": {
+        "preferredToneTags": [
+          "curious",
+          "deep"
+        ],
+        "allowedPressureTags": [
+          "threshold",
+          "word",
+          "lamp",
+          "breath"
+        ],
+        "passageIntensityBand": "gentle",
+        "weatherPressure": "medium",
+        "returnAnchorKind": "image",
+        "groundingPreference": "quiet_room"
+      },
+      "playerFacingText": null
     },
     "sessionCovenant": {
       "schema": "SessionCovenantV1",

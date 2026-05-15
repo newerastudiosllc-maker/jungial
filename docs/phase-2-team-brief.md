@@ -28,6 +28,7 @@ The repo already contains engine-agnostic Node.js systems, JSON contracts, and U
 - Dream Weather
 - Session Arc
 - Session Shape presets
+- Session Content Gate
 - Dream Session checkpoints
 - Dreamer Profile memory
 - GNI bridge, queue, emulator, and Firebreak
@@ -152,6 +153,7 @@ For the next 30 to 45 days, prioritize:
 - GNI never owns mutable gameplay state.
 - AI output is advisory and must pass through Firebreak.
 - Session shape choices must resolve into bounded covenants before gameplay, renderer, or GNI systems consume them.
+- Selected dream content must pass the hidden content gate before save, renderer handoff, or future replacement routing.
 - Content must pass validation before entering the runtime catalog.
 - Runtime readiness must block broken content and degrade optional provider gaps before a session starts.
 - Procedural changes must pass replay/scenario checks.

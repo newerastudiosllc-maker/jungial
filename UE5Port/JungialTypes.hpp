@@ -90,6 +90,42 @@ struct FSessionShapeSelectionV1
     String PlayerFacingText; // Must stay empty. The player sees atmosphere and options, not hidden mechanics.
 };
 
+struct FSessionContentGateCheckedV1
+{
+    String PassageId;
+    String DreamWeatherId;
+    String DreamJourneySummary;
+    String MaskId;
+};
+
+struct FSessionContentGateReplacementHintsV1
+{
+    Array<String> PreferredToneTags;
+    Array<String> AllowedPressureTags;
+    String PassageIntensityBand;
+    String WeatherPressure;
+    String ReturnAnchorKind;
+    String GroundingPreference;
+};
+
+struct FSessionContentGateV1
+{
+    String GateId;
+    bool bAllowed = true;
+    String SessionShapeId;
+    float IntensityCeiling = 0.35f;
+    FSessionContentGateCheckedV1 Checked;
+    Array<String> SuppressedTags;
+    Array<String> Warnings;
+    Array<String> BlockedReasons;
+    FSessionContentGateReplacementHintsV1 ReplacementHints;
+    String PlayerFacingText; // Must stay empty. Internal audit only.
+};
+
+// UJungialContentGateSubsystem should run after Passage, DreamWeather, Journey, and Mask selection.
+// It reports boundary and intensity drift before save, renderer handoff, or GNI context packaging.
+// The subsystem may request replacement content, but should never describe the hidden rule path in-world.
+
 enum class EJungialRuntimeReadinessStatus
 {
     Ready,

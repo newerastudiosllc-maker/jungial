@@ -70,6 +70,7 @@ const RUNTIME_READINESS_CAPABILITIES = Object.freeze([
   'dreamWeather',
   'experienceDirector',
   'sessionFrame',
+  'sessionContentGate',
   'saveResume',
   'asyncGniQueue',
   'gniFirebreak'
@@ -762,6 +763,57 @@ export function validateSessionShapeSelection(selection) {
     errors.push(...prefixNestedErrors(covenantValidation.errors, 'covenant', 'covenant'));
   }
   if (selection?.playerFacingText !== null) {
+    errors.push('playerFacingText must be null');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function validateSessionContentGate(gate) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'gateId',
+    'allowed',
+    'sessionShapeId',
+    'intensityCeiling',
+    'checked',
+    'suppressedTags',
+    'warnings',
+    'blockedReasons',
+    'replacementHints',
+    'playerFacingText'
+  ];
+
+  if (gate?.schema !== 'SessionContentGateV1') {
+    errors.push('schema must be SessionContentGateV1');
+  }
+  if (gate?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  errors.push(...validateKnownKeys(gate, allowedKeys, 'sessionContentGate'));
+  if (!isNonEmptyString(gate?.gateId)) {
+    errors.push('gateId is required');
+  }
+  if (typeof gate?.allowed !== 'boolean') {
+    errors.push('allowed must be a boolean');
+  }
+  if (!isNullableString(gate?.sessionShapeId)) {
+    errors.push('sessionShapeId must be a string or null');
+  } else if (typeof gate.sessionShapeId === 'string' && !SESSION_SHAPE_IDS.includes(gate.sessionShapeId)) {
+    errors.push(`sessionShapeId must be one of ${SESSION_SHAPE_IDS.join(', ')} or null`);
+  }
+  errors.push(...validateNumberBetween(gate?.intensityCeiling, 'intensityCeiling', 0, 1));
+  errors.push(...validateSessionContentGateChecked(gate?.checked));
+  errors.push(...validateStringList(gate?.suppressedTags, 'suppressedTags'));
+  errors.push(...validateStringList(gate?.warnings, 'warnings'));
+  errors.push(...validateStringList(gate?.blockedReasons, 'blockedReasons'));
+  errors.push(...validateSessionContentGateReplacementHints(gate?.replacementHints));
+  if (gate?.playerFacingText !== null) {
     errors.push('playerFacingText must be null');
   }
 
@@ -2141,6 +2193,11 @@ export function validateSaveGame(saveGame) {
     validateSessionShapeSelection
   ));
   errors.push(...validateOptionalNestedContract(
+    saveGame.payload.sessionContentGate,
+    'payload.sessionContentGate',
+    validateSessionContentGate
+  ));
+  errors.push(...validateOptionalNestedContract(
     saveGame.payload.sessionArc,
     'payload.sessionArc',
     validateSessionArc
@@ -2273,6 +2330,52 @@ function validateMemoryMap(map, label) {
     if (!isNullableString(value.lastSeenAt)) {
       errors.push(`${label}.${key}.lastSeenAt must be a string or null`);
     }
+  }
+  return errors;
+}
+
+function validateSessionContentGateChecked(value) {
+  const errors = [];
+  const allowedKeys = ['passageId', 'dreamWeatherId', 'dreamJourneySummary', 'maskId'];
+  if (!isObject(value)) {
+    return ['checked must be an object'];
+  }
+  errors.push(...validateKnownKeys(value, allowedKeys, 'checked'));
+  for (const key of allowedKeys) {
+    if (!isNullableString(value[key])) {
+      errors.push(`checked.${key} must be a string or null`);
+    }
+  }
+  return errors;
+}
+
+function validateSessionContentGateReplacementHints(value) {
+  const errors = [];
+  const allowedKeys = [
+    'preferredToneTags',
+    'allowedPressureTags',
+    'passageIntensityBand',
+    'weatherPressure',
+    'returnAnchorKind',
+    'groundingPreference'
+  ];
+  if (!isObject(value)) {
+    return ['replacementHints must be an object'];
+  }
+  errors.push(...validateKnownKeys(value, allowedKeys, 'replacementHints'));
+  errors.push(...validateStringList(value.preferredToneTags, 'replacementHints.preferredToneTags'));
+  errors.push(...validateStringList(value.allowedPressureTags, 'replacementHints.allowedPressureTags'));
+  if (!['gentle', 'strange', 'dark', 'horrific', 'abyssal', 'cathartic', 'beautiful', 'chaotic'].includes(value.passageIntensityBand)) {
+    errors.push('replacementHints.passageIntensityBand is unsupported');
+  }
+  if (!DREAM_WEATHER_PRESSURES.includes(value.weatherPressure)) {
+    errors.push(`replacementHints.weatherPressure must be one of ${DREAM_WEATHER_PRESSURES.join(', ')}`);
+  }
+  if (!isNonEmptyString(value.returnAnchorKind)) {
+    errors.push('replacementHints.returnAnchorKind is required');
+  }
+  if (!isNonEmptyString(value.groundingPreference)) {
+    errors.push('replacementHints.groundingPreference is required');
   }
   return errors;
 }

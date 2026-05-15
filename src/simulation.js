@@ -16,6 +16,7 @@ import { DreamerProfile } from './dreamerProfile.js';
 import { prepareSaveSlot } from './saveSlotManager.js';
 import { advanceSessionArc } from './sessionArc.js';
 import { createSessionCovenant } from './sessionCovenant.js';
+import { createSessionContentGateReport } from './sessionContentGate.js';
 import { createSessionShapeSelection } from './sessionShape.js';
 import { createEchoTrace, selectPassage, toGniPassageContext } from './passageLattice.js';
 import { createDreamWeather, createWeatherTrace, toGniWeatherContext } from './dreamWeather.js';
@@ -259,6 +260,22 @@ export async function runSimulation({
     spawnTrigger: mask?.spawnTrigger ?? null
   });
 
+  const sessionContentGate = createSessionContentGateReport({
+    sessionCovenant: activeSessionCovenant,
+    sessionShapeSelection,
+    passage: activePassage,
+    dreamWeather,
+    dreamJourney,
+    mask
+  });
+  traceRecorder.record('session.content_gate.created', {
+    gateId: sessionContentGate.gateId,
+    allowed: sessionContentGate.allowed,
+    blockedReasons: sessionContentGate.blockedReasons,
+    suppressedTags: sessionContentGate.suppressedTags,
+    warnings: sessionContentGate.warnings
+  });
+
   const symbolGrammar = new SymbolGrammar();
   symbolGrammar.ingest({ symbols: dreamJourney.symbolTrail, vibeState: feeling.vibeState });
   const entry = journal.writeReturnEntry({
@@ -413,6 +430,7 @@ export async function runSimulation({
     gniBridgeResult,
     appliedGniDirective,
     ...(sessionShapeSelection ? { sessionShapeSelection } : {}),
+    sessionContentGate,
     sessionCovenant: activeSessionCovenant,
     echoTrace,
     activePassage,
@@ -446,6 +464,7 @@ export async function runSimulation({
     sessionArc: activeSessionArc,
     sessionArcDirective,
     sessionShapeSelection,
+    sessionContentGate,
     sessionCovenant: activeSessionCovenant,
     firstListeningRun,
     experienceDirective,

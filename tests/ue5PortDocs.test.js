@@ -80,3 +80,12 @@ test('UE5 core type pseudocode documents session shape selections', async () => 
   assert.match(text, /nightmare_veil/);
   assert.match(text, /PlayerFacingText/);
 });
+
+test('UE5 core type pseudocode documents session content gate reports', async () => {
+  const text = await readFile('UE5Port/JungialTypes.hpp', 'utf8');
+
+  assert.match(text, /struct FSessionContentGateV1/);
+  assert.match(text, /SuppressedTags/);
+  assert.match(text, /ReplacementHints/);
+  assert.match(text, /UJungialContentGateSubsystem/);
+});

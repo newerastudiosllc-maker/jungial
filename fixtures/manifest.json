@@ -11,6 +11,7 @@
     "experience_directive_v1.json",
     "session_frame_v1.json",
     "session_shape_selection_v1.json",
+    "session_content_gate_v1.json",
     "runtime_readiness_v1.json",
     "dreamer_profile_v1.json",
     "dreamer_memory_context_v1.json",
@@ -31,5 +32,5 @@
     "fixture-pending-run.save.json",
     "trace_summary_v1.json"
   ],
-  "hash": "d5b5704cab8660f097aea088991f2a6820a40cd48fd8e04877962e82b92ae37c"
+  "hash": "9c34976880c388cfc787b4a54df0ed1cd863fd571cef0ab9c407c1262ec4bcbc"
 }

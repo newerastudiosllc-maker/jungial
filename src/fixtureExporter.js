@@ -24,6 +24,7 @@ const FIXTURE_FILES = Object.freeze([
   'experience_directive_v1.json',
   'session_frame_v1.json',
   'session_shape_selection_v1.json',
+  'session_content_gate_v1.json',
   'runtime_readiness_v1.json',
   'dreamer_profile_v1.json',
   'dreamer_memory_context_v1.json',
@@ -74,6 +75,7 @@ export async function exportContractFixtures({
   const sessionShapeSelection = createSessionShapeSelection({
     shapeId: 'dark_mirror'
   });
+  const sessionContentGate = run.sessionContentGate;
   const runtimeReadiness = createRuntimeReadinessReport({
     gniEndpoint: 'gni://local-dev-placeholder',
     platformTargets: ['node_prototype', 'ue5', 'vr', 'console']
@@ -160,6 +162,7 @@ export async function exportContractFixtures({
     'experience_directive_v1.json': experienceDirective,
     'session_frame_v1.json': sessionFrame,
     'session_shape_selection_v1.json': sessionShapeSelection,
+    'session_content_gate_v1.json': sessionContentGate,
     'runtime_readiness_v1.json': runtimeReadiness,
     'dreamer_profile_v1.json': dreamerProfile,
     'dreamer_memory_context_v1.json': dreamerMemoryContext,

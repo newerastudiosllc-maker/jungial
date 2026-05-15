@@ -33,6 +33,8 @@ It intentionally avoids raw speech, raw room text, transcripts, and arbitrary no
 
 `SessionShapeSelectionV1` lets the player or platform choose broad tone without exposing hidden scoring. A shape may make the session gentle, strange, dark, or horrific, but it resolves to bounded covenant fields and can only lower intensity or add boundaries through overrides.
 
+`SessionContentGateV1` is the hidden audit after content selection. It checks Passage, Dream Weather, DreamJourney, and Mask packets against the current covenant, records suppressed tags and replacement hints, and stays internal. It should never become player-facing explanation, diagnostic language, or a storehouse for raw speech.
+
 ## Save Modes
 
 Use these modes as the product language and system shape:
@@ -104,6 +106,7 @@ Production safety should include:
 - A grounded exit/return path from intense sessions.
 - Session length awareness and gentle stopping points.
 - Clear separation between world voice and support resources.
+- Hidden content-gate checks before save, renderer handoff, or future replacement routing.
 - Human review before any medical, therapeutic, or clinical claim.
 
 ## Team Checklist

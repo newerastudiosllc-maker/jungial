@@ -29,6 +29,7 @@ import {
   validateSaveSlotPlan,
   validateRuntimeReadiness,
   validateSessionArc,
+  validateSessionContentGate,
   validateSessionCovenant,
   validateSessionShapeSelection,
   validateSessionFrame,
@@ -47,6 +48,7 @@ import {
 } from '../src/dreamWeather.js';
 import { buildThresholdPresentation } from '../src/presentation.js';
 import { createRuntimeReadinessReport } from '../src/runtimeReadiness.js';
+import { createSessionContentGateReport } from '../src/sessionContentGate.js';
 import { createSessionShapeSelection } from '../src/sessionShape.js';
 import { createDeterministicClock } from '../src/clock.js';
 import { applyPlayerInput } from '../src/input.js';
@@ -136,6 +138,16 @@ test('Session Shape schema documents bounded session tone presets', async () => 
   assert.equal(schema.properties.playerFacingText.type, 'null');
 });
 
+test('Session Content Gate schema documents internal boundary audit reports', async () => {
+  const schema = await readJson('data/schemas/session_content_gate.schema.json');
+
+  assert.equal(schema.title, 'SessionContentGateV1');
+  assert.deepEqual(schema.properties.schema, { const: 'SessionContentGateV1' });
+  assert.equal(schema.additionalProperties, false);
+  assert.equal(schema.properties.playerFacingText.type, 'null');
+  assert.equal(schema.properties.rawSpeech, undefined);
+});
+
 test('session bundle validation reports missing GNI handoff fields', () => {
   const result = validateSessionBundle({
     schema: 'SessionBundleV1',
@@ -220,6 +232,28 @@ test('Session Shape validation rejects raw or player-facing fields', () => {
     'source must be preset or fallback',
     'intensityBand must be one of gentle, strange, dark, horrific',
     'shapeTags[1] must be a non-empty string',
+    'playerFacingText must be null'
+  ]);
+});
+
+test('Session Content Gate validation accepts internal reports and rejects leaks', () => {
+  const selection = createSessionShapeSelection({ shapeId: 'quiet_lantern' });
+  const report = createSessionContentGateReport({
+    sessionShapeSelection: selection,
+    sessionCovenant: selection.covenant
+  });
+
+  assert.deepEqual(validateSessionContentGate(report), { valid: true, errors: [] });
+
+  const result = validateSessionContentGate({
+    ...report,
+    playerFacingText: 'This room changed because of a safety rule.',
+    rawSpeech: 'do not keep me'
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'sessionContentGate.rawSpeech is not allowed',
     'playerFacingText must be null'
   ]);
 });

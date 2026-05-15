@@ -25,6 +25,7 @@ test('fixture exporter writes stable GNI handoff fixtures', async () => {
       'experience_directive_v1.json',
       'session_frame_v1.json',
       'session_shape_selection_v1.json',
+      'session_content_gate_v1.json',
       'runtime_readiness_v1.json',
       'dreamer_profile_v1.json',
       'dreamer_memory_context_v1.json',
@@ -55,6 +56,7 @@ test('fixture exporter writes stable GNI handoff fixtures', async () => {
     const experienceDirective = JSON.parse(await readFile(join(dir, 'experience_directive_v1.json'), 'utf8'));
     const sessionFrame = JSON.parse(await readFile(join(dir, 'session_frame_v1.json'), 'utf8'));
     const sessionShape = JSON.parse(await readFile(join(dir, 'session_shape_selection_v1.json'), 'utf8'));
+    const sessionContentGate = JSON.parse(await readFile(join(dir, 'session_content_gate_v1.json'), 'utf8'));
     const runtimeReadiness = JSON.parse(await readFile(join(dir, 'runtime_readiness_v1.json'), 'utf8'));
     const dreamerProfile = JSON.parse(await readFile(join(dir, 'dreamer_profile_v1.json'), 'utf8'));
     const memoryContext = JSON.parse(await readFile(join(dir, 'dreamer_memory_context_v1.json'), 'utf8'));
@@ -87,6 +89,9 @@ test('fixture exporter writes stable GNI handoff fixtures', async () => {
     assert.equal(sessionShape.schema, 'SessionShapeSelectionV1');
     assert.equal(sessionShape.shapeId, 'dark_mirror');
     assert.equal(sessionShape.playerFacingText, null);
+    assert.equal(sessionContentGate.schema, 'SessionContentGateV1');
+    assert.equal(sessionContentGate.playerFacingText, null);
+    assert.deepEqual(sessionContentGate, fixtureRunSave.payload.sessionContentGate);
     assert.equal(runtimeReadiness.schema, 'RuntimeReadinessV1');
     assert.equal(runtimeReadiness.canStartSession, true);
     assert.equal(runtimeReadiness.checks.some((check) => check.id === 'content.catalog'), true);

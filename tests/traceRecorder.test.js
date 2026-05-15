@@ -67,6 +67,7 @@ test('simulation trace explains dream journey and GNI handoff without in-world e
       'dream.journey.selected',
       'dream.weather.created',
       'mask.selected',
+      'session.content_gate.created',
       'journal.entry.written',
       'witness.bundle.created',
       'gni.request.created',
@@ -84,10 +85,13 @@ test('simulation trace explains dream journey and GNI handoff without in-world e
     assert.equal(firebreakEntry.payload.clampCounts.dreamWeightDeltas, 1);
     assert.equal(result.trace.entries.find((entry) => entry.type === 'dream.journey.selected').payload.beats.length, 4);
     const weatherEntry = result.trace.entries.find((entry) => entry.type === 'dream.weather.created');
+    const contentGateEntry = result.trace.entries.find((entry) => entry.type === 'session.content_gate.created');
     assert.equal(weatherEntry.payload.weatherId, result.dreamWeather.weatherId);
     assert.equal(weatherEntry.payload.traceId, result.weatherTrace.traceId);
     assert.deepEqual(weatherEntry.payload.sourceTags, result.weatherTrace.sourceTags);
     assert.deepEqual(weatherEntry.payload.suppressedTags, result.weatherTrace.suppressedTags);
+    assert.equal(contentGateEntry.payload.gateId, result.sessionContentGate.gateId);
+    assert.equal(contentGateEntry.payload.allowed, result.sessionContentGate.allowed);
     assert.equal(saved.trace.entries.length, result.trace.entries.length);
   } finally {
     await rm(dir, { recursive: true, force: true });

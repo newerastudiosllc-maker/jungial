@@ -647,7 +647,7 @@
         "movementDrag": 0.277
       },
       "debug": {
-        "eventCount": 15,
+        "eventCount": 16,
         "lastEventType": "experience.directive.created"
       },
       "playerFacingText": null
@@ -956,6 +956,18 @@
         {
           "index": 11,
           "at": "2060-01-01T00:00:10.000Z",
+          "type": "session.content_gate.created",
+          "payload": {
+            "gateId": "content-gate-b4041773f266",
+            "allowed": true,
+            "blockedReasons": [],
+            "suppressedTags": [],
+            "warnings": []
+          }
+        },
+        {
+          "index": 12,
+          "at": "2060-01-01T00:00:11.000Z",
           "type": "journal.entry.written",
           "payload": {
             "entryId": "journal_001",
@@ -972,8 +984,8 @@
           }
         },
         {
-          "index": 12,
-          "at": "2060-01-01T00:00:11.000Z",
+          "index": 13,
+          "at": "2060-01-01T00:00:12.000Z",
           "type": "witness.bundle.created",
           "payload": {
             "sessionId": "session_0001",
@@ -989,8 +1001,8 @@
           }
         },
         {
-          "index": 13,
-          "at": "2060-01-01T00:00:12.000Z",
+          "index": 14,
+          "at": "2060-01-01T00:00:13.000Z",
           "type": "gni.request.created",
           "payload": {
             "provider": "GNI",
@@ -1009,8 +1021,8 @@
           }
         },
         {
-          "index": 14,
-          "at": "2060-01-01T00:00:13.000Z",
+          "index": 15,
+          "at": "2060-01-01T00:00:14.000Z",
           "type": "gni.request.queued",
           "payload": {
             "id": "gni_pending_session_0001",
@@ -1019,8 +1031,8 @@
           }
         },
         {
-          "index": 15,
-          "at": "2060-01-01T00:00:14.000Z",
+          "index": 16,
+          "at": "2060-01-01T00:00:15.000Z",
           "type": "experience.directive.created",
           "payload": {
             "directiveId": "experience-31dc28e42a",
@@ -1034,8 +1046,8 @@
           }
         },
         {
-          "index": 16,
-          "at": "2060-01-01T00:00:15.000Z",
+          "index": 17,
+          "at": "2060-01-01T00:00:16.000Z",
           "type": "simulation.saved",
           "payload": {
             "savePath": "fixtures\\fixture-pending-run.save.json",
@@ -1715,6 +1727,35 @@
       "errors": []
     },
     "appliedGniDirective": null,
+    "sessionContentGate": {
+      "schema": "SessionContentGateV1",
+      "schemaVersion": 1,
+      "gateId": "content-gate-b4041773f266",
+      "allowed": true,
+      "sessionShapeId": null,
+      "intensityCeiling": 0.35,
+      "checked": {
+        "passageId": "candle_refuses_dark",
+        "dreamWeatherId": "weather-777",
+        "dreamJourneySummary": "entry:Boundless White Void -> pressure:Space / Black Hole -> mirror:Space / Black Hole -> return:Boundless White Void",
+        "maskId": "double"
+      },
+      "suppressedTags": [],
+      "warnings": [],
+      "blockedReasons": [],
+      "replacementHints": {
+        "preferredToneTags": [
+          "gentle",
+          "strange"
+        ],
+        "allowedPressureTags": [],
+        "passageIntensityBand": "gentle",
+        "weatherPressure": "low",
+        "returnAnchorKind": "image",
+        "groundingPreference": "quiet_room"
+      },
+      "playerFacingText": null
+    },
     "sessionCovenant": {
       "schema": "SessionCovenantV1",
       "schemaVersion": 1,

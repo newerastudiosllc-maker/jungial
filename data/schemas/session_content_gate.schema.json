@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/session_content_gate.schema.json",
+  "title": "SessionContentGateV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "schemaVersion",
+    "gateId",
+    "allowed",
+    "sessionShapeId",
+    "intensityCeiling",
+    "checked",
+    "suppressedTags",
+    "warnings",
+    "blockedReasons",
+    "replacementHints",
+    "playerFacingText"
+  ],
+  "properties": {
+    "schema": { "const": "SessionContentGateV1" },
+    "schemaVersion": { "const": 1 },
+    "gateId": { "type": "string", "minLength": 1 },
+    "allowed": { "type": "boolean" },
+    "sessionShapeId": {
+      "anyOf": [
+        { "type": "null" },
+        { "enum": ["quiet_lantern", "strange_threshold", "dark_mirror", "nightmare_veil"] }
+      ]
+    },
+    "intensityCeiling": { "type": "number", "minimum": 0, "maximum": 1 },
+    "checked": {
+      "type": "object",
+      "required": ["passageId", "dreamWeatherId", "dreamJourneySummary", "maskId"],
+      "properties": {
+        "passageId": { "type": ["string", "null"] },
+        "dreamWeatherId": { "type": ["string", "null"] },
+        "dreamJourneySummary": { "type": ["string", "null"] },
+        "maskId": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "suppressedTags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "blockedReasons": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "replacementHints": {
+      "type": "object",
+      "required": [
+        "preferredToneTags",
+        "allowedPressureTags",
+        "passageIntensityBand",
+        "weatherPressure",
+        "returnAnchorKind",
+        "groundingPreference"
+      ],
+      "properties": {
+        "preferredToneTags": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "allowedPressureTags": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "passageIntensityBand": {
+          "enum": ["gentle", "strange", "dark", "horrific", "abyssal", "cathartic", "beautiful", "chaotic"]
+        },
+        "weatherPressure": { "enum": ["low", "medium", "heavy", "storm"] },
+        "returnAnchorKind": { "type": "string", "minLength": 1 },
+        "groundingPreference": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "playerFacingText": { "type": "null" }
+  },
+  "additionalProperties": false
+}

@@ -12,6 +12,7 @@ const RUNTIME_CONTRACTS = Object.freeze([
   'GniDirectiveQueueV1',
   'SessionCovenantV1',
   'SessionShapeSelectionV1',
+  'SessionContentGateV1',
   'FirstListeningRunV1',
   'PassageV1',
   'EchoTraceV1',
@@ -35,6 +36,7 @@ export const RUNTIME_READINESS_CAPABILITIES = Object.freeze([
   'dreamWeather',
   'experienceDirector',
   'sessionFrame',
+  'sessionContentGate',
   'saveResume',
   'asyncGniQueue',
   'gniFirebreak'
