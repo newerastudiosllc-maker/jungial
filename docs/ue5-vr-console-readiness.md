@@ -18,7 +18,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - `UJungialSymbolLexicon`: central DataAsset/registry for valid symbolic tags.
 - `UJungialWitnessComponent`: builds `SessionBundleV1`.
 - `UJungialArchitectSubsystem`: applies safe `JungialDirectiveV1` data and persists long-range state.
-- `UGniBridgeSubsystem`: validates bundles, creates `GniProcessingRequestV1`, selects provider/emulator/fixture source, and returns normalized directives.
+- `UGniBridgeSubsystem`: validates bundles, creates `GniProcessingRequestV1`, selects provider/emulator/fixture source, runs the GNI Firebreak, and returns normalized directives.
 - `UGniDirectiveQueueSubsystem`: persists pending GNI requests and resolved directives across level loads, suspend/resume, and offline provider windows.
 - `IJungialAiProvider`: implemented first by an emulator, then by GNI.
 - `FGniHttpProviderAdapter`: early network-backed provider that POSTs request envelopes while final GNI transport details settle.
@@ -38,7 +38,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - Queue processing should happen from a platform-safe async/service layer that writes back normalized directives and Architect snapshots, never from an actor tick that can hitch VR rendering.
 - HTTP-backed GNI calls should be injectable and mockable so packaged builds can test without network access.
 - HTTP `202`/`204` responses from GNI should be treated as pending async work and routed into the SaveGame-backed queue; `202` responses may carry provider job metadata for later polling.
-- GNI/GNI-emulator outputs must be normalized before touching gameplay state.
+- GNI/GNI-emulator outputs must pass through the Firebreak before touching gameplay state.
 - GNI contract fixtures should pass strict validation before provider changes are accepted.
 - Content validation must run before packaged builds and before accepting AI-authored content.
 - Dream modules should reference known lexicon symbols rather than ad hoc strings.

@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { ArchitectState } from './ai.js';
 import { callGniProvider, isGniProviderPendingResponse } from './gniBridge.js';
 import { createDeterministicClock } from './clock.js';
+import { applyGniFirebreak } from './gniFirebreak.js';
 import { GniHttpProvider } from './gniHttpProvider.js';
 import { GniDirectiveQueue } from './gniQueue.js';
 import { loadGameState, saveGameState } from './persistence.js';
@@ -72,7 +73,15 @@ export async function processPendingGniQueue({
         continue;
       }
 
-      const resolved = queue.resolve(entry.id, rawResponse, { at: nowIso(clock) });
+      const firebreak = applyGniFirebreak({
+        rawDirective: rawResponse,
+        request: entry.request,
+        source: 'queue'
+      });
+      const resolved = queue.resolve(entry.id, firebreak.directive, {
+        at: nowIso(clock),
+        firebreakTrace: firebreak.trace
+      });
       const directiveUpdate = resolved.directive ? architect.applyDirective(resolved.directive) : null;
       processed.push({
         id: entry.id,
@@ -80,6 +89,7 @@ export async function processPendingGniQueue({
         directive: resolved.directive,
         directiveUpdate,
         providerJob: entry.providerJob ?? null,
+        firebreakTrace: firebreak.trace,
         errors: []
       });
     } catch (error) {
@@ -130,14 +140,29 @@ export async function processSavedGniQueue({
     jobPollTimeoutMs
   });
 
+  let nextTrace = appendTraceEntry(state.trace, 'gni.queue.processed', summarizeQueueProcessForTrace(result), {
+    clock: clock ?? undefined
+  });
+  for (const entry of result.processed) {
+    if (entry.firebreakTrace?.changed) {
+      nextTrace = appendTraceEntry(nextTrace, 'gni.firebreak.applied', {
+        id: entry.id,
+        source: entry.firebreakTrace.source,
+        suppressedCounts: entry.firebreakTrace.suppressedCounts,
+        clampCounts: entry.firebreakTrace.clampCounts,
+        boundaryTags: entry.firebreakTrace.boundaryTags
+      }, {
+        clock: clock ?? undefined
+      });
+    }
+  }
+
   const nextState = {
     ...state,
     gniQueue: result.queue,
     architectState: result.architectState,
     lastGniQueueProcessResult: result,
-    trace: appendTraceEntry(state.trace, 'gni.queue.processed', summarizeQueueProcessForTrace(result), {
-      clock: clock ?? undefined
-    })
+    trace: nextTrace
   };
 
   await saveGameState(outputPath, nextState, { clock });

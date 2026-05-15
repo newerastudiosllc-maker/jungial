@@ -229,6 +229,14 @@ export async function runSimulation({
     contract: gniRequest.contract,
     sessionId: gniRequest.payload.sessionId
   });
+  if (gniBridgeResult.firebreakTrace?.changed) {
+    traceRecorder.record('gni.firebreak.applied', {
+      source: gniBridgeResult.firebreakTrace.source,
+      suppressedCounts: gniBridgeResult.firebreakTrace.suppressedCounts,
+      clampCounts: gniBridgeResult.firebreakTrace.clampCounts,
+      boundaryTags: gniBridgeResult.firebreakTrace.boundaryTags
+    });
+  }
 
   if (gniBridgeResult.source === 'emulator') {
     transcript.push('GNI emulator prepared a directive.');

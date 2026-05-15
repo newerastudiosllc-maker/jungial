@@ -1464,6 +1464,7 @@
       "rawResponse": null,
       "directive": null,
       "providerJob": null,
+      "firebreakTrace": null,
       "errors": []
     },
     "appliedGniDirective": null,

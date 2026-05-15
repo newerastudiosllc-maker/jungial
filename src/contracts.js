@@ -774,6 +774,53 @@ export function validateGniProcessingRequest(request) {
   };
 }
 
+export function validateGniFirebreakTrace(trace) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'schemaVersion',
+    'source',
+    'changed',
+    'ceiling',
+    'boundaryTags',
+    'suppressedCounts',
+    'clampCounts'
+  ];
+
+  if (trace?.schema !== 'GniFirebreakTraceV1') {
+    errors.push('schema must be GniFirebreakTraceV1');
+  }
+  if (trace?.schemaVersion !== 1) {
+    errors.push('schemaVersion must be 1');
+  }
+  errors.push(...validateKnownKeys(trace, allowedKeys, 'firebreakTrace'));
+  if (!['provided', 'provider', 'emulator', 'queue'].includes(trace?.source)) {
+    errors.push('source must be provided, provider, emulator, or queue');
+  }
+  if (typeof trace?.changed !== 'boolean') {
+    errors.push('changed must be a boolean');
+  }
+  errors.push(...validateNumberBetween(trace?.ceiling, 'ceiling', 0, 2));
+  errors.push(...validateStringList(trace?.boundaryTags, 'boundaryTags'));
+  errors.push(...validateCountMap(trace?.suppressedCounts, 'suppressedCounts', [
+    'fields',
+    'dreamWeightDeltas',
+    'symbolEchoes',
+    'maskPressure',
+    'pacingDelta'
+  ]));
+  errors.push(...validateCountMap(trace?.clampCounts, 'clampCounts', [
+    'dreamWeightDeltas',
+    'maskPressure',
+    'pacingDelta'
+  ]));
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
 export function validateGniBridgeResult(result) {
   const errors = [];
   const statuses = ['invalid_session', 'pending', 'provider_empty', 'provider_error', 'directive_ready'];
@@ -804,6 +851,12 @@ export function validateGniBridgeResult(result) {
     errors.push('rawResponse must be an object or null');
   }
   errors.push(...validateProviderJob(result?.providerJob, 'providerJob'));
+  if (result?.firebreakTrace !== undefined && result.firebreakTrace !== null) {
+    const firebreakValidation = validateGniFirebreakTrace(result.firebreakTrace);
+    if (!firebreakValidation.valid) {
+      errors.push(...firebreakValidation.errors.map((error) => `firebreakTrace.${error}`));
+    }
+  }
   if (!Array.isArray(result?.errors)) {
     errors.push('errors must be an array');
   } else {
@@ -1311,6 +1364,20 @@ function validateDreadAxisList(value, label) {
   return errors;
 }
 
+function validateCountMap(value, label, allowedKeys) {
+  const errors = [];
+  if (!isObject(value)) {
+    return [`${label} must be an object`];
+  }
+  errors.push(...validateKnownKeys(value, allowedKeys, label));
+  for (const key of allowedKeys) {
+    if (!isNonNegativeInteger(value[key])) {
+      errors.push(`${label}.${key} must be a non-negative integer`);
+    }
+  }
+  return errors;
+}
+
 function validatePresentationNumberMap(value, label) {
   const errors = [];
   if (!isObject(value)) {
@@ -1401,6 +1468,12 @@ function validateQueueProcessEntry(entry, label) {
     errors.push(`${label}.directiveUpdate must be an object or null`);
   }
   errors.push(...validateProviderJob(entry?.providerJob, `${label}.providerJob`));
+  if (entry?.firebreakTrace !== undefined && entry.firebreakTrace !== null) {
+    const firebreakValidation = validateGniFirebreakTrace(entry.firebreakTrace);
+    if (!firebreakValidation.valid) {
+      errors.push(...firebreakValidation.errors.map((error) => `${label}.firebreakTrace.${error}`));
+    }
+  }
 
   return errors;
 }
@@ -1432,6 +1505,12 @@ function validateQueueEntry(entry, label, expectedStatus) {
     errors.push(...requestValidation.errors.map((error) => `${label}.request.${error}`));
   }
   errors.push(...validateProviderJob(entry?.providerJob, `${label}.providerJob`));
+  if (entry?.firebreakTrace !== undefined && entry.firebreakTrace !== null) {
+    const firebreakValidation = validateGniFirebreakTrace(entry.firebreakTrace);
+    if (!firebreakValidation.valid) {
+      errors.push(...firebreakValidation.errors.map((error) => `${label}.firebreakTrace.${error}`));
+    }
+  }
 
   if (expectedStatus === 'resolved') {
     if (!isNullableString(entry?.resolvedAt)) {

@@ -22,6 +22,7 @@ const FIXTURE_FILES = Object.freeze([
   'threshold_presentation_v1.json',
   'gni_request_v1.json',
   'gni_directive_v1.json',
+  'gni_firebreak_trace_v1.json',
   'gni_bridge_result_v1.json',
   'gni_contract_check_report_v1.json',
   'gni_directive_queue_v1.json',
@@ -76,6 +77,7 @@ export async function exportContractFixtures({
   const thresholdPresentation = run.thresholdPresentation;
   const gniRequest = run.gniRequest;
   const gniDirective = run.appliedGniDirective;
+  const gniFirebreakTrace = run.gniBridgeResult.firebreakTrace;
   const gniBridgeResult = run.gniBridgeResult;
   const gniDirectiveQueue = pendingRun.gniQueue;
   const fixtureRunSave = JSON.parse(await readFile(join(outDir, 'fixture-run.save.json'), 'utf8'));
@@ -118,6 +120,7 @@ export async function exportContractFixtures({
     'threshold_presentation_v1.json': thresholdPresentation,
     'gni_request_v1.json': gniRequest,
     'gni_directive_v1.json': gniDirective,
+    'gni_firebreak_trace_v1.json': gniFirebreakTrace,
     'gni_bridge_result_v1.json': gniBridgeResult,
     'gni_contract_check_report_v1.json': gniContractCheckReport,
     'gni_directive_queue_v1.json': gniDirectiveQueue,

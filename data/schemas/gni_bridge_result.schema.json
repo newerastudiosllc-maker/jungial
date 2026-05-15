@@ -45,6 +45,9 @@
       "required": ["id"],
       "additionalProperties": false
     },
+    "firebreakTrace": {
+      "type": ["object", "null"]
+    },
     "errors": {
       "type": "array",
       "items": { "type": "string" }

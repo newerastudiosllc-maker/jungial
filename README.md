@@ -135,7 +135,7 @@ That matters for the UE5 path: these JSON files can become DataAssets later, whi
 
 GNI is represented by `GniAdapter` in `src/ai.js` and routed through `GniBridge` in `src/gniBridge.js`.
 
-`GniBridge` is the provider boundary for the real GNI side. It validates `SessionBundleV1`, builds a `GniProcessingRequestV1`, accepts one of three directive sources, then normalizes the result before the Architect can apply it:
+`GniBridge` is the provider boundary for the real GNI side. It validates `SessionBundleV1`, builds a `GniProcessingRequestV1`, accepts one of three directive sources, then passes the result through the GNI Firebreak before the Architect can apply it:
 
 - `provided`: a fixture/mock directive, such as `--gni-response=data/mock_gni_directive.json`
 - `provider`: an injected object/function that receives the processing request
@@ -162,9 +162,11 @@ provider.complete = async (request) => {}
 
 That metadata is normalized into `providerJob` and saved in `GniBridgeResultV1` plus the pending `GniDirectiveQueueV1` entry.
 
+`src/gniFirebreak.js` is the final response gate for immediate, emulated, fixture, and queued GNI output. It strips private/raw fields, suppresses hard-boundary symbols, clamps directive pressure to the current session covenant, and emits `GniFirebreakTraceV1` counts for developer traces without preserving raw suppressed content.
+
 `GniDirectiveQueue` in `src/gniQueue.js` records pending GNI requests when the provider is empty, offline, or still processing. The simulation saves a `GniDirectiveQueueV1` snapshot beside the bridge result so later UE5, VR, or console builds can resume async AI work without blocking the chamber or dream return loop.
 
-`processPendingGniQueue()` and `processSavedGniQueue()` in `src/gniQueueProcessor.js` are the later-response path. They first poll an existing `providerJob.statusUrl` when a queued entry already has async job metadata, then fall back to the same GNI provider shapes used by the bridge when no provider job exists. Any returned directive is normalized, applied through `ArchitectState`, and persisted with the updated queue/Architect state when working from a save file.
+`processPendingGniQueue()` and `processSavedGniQueue()` in `src/gniQueueProcessor.js` are the later-response path. They first poll an existing `providerJob.statusUrl` when a queued entry already has async job metadata, then fall back to the same GNI provider shapes used by the bridge when no provider job exists. Any returned directive passes through the GNI Firebreak, is applied through `ArchitectState`, and is persisted with the updated queue/Architect state when working from a save file.
 
 `GniEmulator` in `src/gniEmulator.js` lets the prototype test AI-shaped behavior before real GNI is ready. Use `--emulate-gni` to have the simulation produce and apply a deterministic directive from the current `SessionBundleV1`.
 
@@ -207,6 +209,7 @@ The current contract schemas live in `data/schemas/`:
 - `dreamer_memory_context.schema.json`
 - `gni_processing_request.schema.json`
 - `gni_directive.schema.json`
+- `gni_firebreak_trace.schema.json`
 - `gni_bridge_result.schema.json`
 - `gni_contract_check_report.schema.json`
 - `gni_directive_queue.schema.json`
@@ -234,7 +237,7 @@ The nested `DreamAtmospherePresentationV1` is deliberately presentation-only. It
 
 ## Trace/Audit Output
 
-`TraceRecorder` writes `JungialTraceV1` developer traces. These are not in-world exposition; they are black-box records for QA and GNI debugging. A trace captures threshold input, room awakening, portal opening, dream journey selection, mask selection, journal grounding, Witness bundle creation, GNI requests/directives, queue processing summaries, and save output.
+`TraceRecorder` writes `JungialTraceV1` developer traces. These are not in-world exposition; they are black-box records for QA and GNI debugging. A trace captures threshold input, room awakening, portal opening, dream journey selection, mask selection, journal grounding, Witness bundle creation, GNI requests/directives, Firebreak suppression counts, queue processing summaries, and save output.
 
 Use `--trace=<path>` on simulation runs to write a standalone trace JSON file. Save files also include the trace snapshot, and `processSavedGniQueue()` appends a `gni.queue.processed` event when background AI work is resolved later.
 
@@ -264,7 +267,7 @@ Export GNI contract fixtures:
 npm run fixtures
 ```
 
-This writes `fixtures/session_bundle_v1.json`, `fixtures/session_covenant_v1.json`, `fixtures/passage_v1.json`, `fixtures/echo_trace_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/dream_weather_v1.json`, `fixtures/weather_trace_v1.json`, `fixtures/threshold_presentation_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_contract_check_report_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
+This writes `fixtures/session_bundle_v1.json`, `fixtures/session_covenant_v1.json`, `fixtures/passage_v1.json`, `fixtures/echo_trace_v1.json`, `fixtures/dreamer_profile_v1.json`, `fixtures/dreamer_memory_context_v1.json`, `fixtures/dream_weather_v1.json`, `fixtures/weather_trace_v1.json`, `fixtures/threshold_presentation_v1.json`, `fixtures/gni_request_v1.json`, `fixtures/gni_directive_v1.json`, `fixtures/gni_firebreak_trace_v1.json`, `fixtures/gni_bridge_result_v1.json`, `fixtures/gni_contract_check_report_v1.json`, `fixtures/gni_directive_queue_v1.json`, `fixtures/gni_queue_process_result_v1.json`, `fixtures/fixture-run.save.json`, `fixtures/fixture-pending-run.save.json`, `fixtures/trace_summary_v1.json`, and a manifest hash.
 
 The provider-safe fixture surface is `gni_request_v1.json` and its nested `SessionBundleV1`. Full SaveGame fixtures are internal examples for resume, migration, and QA flows; they may include local or session state that should not be treated as provider input.
 

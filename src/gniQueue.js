@@ -32,7 +32,7 @@ export class GniDirectiveQueue {
     return clone(entry);
   }
 
-  resolve(id, rawDirective, { at = null } = {}) {
+  resolve(id, rawDirective, { at = null, firebreakTrace = null } = {}) {
     const index = this.pending.findIndex((entry) => entry.id === id);
     if (index < 0) {
       return {
@@ -47,7 +47,8 @@ export class GniDirectiveQueue {
       ...pending,
       status: 'resolved',
       resolvedAt: at,
-      directive: normalizeDirective(rawDirective)
+      directive: normalizeDirective(rawDirective),
+      firebreakTrace: firebreakTrace ? clone(firebreakTrace) : null
     };
     this.resolved.push(resolved);
 

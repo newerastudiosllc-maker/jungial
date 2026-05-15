@@ -36,7 +36,8 @@
         "createdAt": { "type": ["string", "null"] },
         "updatedAt": { "type": ["string", "null"] },
         "providerJob": { "$ref": "#/$defs/providerJob" },
-        "request": { "type": "object" }
+        "request": { "type": "object" },
+        "firebreakTrace": { "type": ["object", "null"] }
       },
       "additionalProperties": false
     },
@@ -63,7 +64,8 @@
         "resolvedAt": { "type": ["string", "null"] },
         "providerJob": { "$ref": "#/$defs/providerJob" },
         "request": { "type": "object" },
-        "directive": { "type": "object" }
+        "directive": { "type": "object" },
+        "firebreakTrace": { "type": ["object", "null"] }
       },
       "additionalProperties": false
     },

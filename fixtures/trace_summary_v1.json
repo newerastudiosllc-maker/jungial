@@ -14,6 +14,7 @@
     "journal.entry.written": 1,
     "witness.bundle.created": 1,
     "gni.request.created": 1,
+    "gni.firebreak.applied": 1,
     "gni.emulator.directive.created": 1,
     "gni.directive.applied": 1,
     "simulation.saved": 1

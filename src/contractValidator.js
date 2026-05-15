@@ -8,6 +8,7 @@ import {
   validateDreamWeather,
   validateEchoTrace,
   validateFixtureManifest,
+  validateGniFirebreakTrace,
   validateGniBridgeResult,
   validateGniContractCheckReport,
   validateGniDirectiveQueue,
@@ -49,6 +50,8 @@ export function validateContractDocument(document) {
       return validateThresholdPresentation(document);
     case 'GniBridgeResultV1':
       return validateGniBridgeResult(document);
+    case 'GniFirebreakTraceV1':
+      return validateGniFirebreakTrace(document);
     case 'GniContractCheckReportV1':
       return validateGniContractCheckReport(document);
     case 'GniDirectiveQueueV1':

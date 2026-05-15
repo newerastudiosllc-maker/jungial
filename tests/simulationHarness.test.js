@@ -32,8 +32,8 @@ test('simulation can apply a mocked GNI directive and persist the result', async
     });
     const saved = await loadGameState(savePath);
 
-    assert.equal(result.appliedGniDirective.dreamWeightDeltas.mirror_hall, 0.5);
-    assert.equal(saved.architectState.globalDreamWeights.mirror_hall, 1.5);
+    assert.equal(result.appliedGniDirective.dreamWeightDeltas.mirror_hall, 0.35);
+    assert.equal(saved.architectState.globalDreamWeights.mirror_hall, 1.35);
     assert.equal(saved.thresholdPresentation.schema, 'ThresholdPresentationV1');
     assert.equal(saved.thresholdPresentation.dreamAtmosphere.schema, 'DreamAtmospherePresentationV1');
     assert.equal(saved.thresholdPresentation.dreamAtmosphere.weatherId, saved.dreamWeather.weatherId);
@@ -141,7 +141,7 @@ test('simulation can accept an injected GNI provider boundary', async () => {
     assert.equal(requests.length, 1);
     assert.equal(requests[0].contract.inputFormat, 'SessionBundleV1');
     assert.equal(result.gniBridgeResult.source, 'provider');
-    assert.equal(result.appliedGniDirective.dreamWeightDeltas.garden, 0.4);
+    assert.equal(result.appliedGniDirective.dreamWeightDeltas.garden, 0.35);
     assert.equal(saved.gniBridgeResult.status, 'directive_ready');
     assert.match(result.transcript.join('\n'), /GNI provider returned a directive/);
   } finally {
@@ -318,6 +318,37 @@ test('simulation saves covenant EchoTrace and sends redacted Passage context to 
     assert.equal(requests[0].payload.dreamWeatherContext.schema, 'DreamWeatherContextV1');
     assert.equal(JSON.stringify(requests[0]).includes('this should not be sent'), false);
     assert.equal(JSON.stringify(requests[0].payload.dreamWeatherContext).includes('this should not be sent'), false);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('simulation records a developer trace when GNI Firebreak suppresses output', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'jungial-firebreak-trace-'));
+  const savePath = join(dir, 'session.json');
+
+  try {
+    const result = await runSimulation({
+      seed: 777,
+      savePath,
+      sessionCovenant: {
+        toneTags: ['strange'],
+        intensityCeiling: 0.35,
+        hardBoundaryTags: ['pursuit']
+      },
+      gniProvider: async () => ({
+        dreamWeightDeltas: { garden: 1.2, pursuit: 0.5 },
+        symbolEchoes: ['mirror', 'pursuit'],
+        pacingDelta: { intensity: 0.9 }
+      })
+    });
+    const firebreakEntry = result.trace.entries.find((entry) => entry.type === 'gni.firebreak.applied');
+
+    assert.equal(firebreakEntry.payload.source, 'provider');
+    assert.equal(firebreakEntry.payload.suppressedCounts.symbolEchoes, 1);
+    assert.equal(firebreakEntry.payload.clampCounts.pacingDelta, 1);
+    assert.equal(JSON.stringify(firebreakEntry).includes('pursuit"'), true);
+    assert.equal(JSON.stringify(firebreakEntry).includes('raw'), false);
   } finally {
     await rm(dir, { recursive: true, force: true });
   }

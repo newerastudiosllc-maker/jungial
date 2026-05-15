@@ -1,5 +1,6 @@
 import { GniAdapter } from './ai.js';
 import { validateSessionBundle } from './contracts.js';
+import { applyGniFirebreak } from './gniFirebreak.js';
 import { GniEmulator } from './gniEmulator.js';
 
 export class GniBridge {
@@ -73,12 +74,14 @@ export class GniBridge {
   }
 
   #directiveResult({ request, source, rawResponse }) {
+    const firebreak = applyGniFirebreak({ rawDirective: rawResponse, request, source });
     return this.#result({
       request,
       status: 'directive_ready',
       source,
-      rawResponse,
-      directive: this.adapter.parseDirective(rawResponse)
+      rawResponse: firebreak.rawResponse,
+      directive: this.adapter.parseDirective(firebreak.directive),
+      firebreakTrace: firebreak.trace
     });
   }
 
@@ -89,6 +92,7 @@ export class GniBridge {
     rawResponse = null,
     directive = null,
     providerJob = null,
+    firebreakTrace = null,
     errors = []
   }) {
     return {
@@ -99,6 +103,7 @@ export class GniBridge {
       rawResponse,
       directive,
       providerJob,
+      firebreakTrace,
       errors
     };
   }

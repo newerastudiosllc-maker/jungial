@@ -6,6 +6,9 @@ test('UE5 GNI pseudocode documents async provider job polling and queue trace ou
   const text = await readFile('UE5Port/JungialAiProvider.hpp', 'utf8');
 
   assert.match(text, /struct FGniProviderJobV1/);
+  assert.match(text, /struct FGniFirebreakTraceV1/);
+  assert.match(text, /GNI Firebreak/);
   assert.match(text, /PollProviderJob/);
   assert.match(text, /gni\.queue\.processed/);
+  assert.match(text, /gni\.firebreak\.applied/);
 });

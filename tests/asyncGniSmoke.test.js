@@ -28,7 +28,7 @@ test('async GNI smoke runs simulation, polls queued job, and persists resolved d
     assert.equal(result.queueProcess.processed[0].status, 'directive_ready');
     assert.equal(result.finalSave.gniQueue.pending.length, 0);
     assert.equal(result.finalSave.gniQueue.resolved.length, 1);
-    assert.equal(result.finalSave.architectState.globalDreamWeights.garden, 1.45);
+    assert.equal(result.finalSave.architectState.globalDreamWeights.garden, 1.35);
     assert.equal(
       result.finalSave.architectState.symbolFrequency.threshold,
       result.initialSave.architectState.symbolFrequency.threshold + 1

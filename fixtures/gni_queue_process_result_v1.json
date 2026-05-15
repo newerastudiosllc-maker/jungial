@@ -37,6 +37,28 @@
         }
       },
       "providerJob": null,
+      "firebreakTrace": {
+        "schema": "GniFirebreakTraceV1",
+        "schemaVersion": 1,
+        "source": "queue",
+        "changed": false,
+        "ceiling": 0.35,
+        "boundaryTags": [
+          "real_world_self_harm"
+        ],
+        "suppressedCounts": {
+          "fields": 0,
+          "dreamWeightDeltas": 0,
+          "symbolEchoes": 0,
+          "maskPressure": 0,
+          "pacingDelta": 0
+        },
+        "clampCounts": {
+          "dreamWeightDeltas": 0,
+          "maskPressure": 0,
+          "pacingDelta": 0
+        }
+      },
       "errors": []
     }
   ],
@@ -226,6 +248,28 @@
           "maskPressure": {},
           "pacingDelta": {
             "silence": 0.1
+          }
+        },
+        "firebreakTrace": {
+          "schema": "GniFirebreakTraceV1",
+          "schemaVersion": 1,
+          "source": "queue",
+          "changed": false,
+          "ceiling": 0.35,
+          "boundaryTags": [
+            "real_world_self_harm"
+          ],
+          "suppressedCounts": {
+            "fields": 0,
+            "dreamWeightDeltas": 0,
+            "symbolEchoes": 0,
+            "maskPressure": 0,
+            "pacingDelta": 0
+          },
+          "clampCounts": {
+            "dreamWeightDeltas": 0,
+            "maskPressure": 0,
+            "pacingDelta": 0
           }
         }
       }

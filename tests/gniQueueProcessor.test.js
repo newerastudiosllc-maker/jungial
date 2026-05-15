@@ -67,6 +67,49 @@ test('pending GNI queue processor resolves directives and applies architect stat
   assert.equal(architect.snapshot().symbolFrequency.mirror, 1);
 });
 
+test('pending GNI queue processor applies Firebreak before Architect mutation', async () => {
+  const queue = new GniDirectiveQueue();
+  const request = {
+    ...REQUEST,
+    payload: {
+      ...REQUEST.payload,
+      sessionCovenant: {
+        schema: 'SessionCovenantV1',
+        schemaVersion: 1,
+        mode: 'tonight_shape',
+        toneTags: ['strange'],
+        intensityCeiling: 0.35,
+        hardBoundaryTags: ['real_world_self_harm', 'pursuit'],
+        softBoundaryTags: [],
+        allowedPressureTags: [],
+        returnAnchor: { kind: 'image', value: 'small lamp' },
+        groundingPreference: 'quiet_room',
+        memoryScope: 'session_only'
+      }
+    }
+  };
+  queue.enqueue({ request, reason: 'pending' });
+
+  const result = await processPendingGniQueue({
+    queueSnapshot: queue.snapshot(),
+    architectState: new ArchitectState({ globalDreamWeights: { garden: 1 } }),
+    provider: async () => ({
+      dreamWeightDeltas: { garden: 1.4, pursuit: 0.5 },
+      symbolEchoes: ['mirror', 'pursuit'],
+      maskPressure: { double: 0.8 },
+      pacingDelta: { intensity: 0.9 }
+    })
+  });
+
+  assert.equal(result.processed[0].status, 'directive_ready');
+  assert.deepEqual(result.processed[0].directive.dreamWeightDeltas, { garden: 0.35 });
+  assert.deepEqual(result.processed[0].directive.symbolEchoes, ['mirror']);
+  assert.equal(result.processed[0].firebreakTrace.changed, true);
+  assert.equal(result.queue.resolved[0].directive.dreamWeightDeltas.garden, 0.35);
+  assert.equal(result.architectState.globalDreamWeights.garden, 1.35);
+  assert.equal(result.architectState.symbolFrequency.pursuit, undefined);
+});
+
 test('pending GNI queue processor keeps empty provider responses queued', async () => {
   const queue = new GniDirectiveQueue();
   queue.enqueue({ request: REQUEST, reason: 'pending' });

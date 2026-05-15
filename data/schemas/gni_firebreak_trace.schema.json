@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/gni_firebreak_trace.schema.json",
+  "title": "GniFirebreakTraceV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "schemaVersion",
+    "source",
+    "changed",
+    "ceiling",
+    "boundaryTags",
+    "suppressedCounts",
+    "clampCounts"
+  ],
+  "properties": {
+    "schema": { "const": "GniFirebreakTraceV1" },
+    "schemaVersion": { "const": 1 },
+    "source": { "enum": ["provided", "provider", "emulator", "queue"] },
+    "changed": { "type": "boolean" },
+    "ceiling": { "type": "number", "minimum": 0, "maximum": 2 },
+    "boundaryTags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "suppressedCounts": {
+      "type": "object",
+      "required": ["fields", "dreamWeightDeltas", "symbolEchoes", "maskPressure", "pacingDelta"],
+      "properties": {
+        "fields": { "type": "integer", "minimum": 0 },
+        "dreamWeightDeltas": { "type": "integer", "minimum": 0 },
+        "symbolEchoes": { "type": "integer", "minimum": 0 },
+        "maskPressure": { "type": "integer", "minimum": 0 },
+        "pacingDelta": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "clampCounts": {
+      "type": "object",
+      "required": ["dreamWeightDeltas", "maskPressure", "pacingDelta"],
+      "properties": {
+        "dreamWeightDeltas": { "type": "integer", "minimum": 0 },
+        "maskPressure": { "type": "integer", "minimum": 0 },
+        "pacingDelta": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

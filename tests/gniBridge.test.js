@@ -70,6 +70,46 @@ test('GNI bridge routes stable requests to a provider and normalizes its directi
   assert.deepEqual(result.directive.pacingDelta, { intensity: 0.2 });
 });
 
+test('GNI bridge applies Firebreak before returning provider directives', async () => {
+  const bridge = new GniBridge({
+    provider: async () => ({
+      dreamWeightDeltas: { garden: 1.4, pursuit: 0.5 },
+      symbolEchoes: ['mirror', 'pursuit'],
+      maskPressure: { double: 0.8 },
+      pacingDelta: { intensity: 0.9 },
+      rawTranscript: 'never store this'
+    })
+  });
+
+  const result = await bridge.processSessionBundle({
+    sessionBundle: {
+      ...VALID_BUNDLE,
+      sessionCovenant: {
+        schema: 'SessionCovenantV1',
+        schemaVersion: 1,
+        mode: 'tonight_shape',
+        toneTags: ['strange'],
+        intensityCeiling: 0.35,
+        hardBoundaryTags: ['real_world_self_harm', 'pursuit'],
+        softBoundaryTags: [],
+        allowedPressureTags: [],
+        returnAnchor: { kind: 'image', value: 'small lamp' },
+        groundingPreference: 'quiet_room',
+        memoryScope: 'session_only'
+      }
+    }
+  });
+
+  assert.equal(result.status, 'directive_ready');
+  assert.deepEqual(result.directive.dreamWeightDeltas, { garden: 0.35 });
+  assert.deepEqual(result.directive.symbolEchoes, ['mirror']);
+  assert.deepEqual(result.directive.maskPressure, { double: 0.35 });
+  assert.deepEqual(result.directive.pacingDelta, { intensity: 0.35 });
+  assert.equal(JSON.stringify(result).includes('never store this'), false);
+  assert.equal(result.firebreakTrace.changed, true);
+  assert.equal(result.firebreakTrace.suppressedCounts.symbolEchoes, 1);
+});
+
 test('GNI bridge can use explicit directives without calling a provider', async () => {
   let providerCalled = false;
   const bridge = new GniBridge({

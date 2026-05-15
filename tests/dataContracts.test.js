@@ -16,6 +16,7 @@ import {
   validateGniBridgeResult,
   validateGniContractCheckReport,
   validateGniDirectiveQueue,
+  validateGniFirebreakTrace,
   validateGniQueueProcessResult,
   validateGniProcessingRequest,
   validatePassage,
@@ -480,11 +481,37 @@ test('GNI request and bridge result validation accept provider-ready contracts',
       maskPressure: {},
       pacingDelta: {}
     },
+    firebreakTrace: validFirebreakTrace(),
     errors: []
   };
 
   assert.deepEqual(validateGniProcessingRequest(request), { valid: true, errors: [] });
   assert.deepEqual(validateGniBridgeResult(bridgeResult), { valid: true, errors: [] });
+});
+
+test('GNI Firebreak trace validation accepts redacted suppression counts', () => {
+  assert.deepEqual(validateGniFirebreakTrace(validFirebreakTrace()), { valid: true, errors: [] });
+
+  const result = validateGniFirebreakTrace({
+    ...validFirebreakTrace(),
+    ceiling: 3,
+    boundaryTags: ['pursuit', ''],
+    suppressedCounts: {
+      ...validFirebreakTrace().suppressedCounts,
+      symbolEchoes: -1,
+      rawToken: 1
+    },
+    rawPrompt: 'do not store'
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(result.errors, [
+    'firebreakTrace.rawPrompt is not allowed',
+    'ceiling must be between 0 and 2',
+    'boundaryTags[1] must be a non-empty string',
+    'suppressedCounts.rawToken is not allowed',
+    'suppressedCounts.symbolEchoes must be a non-negative integer'
+  ]);
 });
 
 test('Dreamer profile and memory context validation accept redacted hidden memory', () => {
@@ -1202,6 +1229,29 @@ function validGniRequest() {
       roomConfigSnapshot: { portalOpen: true },
       selectedDream: { id: 'garden' },
       archetypeVector: { Seeker: 1 }
+    }
+  };
+}
+
+function validFirebreakTrace() {
+  return {
+    schema: 'GniFirebreakTraceV1',
+    schemaVersion: 1,
+    source: 'provider',
+    changed: true,
+    ceiling: 0.35,
+    boundaryTags: ['pursuit'],
+    suppressedCounts: {
+      fields: 1,
+      dreamWeightDeltas: 1,
+      symbolEchoes: 1,
+      maskPressure: 0,
+      pacingDelta: 0
+    },
+    clampCounts: {
+      dreamWeightDeltas: 1,
+      maskPressure: 0,
+      pacingDelta: 1
     }
   };
 }

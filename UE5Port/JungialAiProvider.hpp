@@ -29,6 +29,15 @@ struct FGniProviderJobV1
     int32 PollAfterMs = 0;
 };
 
+struct FGniFirebreakTraceV1
+{
+    bool bChanged = false;
+    float Ceiling = 1.0f;
+    Array<String> BoundaryTags;
+    Map<String, int32> SuppressedCounts;
+    Map<String, int32> ClampCounts;
+};
+
 struct FGniBridgeResultV1
 {
     String Status; // pending, directive_ready, invalid_session, provider_empty, provider_error
@@ -36,6 +45,7 @@ struct FGniBridgeResultV1
     FGniProcessingRequestV1 Request;
     FJungialDirectiveV1 Directive;
     FGniProviderJobV1 ProviderJob;
+    FGniFirebreakTraceV1 FirebreakTrace;
     Array<String> Errors;
 };
 
@@ -51,6 +61,7 @@ struct FGniDirectiveQueueEntryV1
     FGniProviderJobV1 ProviderJob;
     FGniProcessingRequestV1 Request;
     FJungialDirectiveV1 Directive;
+    FGniFirebreakTraceV1 FirebreakTrace;
 };
 
 struct FGniProviderJobStatusV1
@@ -90,7 +101,8 @@ public:
         // Validate Bundle as SessionBundleV1.
         // Create GniProcessingRequestV1.
         // Route to Provider, fixture, or emulator.
-        // Normalize provider output as JungialDirectiveV1 before gameplay sees it.
+        // Run provider output through the GNI Firebreak before gameplay sees it.
+        // Clamp against the active covenant, suppress hard boundaries, and record redacted counts.
         return FGniBridgeResultV1();
     }
 };
@@ -109,7 +121,7 @@ public:
 
     bool ResolvePending(const String& Id, const FJungialDirectiveV1& Directive)
     {
-        // Normalize Directive before moving the entry from Pending to Resolved.
+        // Run Directive through the GNI Firebreak before moving the entry from Pending to Resolved.
         // Return false when the response no longer matches a pending request.
         return false;
     }
@@ -123,8 +135,9 @@ public:
         // Prefer PollProviderJob() when a queue entry has ProviderJob.StatusUrl.
         // Fall back to ProcessRequest() only when no provider job exists.
         // Run outside render-critical flow; never poll from actor Tick in VR.
-        // Apply only normalized JungialDirectiveV1 data to Architect, then save Snapshot.
+        // Apply only Firebreak-cleared JungialDirectiveV1 data to Architect, then save Snapshot.
         // Append a developer trace entry named "gni.queue.processed" with status counts.
+        // Append "gni.firebreak.applied" when any output was suppressed or clamped.
         return false;
     }
 };

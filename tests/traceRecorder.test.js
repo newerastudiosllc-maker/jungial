@@ -69,10 +69,14 @@ test('simulation trace explains dream journey and GNI handoff without in-world e
       'journal.entry.written',
       'witness.bundle.created',
       'gni.request.created',
+      'gni.firebreak.applied',
       'gni.emulator.directive.created',
       'gni.directive.applied',
       'simulation.saved'
     ]);
+    const firebreakEntry = result.trace.entries.find((entry) => entry.type === 'gni.firebreak.applied');
+    assert.equal(firebreakEntry.payload.source, 'emulator');
+    assert.equal(firebreakEntry.payload.clampCounts.dreamWeightDeltas, 1);
     assert.equal(result.trace.entries.find((entry) => entry.type === 'dream.journey.selected').payload.beats.length, 4);
     const weatherEntry = result.trace.entries.find((entry) => entry.type === 'dream.weather.created');
     assert.equal(weatherEntry.payload.weatherId, result.dreamWeather.weatherId);
