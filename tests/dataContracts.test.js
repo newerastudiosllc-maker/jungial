@@ -21,6 +21,7 @@ import {
   validateGniContractCheckReport,
   validateGniDirectiveQueue,
   validateGniFirebreakTrace,
+  validateGniProviderComparisonReport,
   validateGniQueueProcessResult,
   validateGniProcessingRequest,
   validateListeningBeat,
@@ -211,6 +212,18 @@ test('session bundle validation reports missing GNI handoff fields', () => {
     'roomConfigSnapshot is required',
     'archetypeVector is required'
   ]);
+});
+
+test('GNI provider comparison schema documents non-mutating provider diff reports', async () => {
+  const schema = await readJson('data/schemas/gni_provider_comparison_report.schema.json');
+
+  assert.equal(schema.title, 'GniProviderComparisonReportV1');
+  assert.deepEqual(schema.properties.schema, { const: 'GniProviderComparisonReportV1' });
+  assert.deepEqual(schema.properties.applied, { const: false });
+  assert.deepEqual(schema.required, ['schema', 'ok', 'applied', 'endpoint', 'request', 'emulator', 'provider', 'diff']);
+  assert.equal(schema.additionalProperties, false);
+  assert.equal(schema.properties.rawSpeech, undefined);
+  assert.equal(schema.$defs.endpointResult.properties.rawResponse, undefined);
 });
 
 test('session bundle validation accepts compact Witness handoff data', () => {
@@ -1649,6 +1662,43 @@ test('GNI contract check report validation rejects impossible ok reports', () =>
   ]);
 });
 
+test('GNI provider comparison report validation accepts non-mutating directive diffs', () => {
+  assert.deepEqual(validateGniProviderComparisonReport(validGniProviderComparisonReport()), {
+    valid: true,
+    errors: []
+  });
+});
+
+test('GNI provider comparison report validation rejects mutable and impossible reports', () => {
+  const result = validateGniProviderComparisonReport({
+    ...validGniProviderComparisonReport(),
+    ok: true,
+    applied: true,
+    rawSpeech: 'do not keep me',
+    request: {
+      valid: false,
+      errors: [],
+      value: {}
+    },
+    provider: {
+      status: 'provider_error',
+      providerJob: null,
+      directive: null,
+      firebreakTrace: null,
+      errors: []
+    },
+    diff: null
+  });
+
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.includes('gniProviderComparisonReport.rawSpeech is not allowed'));
+  assert.ok(result.errors.includes('applied must be false'));
+  assert.ok(result.errors.includes('request.errors must include details when request.valid is false'));
+  assert.ok(result.errors.includes('provider.errors must include details when status is provider_error'));
+  assert.ok(result.errors.includes('provider must be null when request is invalid'));
+  assert.ok(result.errors.includes('ok cannot be true when request, emulator, provider, or diff is not comparable'));
+});
+
 test('GNI bridge result validation rejects impossible status envelopes', () => {
   const request = validGniRequest();
 
@@ -1931,11 +1981,11 @@ function validGniRequest() {
   };
 }
 
-function validFirebreakTrace() {
+function validFirebreakTrace(source = 'provider') {
   return {
     schema: 'GniFirebreakTraceV1',
     schemaVersion: 1,
-    source: 'provider',
+    source,
     changed: true,
     ceiling: 0.35,
     boundaryTags: ['pursuit'],
@@ -1951,6 +2001,77 @@ function validFirebreakTrace() {
       maskPressure: 0,
       pacingDelta: 1
     }
+  };
+}
+
+function validGniProviderComparisonReport() {
+  return {
+    schema: 'GniProviderComparisonReportV1',
+    ok: true,
+    applied: false,
+    endpoint: 'https://gni.local/process',
+    request: {
+      valid: true,
+      errors: [],
+      value: validGniRequest()
+    },
+    emulator: {
+      status: 'directive_ready',
+      providerJob: null,
+      directive: validGniDirective({ dreamWeightDeltas: { garden: 0.2 } }),
+      firebreakTrace: validFirebreakTrace('emulator'),
+      errors: []
+    },
+    provider: {
+      status: 'directive_ready',
+      providerJob: null,
+      directive: validGniDirective({
+        dreamWeightDeltas: { garden: 0.1 },
+        symbolEchoes: ['threshold', 'mirror']
+      }),
+      firebreakTrace: validFirebreakTrace('provider'),
+      errors: []
+    },
+    diff: {
+      matches: false,
+      dreamWeightDeltas: {
+        matches: false,
+        shared: ['garden'],
+        changed: [{ key: 'garden', emulator: 0.2, provider: 0.1 }],
+        onlyEmulator: [],
+        onlyProvider: []
+      },
+      symbolEchoes: {
+        matches: false,
+        shared: ['threshold'],
+        onlyEmulator: [],
+        onlyProvider: ['mirror']
+      },
+      maskPressure: validEmptyNumberMapDiff(),
+      pacingDelta: validEmptyNumberMapDiff()
+    }
+  };
+}
+
+function validGniDirective(overrides = {}) {
+  return {
+    schema: 'JungialDirectiveV1',
+    schemaVersion: 1,
+    dreamWeightDeltas: {},
+    symbolEchoes: ['threshold'],
+    maskPressure: {},
+    pacingDelta: {},
+    ...overrides
+  };
+}
+
+function validEmptyNumberMapDiff() {
+  return {
+    matches: true,
+    shared: [],
+    changed: [],
+    onlyEmulator: [],
+    onlyProvider: []
   };
 }
 

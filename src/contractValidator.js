@@ -16,6 +16,7 @@ import {
   validateGniBridgeResult,
   validateGniContractCheckReport,
   validateGniDirectiveQueue,
+  validateGniProviderComparisonReport,
   validateGniQueueProcessResult,
   validateGniProcessingRequest,
   validatePassage,
@@ -83,6 +84,8 @@ export function validateContractDocument(document) {
       return validateGniFirebreakTrace(document);
     case 'GniContractCheckReportV1':
       return validateGniContractCheckReport(document);
+    case 'GniProviderComparisonReportV1':
+      return validateGniProviderComparisonReport(document);
     case 'GniDirectiveQueueV1':
       return validateGniDirectiveQueue(document);
     case 'GniDirectiveQueueProcessResultV1':

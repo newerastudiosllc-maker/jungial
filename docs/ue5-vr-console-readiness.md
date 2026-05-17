@@ -56,6 +56,7 @@ Jungial now has a clean runtime composition boundary: `createJungialRuntime()` l
 - GNI contract fixtures should pass strict validation before provider changes are accepted.
 - GNI requests may include `DreamJourneyContextV1`, but only as compact symbolic evidence: symbol trail, suppressed module ids, reroute records, and fallback state.
 - The local GNI emulator should keep rehearsing `DreamJourneyContextV1` semantics so real provider behavior can be compared against deterministic replacement boosts, blocked-module softening, safe echoes, and pacing nudges.
+- Real GNI providers should pass a non-mutating `GniProviderComparisonReportV1` rehearsal against the emulator before their directives are allowed into Architect state.
 - Selected content should pass through the content surface resolver before save, renderer handoff, or GNI context.
 - Dreamflow should route blocked weighted module picks into compatible allowed modules before finalizing a `DreamJourneyV1`; the content gate remains the final audit.
 - `SessionContentReplacementPlanV1` should be deterministic from gate report, covenant, catalog, and seed so QA can replay reroutes.

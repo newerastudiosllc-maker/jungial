@@ -195,6 +195,12 @@ That metadata is normalized into `providerJob` and saved in `GniBridgeResultV1` 
 
 `GniEmulator` in `src/gniEmulator.js` lets the prototype test AI-shaped behavior before real GNI is ready. Use `--emulate-gni` to have the simulation produce and apply a deterministic directive from the current `SessionBundleV1`. The emulator reads `DreamJourneyContextV1` so reroutes can reinforce the selected replacement, soften blocked module ids, echo carried safe symbols, and rehearse pacing nudges.
 
+`src/gniProviderCompare.js` is the non-mutating provider rehearsal path. It sends the same `GniProcessingRequestV1` to the deterministic emulator and a configured GNI provider, runs both directives through the Firebreak, and emits `GniProviderComparisonReportV1` with `applied: false` plus a structured diff of dream weights, symbols, mask pressure, and pacing deltas.
+
+```bash
+npm run gni:compare -- --endpoint=https://gni.local/process --request=fixtures/gni_request_v1.json --emulator-seed=777 --json
+```
+
 `DreamJourneyContextV1` is the compact GNI-facing form of DreamJourney policy evidence. It carries symbol trail, suppressed module ids, internal reroute summaries, and fallback use, but omits player-facing explanation, hard-boundary prose, and raw player material.
 
 The game sends `SessionBundleV1`:
@@ -251,6 +257,7 @@ The current contract schemas live in `data/schemas/`:
 - `gni_firebreak_trace.schema.json`
 - `gni_bridge_result.schema.json`
 - `gni_contract_check_report.schema.json`
+- `gni_provider_comparison_report.schema.json`
 - `gni_directive_queue.schema.json`
 - `gni_queue_process_result.schema.json`
 

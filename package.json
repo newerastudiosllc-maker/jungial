@@ -19,6 +19,7 @@
     "fixtures": "node src/fixtureExporter.js fixtures",
     "contracts": "npm run fixtures && node src/contractValidator.js fixtures/session_bundle_v1.json fixtures/session_covenant_v1.json fixtures/session_shape_selection_v1.json fixtures/session_content_gate_v1.json fixtures/session_content_replacement_plan_v1.json fixtures/passage_v1.json fixtures/echo_trace_v1.json fixtures/first_listening_v1.json fixtures/experience_directive_v1.json fixtures/session_frame_v1.json fixtures/runtime_readiness_v1.json fixtures/dreamer_profile_v1.json fixtures/dreamer_memory_context_v1.json fixtures/session_arc_v1.json fixtures/dream_session_v1.json fixtures/dream_session_checkpoint_v1.json fixtures/dream_weather_v1.json fixtures/weather_trace_v1.json fixtures/threshold_presentation_v1.json fixtures/gni_request_v1.json fixtures/gni_directive_v1.json fixtures/gni_firebreak_trace_v1.json fixtures/gni_bridge_result_v1.json fixtures/gni_contract_check_report_v1.json fixtures/gni_directive_queue_v1.json fixtures/gni_queue_process_result_v1.json fixtures/fixture-run.save.json fixtures/fixture-pending-run.save.json fixtures/trace_summary_v1.json fixtures/manifest.json data/mock_gni_directive.json",
     "gni:contract": "node src/gniContractCheck.js",
+    "gni:compare": "node src/gniProviderCompare.js",
     "gni:process": "node src/gniQueueProcessor.js",
     "gni:smoke:async": "node src/asyncGniSmoke.js",
     "mock:gni": "node src/mockGniServer.js",

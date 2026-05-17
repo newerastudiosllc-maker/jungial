@@ -1495,6 +1495,80 @@ export function validateGniContractCheckReport(report) {
   };
 }
 
+export function validateGniProviderComparisonReport(report) {
+  const errors = [];
+  const allowedKeys = [
+    'schema',
+    'ok',
+    'applied',
+    'endpoint',
+    'request',
+    'emulator',
+    'provider',
+    'diff'
+  ];
+
+  if (report?.schema !== 'GniProviderComparisonReportV1') {
+    errors.push('schema must be GniProviderComparisonReportV1');
+  }
+  errors.push(...validateKnownKeys(report, allowedKeys, 'gniProviderComparisonReport'));
+  if (typeof report?.ok !== 'boolean') {
+    errors.push('ok must be a boolean');
+  }
+  if (report?.applied !== false) {
+    errors.push('applied must be false');
+  }
+  if (!(report?.endpoint === null || isNonEmptyString(report?.endpoint))) {
+    errors.push('endpoint must be a non-empty string or null');
+  }
+
+  const requestOk = validateContractCheckRequest(report?.request, errors);
+  let emulatorOk = false;
+  let providerOk = false;
+  let diffOk = false;
+
+  if (!requestOk) {
+    if (report?.emulator !== null) {
+      validateProviderComparisonEndpointResult(report?.emulator, 'emulator', errors);
+      errors.push('emulator must be null when request is invalid');
+    }
+    if (report?.provider !== null) {
+      validateProviderComparisonEndpointResult(report?.provider, 'provider', errors);
+      errors.push('provider must be null when request is invalid');
+    }
+    if (report?.diff !== null) {
+      errors.push('diff must be null when request is invalid');
+    }
+    diffOk = report?.diff === null;
+  } else {
+    emulatorOk = validateProviderComparisonEndpointResult(report?.emulator, 'emulator', errors);
+    providerOk = validateProviderComparisonEndpointResult(report?.provider, 'provider', errors);
+
+    const requiresDiff = report?.emulator?.status === 'directive_ready'
+      && report?.provider?.status === 'directive_ready';
+    if (requiresDiff) {
+      if (!isObject(report?.diff)) {
+        errors.push('diff is required when both emulator and provider have directives');
+      } else {
+        diffOk = validateProviderComparisonDiff(report.diff, 'diff', errors);
+      }
+    } else if (report?.diff !== null) {
+      errors.push('diff must be null unless both emulator and provider have directives');
+    } else {
+      diffOk = true;
+    }
+  }
+
+  if (report?.ok === true && (!requestOk || !emulatorOk || !providerOk || !diffOk)) {
+    errors.push('ok cannot be true when request, emulator, provider, or diff is not comparable');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
 export function validateTrace(trace) {
   const errors = [];
 
@@ -1665,6 +1739,172 @@ function validateContractCheckDirectiveReport(directive, label) {
     valid: errors.length === 0,
     errors
   };
+}
+
+function validateProviderComparisonEndpointResult(result, label, errors) {
+  const statuses = ['directive_ready', 'provider_pending', 'provider_empty', 'provider_error', 'invalid_directive'];
+  const startErrorCount = errors.length;
+
+  if (!isObject(result)) {
+    errors.push(`${label} must be an object`);
+    return false;
+  }
+
+  errors.push(...validateKnownKeys(result, [
+    'status',
+    'providerJob',
+    'directive',
+    'firebreakTrace',
+    'errors'
+  ], label));
+  if (!statuses.includes(result.status)) {
+    errors.push(`${label}.status must be one of ${statuses.join(', ')}`);
+  }
+  if (!Array.isArray(result.errors)) {
+    errors.push(`${label}.errors must be an array`);
+  } else {
+    result.errors.forEach((error, index) => {
+      if (typeof error !== 'string') {
+        errors.push(`${label}.errors[${index}] must be a string`);
+      }
+    });
+    if (['provider_error', 'invalid_directive'].includes(result.status) && result.errors.length === 0) {
+      errors.push(`${label}.errors must include details when status is ${result.status}`);
+    }
+  }
+
+  errors.push(...validateProviderJob(result.providerJob, `${label}.providerJob`));
+  if (result.status === 'provider_pending' && !isObject(result.providerJob)) {
+    errors.push(`${label}.providerJob is required when status is provider_pending`);
+  }
+
+  if (result.status === 'directive_ready') {
+    const directiveValidation = validateDirective(result.directive);
+    if (!directiveValidation.valid) {
+      errors.push(...directiveValidation.errors.map((error) => `${label}.directive.${error}`));
+    }
+    if (!isObject(result.firebreakTrace)) {
+      errors.push(`${label}.firebreakTrace is required when status is directive_ready`);
+    } else {
+      const firebreakValidation = validateGniFirebreakTrace(result.firebreakTrace);
+      if (!firebreakValidation.valid) {
+        errors.push(...firebreakValidation.errors.map((error) => `${label}.firebreakTrace.${error}`));
+      }
+    }
+  } else {
+    if (result.directive !== null) {
+      errors.push(`${label}.directive must be null unless status is directive_ready`);
+    }
+    if (result.firebreakTrace !== null) {
+      errors.push(`${label}.firebreakTrace must be null unless status is directive_ready`);
+    }
+  }
+
+  return errors.length === startErrorCount
+    && ['directive_ready', 'provider_pending', 'provider_empty'].includes(result.status);
+}
+
+function validateProviderComparisonDiff(diff, label, errors) {
+  const startErrorCount = errors.length;
+
+  errors.push(...validateKnownKeys(diff, [
+    'matches',
+    'dreamWeightDeltas',
+    'symbolEchoes',
+    'maskPressure',
+    'pacingDelta'
+  ], label));
+  if (typeof diff.matches !== 'boolean') {
+    errors.push(`${label}.matches must be a boolean`);
+  }
+
+  const dreamWeightOk = validateNumberMapDiff(diff.dreamWeightDeltas, `${label}.dreamWeightDeltas`, errors);
+  const symbolOk = validateStringListDiff(diff.symbolEchoes, `${label}.symbolEchoes`, errors);
+  const maskOk = validateNumberMapDiff(diff.maskPressure, `${label}.maskPressure`, errors);
+  const pacingOk = validateNumberMapDiff(diff.pacingDelta, `${label}.pacingDelta`, errors);
+  const expectedMatches = diff.dreamWeightDeltas?.matches === true
+    && diff.symbolEchoes?.matches === true
+    && diff.maskPressure?.matches === true
+    && diff.pacingDelta?.matches === true;
+
+  if (typeof diff.matches === 'boolean' && diff.matches !== expectedMatches) {
+    errors.push(`${label}.matches must match child diff matches`);
+  }
+
+  return errors.length === startErrorCount && dreamWeightOk && symbolOk && maskOk && pacingOk;
+}
+
+function validateNumberMapDiff(diff, label, errors) {
+  const startErrorCount = errors.length;
+  if (!isObject(diff)) {
+    errors.push(`${label} must be an object`);
+    return false;
+  }
+  errors.push(...validateKnownKeys(diff, ['matches', 'shared', 'changed', 'onlyEmulator', 'onlyProvider'], label));
+  if (typeof diff.matches !== 'boolean') {
+    errors.push(`${label}.matches must be a boolean`);
+  }
+  errors.push(...validateStringList(diff.shared, `${label}.shared`));
+  errors.push(...validateStringList(diff.onlyEmulator, `${label}.onlyEmulator`));
+  errors.push(...validateStringList(diff.onlyProvider, `${label}.onlyProvider`));
+  if (!Array.isArray(diff.changed)) {
+    errors.push(`${label}.changed must be an array`);
+  } else {
+    diff.changed.forEach((entry, index) => {
+      const entryLabel = `${label}.changed[${index}]`;
+      if (!isObject(entry)) {
+        errors.push(`${entryLabel} must be an object`);
+        return;
+      }
+      errors.push(...validateKnownKeys(entry, ['key', 'emulator', 'provider'], entryLabel));
+      if (!isNonEmptyString(entry.key)) {
+        errors.push(`${entryLabel}.key is required`);
+      }
+      if (!Number.isFinite(entry.emulator)) {
+        errors.push(`${entryLabel}.emulator must be a finite number`);
+      }
+      if (!Number.isFinite(entry.provider)) {
+        errors.push(`${entryLabel}.provider must be a finite number`);
+      }
+    });
+  }
+
+  const expectedMatches = Array.isArray(diff.changed)
+    && diff.changed.length === 0
+    && Array.isArray(diff.onlyEmulator)
+    && diff.onlyEmulator.length === 0
+    && Array.isArray(diff.onlyProvider)
+    && diff.onlyProvider.length === 0;
+  if (typeof diff.matches === 'boolean' && diff.matches !== expectedMatches) {
+    errors.push(`${label}.matches must match diff entries`);
+  }
+
+  return errors.length === startErrorCount;
+}
+
+function validateStringListDiff(diff, label, errors) {
+  const startErrorCount = errors.length;
+  if (!isObject(diff)) {
+    errors.push(`${label} must be an object`);
+    return false;
+  }
+  errors.push(...validateKnownKeys(diff, ['matches', 'shared', 'onlyEmulator', 'onlyProvider'], label));
+  if (typeof diff.matches !== 'boolean') {
+    errors.push(`${label}.matches must be a boolean`);
+  }
+  errors.push(...validateStringList(diff.shared, `${label}.shared`));
+  errors.push(...validateStringList(diff.onlyEmulator, `${label}.onlyEmulator`));
+  errors.push(...validateStringList(diff.onlyProvider, `${label}.onlyProvider`));
+
+  const expectedMatches = Array.isArray(diff.onlyEmulator)
+    && diff.onlyEmulator.length === 0
+    && Array.isArray(diff.onlyProvider)
+    && diff.onlyProvider.length === 0;
+  if (typeof diff.matches === 'boolean' && diff.matches !== expectedMatches) {
+    errors.push(`${label}.matches must match diff entries`);
+  }
+
+  return errors.length === startErrorCount;
 }
 
 export function validateSaveSlotPlan(plan) {

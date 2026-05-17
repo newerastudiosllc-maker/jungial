@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jungial.local/schemas/gni_provider_comparison_report.schema.json",
+  "title": "GniProviderComparisonReportV1",
+  "type": "object",
+  "required": ["schema", "ok", "applied", "endpoint", "request", "emulator", "provider", "diff"],
+  "properties": {
+    "schema": { "const": "GniProviderComparisonReportV1" },
+    "ok": { "type": "boolean" },
+    "applied": { "const": false },
+    "endpoint": { "type": ["string", "null"], "minLength": 1 },
+    "request": {
+      "type": "object",
+      "required": ["valid", "errors", "value"],
+      "properties": {
+        "valid": { "type": "boolean" },
+        "errors": { "type": "array", "items": { "type": "string" } },
+        "value": { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+    "emulator": {
+      "anyOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/endpointResult" }
+      ]
+    },
+    "provider": {
+      "anyOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/endpointResult" }
+      ]
+    },
+    "diff": {
+      "anyOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/directiveDiff" }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "endpointResult": {
+      "type": "object",
+      "required": ["status", "providerJob", "directive", "firebreakTrace", "errors"],
+      "properties": {
+        "status": {
+          "enum": [
+            "directive_ready",
+            "provider_pending",
+            "provider_empty",
+            "provider_error",
+            "invalid_directive"
+          ]
+        },
+        "providerJob": {
+          "type": ["object", "null"],
+          "properties": {
+            "id": { "type": "string", "minLength": 1 },
+            "statusUrl": { "type": "string" },
+            "pollAfterMs": { "type": "integer", "minimum": 0 }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "directive": {
+          "anyOf": [
+            { "type": "null" },
+            { "type": "object" }
+          ]
+        },
+        "firebreakTrace": {
+          "anyOf": [
+            { "type": "null" },
+            { "type": "object" }
+          ]
+        },
+        "errors": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "directiveDiff": {
+      "type": "object",
+      "required": ["matches", "dreamWeightDeltas", "symbolEchoes", "maskPressure", "pacingDelta"],
+      "properties": {
+        "matches": { "type": "boolean" },
+        "dreamWeightDeltas": { "$ref": "#/$defs/numberMapDiff" },
+        "symbolEchoes": { "$ref": "#/$defs/stringListDiff" },
+        "maskPressure": { "$ref": "#/$defs/numberMapDiff" },
+        "pacingDelta": { "$ref": "#/$defs/numberMapDiff" }
+      },
+      "additionalProperties": false
+    },
+    "numberMapDiff": {
+      "type": "object",
+      "required": ["matches", "shared", "changed", "onlyEmulator", "onlyProvider"],
+      "properties": {
+        "matches": { "type": "boolean" },
+        "shared": { "type": "array", "items": { "type": "string" } },
+        "changed": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["key", "emulator", "provider"],
+            "properties": {
+              "key": { "type": "string", "minLength": 1 },
+              "emulator": { "type": "number" },
+              "provider": { "type": "number" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "onlyEmulator": { "type": "array", "items": { "type": "string" } },
+        "onlyProvider": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "stringListDiff": {
+      "type": "object",
+      "required": ["matches", "shared", "onlyEmulator", "onlyProvider"],
+      "properties": {
+        "matches": { "type": "boolean" },
+        "shared": { "type": "array", "items": { "type": "string" } },
+        "onlyEmulator": { "type": "array", "items": { "type": "string" } },
+        "onlyProvider": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    }
+  }
+}
