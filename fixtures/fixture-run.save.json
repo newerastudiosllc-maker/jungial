@@ -208,9 +208,14 @@
       "symbolFrequency": {
         "light": 2,
         "threshold": 1,
-        "silence": 1,
+        "silence": 2,
         "awakening": 1,
-        "portal": 1
+        "portal": 1,
+        "boundlessness": 1,
+        "dissolution": 1,
+        "annihilation": 1,
+        "rebirth": 1,
+        "cosmic_mystery": 1
       },
       "pacingProfile": {
         "intensity": 0.358,
@@ -1156,7 +1161,13 @@
                 "white_void": 0.361
               },
               "symbolEchoes": [
-                "light"
+                "light",
+                "boundlessness",
+                "dissolution",
+                "silence",
+                "annihilation",
+                "rebirth",
+                "cosmic_mystery"
               ],
               "maskPressure": {
                 "double": 0.294
@@ -1181,7 +1192,13 @@
                 "white_void": 0.361
               },
               "symbolEchoes": [
-                "light"
+                "light",
+                "boundlessness",
+                "dissolution",
+                "silence",
+                "annihilation",
+                "rebirth",
+                "cosmic_mystery"
               ],
               "maskPressure": {
                 "double": 0.294
@@ -1199,9 +1216,14 @@
               "symbolFrequency": {
                 "light": 2,
                 "threshold": 1,
-                "silence": 1,
+                "silence": 2,
                 "awakening": 1,
-                "portal": 1
+                "portal": 1,
+                "boundlessness": 1,
+                "dissolution": 1,
+                "annihilation": 1,
+                "rebirth": 1,
+                "cosmic_mystery": 1
               },
               "maskPressure": {
                 "double": 0.294
@@ -1801,7 +1823,13 @@
           "white_void": 0.361
         },
         "symbolEchoes": [
-          "light"
+          "light",
+          "boundlessness",
+          "dissolution",
+          "silence",
+          "annihilation",
+          "rebirth",
+          "cosmic_mystery"
         ],
         "maskPressure": {
           "double": 0.294
@@ -1819,7 +1847,13 @@
           "white_void": 0.361
         },
         "symbolEchoes": [
-          "light"
+          "light",
+          "boundlessness",
+          "dissolution",
+          "silence",
+          "annihilation",
+          "rebirth",
+          "cosmic_mystery"
         ],
         "maskPressure": {
           "double": 0.294
@@ -1862,7 +1896,13 @@
         "white_void": 0.361
       },
       "symbolEchoes": [
-        "light"
+        "light",
+        "boundlessness",
+        "dissolution",
+        "silence",
+        "annihilation",
+        "rebirth",
+        "cosmic_mystery"
       ],
       "maskPressure": {
         "double": 0.294

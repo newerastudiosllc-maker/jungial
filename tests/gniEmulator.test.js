@@ -31,3 +31,35 @@ test('GNI emulator returns deterministic Jungial directives from session bundle 
   assert.ok(first.maskPressure.double > 0);
   assert.ok(first.pacingDelta.intensity > 0);
 });
+
+test('GNI emulator rehearses DreamJourney reroute context without echoing suppressed symbols', () => {
+  const directive = new GniEmulator({ seed: 123 }).processSessionBundle({
+    ...bundle,
+    sessionId: 'session-reroute',
+    recentSymbols: ['portal'],
+    selectedDream: { id: 'clear_mirror', symbolicTags: ['reflection', 'growth'] },
+    dreamJourneyContext: {
+      schema: 'DreamJourneyContextV1',
+      schemaVersion: 1,
+      symbolTrail: ['shadow', 'reflection', 'growth'],
+      suppressedModuleIds: ['shadow_mirror'],
+      replacementRoutes: [
+        {
+          blockedId: 'shadow_mirror',
+          selectedId: 'clear_mirror',
+          carriedTags: ['reflection'],
+          suppressedTags: ['shadow'],
+          reason: 'dream_journey_boundary_reroute'
+        }
+      ],
+      fallbackUsed: false
+    }
+  });
+
+  assert.ok(directive.dreamWeightDeltas.clear_mirror > 0.35);
+  assert.ok(directive.dreamWeightDeltas.shadow_mirror < 0);
+  assert.equal(directive.symbolEchoes.includes('reflection'), true);
+  assert.equal(directive.symbolEchoes.includes('growth'), true);
+  assert.equal(directive.symbolEchoes.includes('shadow'), false);
+  assert.ok(directive.pacingDelta.repetition > 0);
+});

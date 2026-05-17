@@ -190,7 +190,13 @@
       "white_void": 0.361
     },
     "symbolEchoes": [
-      "light"
+      "light",
+      "boundlessness",
+      "dissolution",
+      "silence",
+      "annihilation",
+      "rebirth",
+      "cosmic_mystery"
     ],
     "maskPressure": {
       "double": 0.294
@@ -208,7 +214,13 @@
       "white_void": 0.361
     },
     "symbolEchoes": [
-      "light"
+      "light",
+      "boundlessness",
+      "dissolution",
+      "silence",
+      "annihilation",
+      "rebirth",
+      "cosmic_mystery"
     ],
     "maskPressure": {
       "double": 0.294

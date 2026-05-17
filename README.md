@@ -193,7 +193,7 @@ That metadata is normalized into `providerJob` and saved in `GniBridgeResultV1` 
 
 `processPendingGniQueue()` and `processSavedGniQueue()` in `src/gniQueueProcessor.js` are the later-response path. They first poll an existing `providerJob.statusUrl` when a queued entry already has async job metadata, then fall back to the same GNI provider shapes used by the bridge when no provider job exists. Any returned directive passes through the GNI Firebreak, is applied through `ArchitectState`, and is persisted with the updated queue/Architect state when working from a save file.
 
-`GniEmulator` in `src/gniEmulator.js` lets the prototype test AI-shaped behavior before real GNI is ready. Use `--emulate-gni` to have the simulation produce and apply a deterministic directive from the current `SessionBundleV1`.
+`GniEmulator` in `src/gniEmulator.js` lets the prototype test AI-shaped behavior before real GNI is ready. Use `--emulate-gni` to have the simulation produce and apply a deterministic directive from the current `SessionBundleV1`. The emulator reads `DreamJourneyContextV1` so reroutes can reinforce the selected replacement, soften blocked module ids, echo carried safe symbols, and rehearse pacing nudges.
 
 `DreamJourneyContextV1` is the compact GNI-facing form of DreamJourney policy evidence. It carries symbol trail, suppressed module ids, internal reroute summaries, and fallback use, but omits player-facing explanation, hard-boundary prose, and raw player material.
 
